@@ -63,6 +63,10 @@ void AMonsterBase::BeginPlay()
 	}
 }
 
+void AMonsterBase::AttackHitCheck()
+{
+}
+
 UAbilitySystemComponent* AMonsterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
