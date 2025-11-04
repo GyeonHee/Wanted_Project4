@@ -18,8 +18,8 @@ public:
 	AMonsterBase();
 
 	// 인터페이스로 구현하기
-	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	const UMonsterAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
+	FORCEINLINE const UMonsterAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 public:
 	virtual void BeginPlay() override;
@@ -32,7 +32,19 @@ protected:
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TObjectPtr<class UAbilitySystemComponent> ASC;
 
-	// 몬스터 스탯 ATtributeSet
+	// 몬스터 스탯 AttributeSet
 	UPROPERTY()
 	TObjectPtr<UMonsterAttributeSet> AttributeSet;
+
+	// 몬스터 스탯을 들고올 DataTable
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	TObjectPtr<UDataTable> MonsterStatData;
+
+	// 몬스터 이름
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	FName MonsterID;
+
+	// 선공 여부
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
+	bool bIsAgressive;
 };
