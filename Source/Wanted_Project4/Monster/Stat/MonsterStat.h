@@ -22,7 +22,7 @@ struct FMonsterStat : public FTableRowBase
 		  Attack(0.f), AttackSpeed(0.f), bIsAggressive(false)
 	{
 	}
-
+	
 	// 스탯=======================================================
 	// 최대 체력
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Stat)
