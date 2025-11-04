@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Engine/DataTable.h"
-#include "MonsterStat.generated.h"
+#include "P4MonsterStat.generated.h"
 
 /*
 * MaxHP, DetectRange, ChaseRange, MovementSpeed, ChaseSpeed, TurnSpeed, Attack, AttackSpeed, bIsAggressive
 */
 
 USTRUCT(BlueprintType)
-struct FMonsterStat : public FTableRowBase
+struct FP4MonsterStat : public FTableRowBase
 {
 	GENERATED_BODY()
 
-	FMonsterStat()
+	FP4MonsterStat()
 		: MaxHP(0.f),
 		  DetectRange(0.f), ChaseRange(0.f),
 		  MovementSpeed(0.f), ChaseSpeed(0.f), TurnSpeed(0.f),

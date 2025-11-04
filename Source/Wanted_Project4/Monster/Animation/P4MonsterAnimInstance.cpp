@@ -1,18 +1,18 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MonsterAnimInstance.h"
+#include "P4MonsterAnimInstance.h"
 
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
-UMonsterAnimInstance::UMonsterAnimInstance()
+UP4MonsterAnimInstance::UP4MonsterAnimInstance()
 {
 	// 이동 여부 최소값 설정
 	MovingThreshold = 3.f;
 }
 
-void UMonsterAnimInstance::NativeInitializeAnimation()
+void UP4MonsterAnimInstance::NativeInitializeAnimation()
 {
 	Super::NativeInitializeAnimation();
 
@@ -29,7 +29,7 @@ void UMonsterAnimInstance::NativeInitializeAnimation()
 }
 
 // 몬스터 정보를 받아와서 프레임마다 업데이트
-void UMonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
+void UP4MonsterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
 	Super::NativeUpdateAnimation(DeltaSeconds);
 	

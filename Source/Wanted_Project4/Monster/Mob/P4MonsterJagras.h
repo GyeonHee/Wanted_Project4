@@ -3,18 +3,18 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "../MonsterBase.h"
-#include "MonsterJagras.generated.h"
+#include "../P4MonsterBase.h"
+#include "P4MonsterJagras.generated.h"
 /**
  * 
  */
 
 UCLASS()
-class WANTED_PROJECT4_API AMonsterJagras : public AMonsterBase
+class WANTED_PROJECT4_API AP4MonsterJagras : public AP4MonsterBase
 {
 	GENERATED_BODY()
 
 public:
-	AMonsterJagras();
+	AP4MonsterJagras();
 	
 };

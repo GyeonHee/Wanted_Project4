@@ -5,32 +5,32 @@
 #include "CoreMinimal.h"
 #include "AttributeSet.h"
 #include "AbilitySystemComponent.h"
-#include "MonsterAttributeSet.generated.h"
+#include "P4MonsterAttributeSet.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WANTED_PROJECT4_API UMonsterAttributeSet : public UAttributeSet
+class WANTED_PROJECT4_API UP4MonsterAttributeSet : public UAttributeSet
 {
 	GENERATED_BODY()
 
 
 public:
-	UMonsterAttributeSet();
+	UP4MonsterAttributeSet();
 
 	// PROPERTY_GETTER : GameplayEffect 에서 쓸 Attribute 핸들 생성
 	// GETTER : FGameplayAttributeData 안의 값을 가져옴
 	// SETTER : FGameplayAttributeData 안의 값을 수정
 	// INITTER : 기본 값 설정
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, MaxHP);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, DetectRange);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, ChaseRange);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, MovementSpeed);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, ChaseSpeed);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, TurnSpeed);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, Attack);
-	ATTRIBUTE_ACCESSORS_BASIC(UMonsterAttributeSet, AttackSpeed);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, MaxHP);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, DetectRange);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, ChaseRange);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, MovementSpeed);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, ChaseSpeed);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, TurnSpeed);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, Attack);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, AttackSpeed);
 	
 protected:
 	// 스탯=======================================================

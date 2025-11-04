@@ -5,12 +5,12 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "Stat/MonsterAttributeSet.h"
+#include "Stat/P4MonsterAttributeSet.h"
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
-#include "MonsterBase.generated.h"
+#include "P4MonsterBase.generated.h"
 
 UCLASS()
-class WANTED_PROJECT4_API AMonsterBase
+class WANTED_PROJECT4_API AP4MonsterBase
 	: public ACharacter,
 	  public IAbilitySystemInterface,
 	  public IAnimationAttackInterface
@@ -19,11 +19,11 @@ class WANTED_PROJECT4_API AMonsterBase
 
 public:
 	// Sets default values for this character's properties
-	AMonsterBase();
+	AP4MonsterBase();
 
 	// 인터페이스로 구현하기
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override;
-	FORCEINLINE const UMonsterAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	FORCEINLINE const UP4MonsterAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 public:
 	virtual void BeginPlay() override;
@@ -41,7 +41,7 @@ protected:
 
 	// 몬스터 스탯 AttributeSet
 	UPROPERTY()
-	TObjectPtr<UMonsterAttributeSet> AttributeSet;
+	TObjectPtr<UP4MonsterAttributeSet> AttributeSet;
 
 	// 몬스터 스탯을 들고올 DataTable
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
@@ -54,4 +54,14 @@ protected:
 	// 선공 여부
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat)
 	bool bIsAgressive;
+
+	// 애니메이션 관련
+protected:
+	// 몬스터 공격 애님 몽타주
+	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> AttackActionMontage;
+
+	// 몬스터 사망 몽타주
+	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DeadMontage;
 };
