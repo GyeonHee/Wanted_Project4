@@ -6,10 +6,14 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Stat/MonsterAttributeSet.h"
+#include "Wanted_Project4/Interface/AnimationAttackInterface.h"
 #include "MonsterBase.generated.h"
 
 UCLASS()
-class WANTED_PROJECT4_API AMonsterBase : public ACharacter, public IAbilitySystemInterface
+class WANTED_PROJECT4_API AMonsterBase
+	: public ACharacter,
+	  public IAbilitySystemInterface,
+	  public IAnimationAttackInterface
 {
 	GENERATED_BODY()
 
@@ -23,8 +27,11 @@ public:
 
 public:
 	virtual void BeginPlay() override;
-	
-protected:
+
+	// 애님 노티파이에서 실행할 Interface 함수 구현
+	// 몬스터 공격 판정 함수
+	virtual void AttackHitCheck() override;
+
 	// ASC
 	// 몬스터의 경우 일시적이므로 Character 에 붙임
 protected:
