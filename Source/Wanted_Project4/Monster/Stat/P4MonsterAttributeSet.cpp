@@ -1,9 +1,9 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MonsterAttributeSet.h"
+#include "P4MonsterAttributeSet.h"
 
-UMonsterAttributeSet::UMonsterAttributeSet()
+UP4MonsterAttributeSet::UP4MonsterAttributeSet()
 {
 	
 }

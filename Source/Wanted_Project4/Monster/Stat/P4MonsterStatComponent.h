@@ -3,19 +3,19 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "MonsterStat.h"
+#include "P4MonsterStat.h"
 #include "Components/ActorComponent.h"
-#include "MonsterStatComponent.generated.h"
+#include "P4MonsterStatComponent.generated.h"
 
 
 UCLASS(ClassGroup=(Custom), meta=(BlueprintSpawnableComponent))
-class WANTED_PROJECT4_API UMonsterStatComponent : public UActorComponent
+class WANTED_PROJECT4_API UP4MonsterStatComponent : public UActorComponent
 {
 	GENERATED_BODY()
 
 public:
 	// Sets default values for this component's properties
-	UMonsterStatComponent();
+	UP4MonsterStatComponent();
 
 protected:
 	// Called when the game starts
@@ -26,7 +26,7 @@ protected:
 
 public:
 	// Getter 함수
-	FORCEINLINE const FMonsterStat& GetBaseStat() const { return BaseStat; }
+	FORCEINLINE const FP4MonsterStat& GetBaseStat() const { return BaseStat; }
 	FORCEINLINE float GetCurrentHP() const { return CurrentHP; }
 
 	// 공격 받을 시 데미지 적용 함수
@@ -45,5 +45,5 @@ protected:
 
 	// 몬스터 기본 스탯
 	UPROPERTY(Transient, VisibleAnywhere, Category = Stat, meta = (AllowPrivateAccess = "true"))
-	FMonsterStat BaseStat;
+	FP4MonsterStat BaseStat;
 };

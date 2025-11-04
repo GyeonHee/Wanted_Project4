@@ -1,10 +1,10 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MonsterStatComponent.h"
+#include "P4MonsterStatComponent.h"
 
 // Sets default values for this component's properties
-UMonsterStatComponent::UMonsterStatComponent()
+UP4MonsterStatComponent::UP4MonsterStatComponent()
 {
 	// InitializeComponent() 호출용 설정
 	bWantsInitializeComponent = true;
@@ -12,14 +12,14 @@ UMonsterStatComponent::UMonsterStatComponent()
 
 
 // Called when the game starts
-void UMonsterStatComponent::BeginPlay()
+void UP4MonsterStatComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
 	
 }
 
-void UMonsterStatComponent::InitializeComponent()
+void UP4MonsterStatComponent::InitializeComponent()
 {
 	Super::InitializeComponent();
 
@@ -28,7 +28,7 @@ void UMonsterStatComponent::InitializeComponent()
 	// 현재 스탯 설정
 }
 
-float UMonsterStatComponent::ApplyDamage(float DamageAmount)
+float UP4MonsterStatComponent::ApplyDamage(float DamageAmount)
 {
 	// 데미지 처리 계산을 위해 이전 체력 저장.
 	const float PrevHp = CurrentHP;
@@ -50,7 +50,7 @@ float UMonsterStatComponent::ApplyDamage(float DamageAmount)
 	return ActualDamage;
 }
 
-void UMonsterStatComponent::SetHP(float NewHP)
+void UP4MonsterStatComponent::SetHP(float NewHP)
 {
 	// 현재 HP 를 새로운 HP 로 설정
 	CurrentHP = FMath::Clamp(NewHP, 0.0f, BaseStat.MaxHP);
