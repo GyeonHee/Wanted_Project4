@@ -4,18 +4,18 @@
 
 #include "CoreMinimal.h"
 #include "Animation/AnimInstance.h"
-#include "MonsterAnimInstance.generated.h"
+#include "P4MonsterAnimInstance.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WANTED_PROJECT4_API UMonsterAnimInstance : public UAnimInstance
+class WANTED_PROJECT4_API UP4MonsterAnimInstance : public UAnimInstance
 {
 	GENERATED_BODY()
 
 public:
-	UMonsterAnimInstance();
+	UP4MonsterAnimInstance();
 
 protected:
 	// 애니메이션 초기화할 때 실행되는 함수.

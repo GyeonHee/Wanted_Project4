@@ -12,11 +12,12 @@ void UAnimNotify_MonsterAttackHitCheck::Notify(USkeletalMeshComponent* MeshComp,
 
 	if (MeshComp)
 	{
-		// MeshComponent 를 갖고있는 
+		// MeshComponent 를 갖고있는 Actor 에 붙어있는 AnimationAttackInterface 불러오기
 		IAnimationAttackInterface* AttackPawn
 			= Cast<IAnimationAttackInterface>(MeshComp->GetOwner());
 		if (AttackPawn)
 		{
+			// 있다면 AttackHitCheck 호출
 			AttackPawn->AttackHitCheck();
 		}
 	}

@@ -1,19 +1,19 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MonsterBase.h"
+#include "P4MonsterBase.h"
 
 #include "AbilitySystemComponent.h"
-#include "Stat/MonsterAttributeSet.h"
-#include "Stat/MonsterStatComponent.h"
+#include "Stat/P4MonsterAttributeSet.h"
+#include "Stat/P4MonsterStatComponent.h"
 
 // Sets default values
-AMonsterBase::AMonsterBase()
+AP4MonsterBase::AP4MonsterBase()
 {
 	// ASC
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
-	AttributeSet = CreateDefaultSubobject<UMonsterAttributeSet>(TEXT("AttributeSet"));
-	ASC->AddAttributeSetSubobject<UMonsterAttributeSet>(AttributeSet);
+	AttributeSet = CreateDefaultSubobject<UP4MonsterAttributeSet>(TEXT("AttributeSet"));
+	ASC->AddAttributeSetSubobject<UP4MonsterAttributeSet>(AttributeSet);
 
 	// Monster Stat Data Table
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableRef(
@@ -28,17 +28,17 @@ AMonsterBase::AMonsterBase()
 	MonsterID = FName("Jagras");
 }
 
-void AMonsterBase::BeginPlay()
+void AP4MonsterBase::BeginPlay()
 {
 	Super::BeginPlay();
 	if (ASC)
 	{
 		ASC->InitAbilityActorInfo(this, this);
-		// @Todo: 데이터 테이블에서 초기 스탯을 불러와서 AttributeSet 초기화
+		// 데이터 테이블에서 초기 스탯을 불러와서 AttributeSet 초기화
 		if (AttributeSet)
 		{
 			// 데이터 테이블에서 이름으로 Row 값 받아와서 값 설정하기
-			if (const FMonsterStat* Row = MonsterStatData->FindRow<FMonsterStat>(MonsterID, TEXT("Monster Data Init")))
+			if (const FP4MonsterStat* Row = MonsterStatData->FindRow<FP4MonsterStat>(MonsterID, TEXT("Monster Data Init")))
 			{
 				// AttributeSet 세팅
 				AttributeSet->SetMaxHP(Row->MaxHP);
@@ -63,11 +63,11 @@ void AMonsterBase::BeginPlay()
 	}
 }
 
-void AMonsterBase::AttackHitCheck()
+void AP4MonsterBase::AttackHitCheck()
 {
 }
 
-UAbilitySystemComponent* AMonsterBase::GetAbilitySystemComponent() const
+UAbilitySystemComponent* AP4MonsterBase::GetAbilitySystemComponent() const
 {
 	return ASC;
 }
