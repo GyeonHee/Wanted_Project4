@@ -3,8 +3,20 @@
 
 #include "P4MonsterJagras.h"
 
+#include "Components/BoxComponent.h"
+
 AP4MonsterJagras::AP4MonsterJagras()
-{
+{	
+	// Mesh 설정
+	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -80.f));
+	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
+
+	// Box Collision 설정
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	BoxCollision->SetupAttachment(GetMesh(), TEXT("Armature_ems049_00"));
+	BoxCollision->SetRelativeLocation(FVector(0.f, -64.f, -90.f));
+	BoxCollision->SetBoxExtent(FVector(30.f, 65.f, 165.f));
+	
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshRef(
 		TEXT("/Game/Monster/Model/Jagras/Jagras.Jagras")
 	);
