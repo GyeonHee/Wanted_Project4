@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AI/P4MonsterAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Stat/P4MonsterStatComponent.h"
 
@@ -72,14 +73,62 @@ void AP4MonsterBase::BeginPlay()
 
 void AP4MonsterBase::AttackHitCheck()
 {
+	// @Todo: 공격 판정 구현 필요
+	
 }
 
 void AP4MonsterBase::AttackByAI()
 {
+	// 각 몬스터 Class 에서 AttackActionBegin(FName& InAttackMontageSectionName) 으로
+	// 공격 몽타주 섹션 이름 넘겨줘서 공격 실행
 }
 
 void AP4MonsterBase::SetAIAttackDelegate(const FAIMonsterAttackFinished& InOnAttackFinished)
 {
+	// 전달받은 델리게이트 저장
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void AP4MonsterBase::NotifyActionEnd()
+{
+	// 공격 끝날 시 전달받은 델리게이트 호출
+	// 여기서는 공격 완료 상태 전달
+	OnAttackFinished.ExecuteIfBound();
+}
+
+void AP4MonsterBase::AttackActionBegin(FName& InAttackMontageSectionName, const float AttackSpeed)
+{
+	// 공격 모션동안 이동 막기
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 몽타주 재생을 위해 AnimInstance 갖고 오기
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		// 입력받은 섹션으로 몽타주 섹션 변경
+		AnimInstance->Montage_JumpToSection(InAttackMontageSectionName, AttackActionMontage);
+		
+		// 몽타주 실행 
+		AnimInstance->Montage_Play(AttackActionMontage, AttackSpeed);
+
+		// 몽타주 재생이 끝날 때 실행될 함수 바인딩
+		FOnMontageEnded OnMontageEnded;
+		OnMontageEnded.BindUObject(this, &AP4MonsterBase::AttackActionEnd);
+
+		// 몽타주 재생 종료 시 바인딩한 델리게이트 실행
+		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, AttackActionMontage);
+
+		
+	}
+}
+
+void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
+{
+	// 무브먼트 모드 복구
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	// 공격이 끝났음을 알림
+	NotifyActionEnd();
 }
 
 UAbilitySystemComponent* AP4MonsterBase::GetAbilitySystemComponent() const

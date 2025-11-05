@@ -107,6 +107,8 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 					false,
 					0.5f
 				);
+
+				return;
 			}
 		}
 	}

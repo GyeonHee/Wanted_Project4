@@ -10,6 +10,7 @@
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
 #include "P4MonsterBase.generated.h"
 
+
 UCLASS()
 class WANTED_PROJECT4_API AP4MonsterBase
 	: public ACharacter,
@@ -43,7 +44,7 @@ public:
 
 	// @Todo: AttributeSet 에 없는 애들을 일단 어떻게 할 것인가
 	// AttributeSet 에 없음
-	FORCEINLINE virtual float GetAIAttackRange() override { return 50.f; }
+	FORCEINLINE virtual float GetAIAttackRange() override { return 150.f; }
 	FORCEINLINE virtual float GetAIPatrolRadius() override { return 500.f; }
 
 	// 공격 요청 함수
@@ -52,6 +53,16 @@ public:
 	// 공격 종료 시점 델리게이트 호출 함수 (종료 시점임을 알림)
 	virtual void SetAIAttackDelegate(const FAIMonsterAttackFinished& InOnAttackFinished) override;
 
+	// 공격 몽타주가 끝나면 알려주는 함수
+	virtual void NotifyActionEnd();
+	
+	//SetAIAttackDelegate 에서 전달된 델리게이트를 저장할 변수
+	FAIMonsterAttackFinished OnAttackFinished;
+
+	// 입력받은 섹션 네임의 공격 몽타주를 실행할 함수
+	virtual void AttackActionBegin(FName& InAttackMontageSectionName, const float AttackSpeed);
+	void AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+	
 	// ASC
 	// 몬스터의 경우 일시적이므로 Character 에 붙임
 protected:
