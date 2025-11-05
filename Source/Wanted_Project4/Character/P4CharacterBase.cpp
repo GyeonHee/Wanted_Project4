@@ -44,10 +44,5 @@ void AP4CharacterBase::Tick(float DeltaTime)
 
 }
 
-// Called to bind functionality to input
-void AP4CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
-}
 
