@@ -41,6 +41,11 @@ public:
         return ItemTags.HasAll(OtherTags);
     }
 
+    // Getter
+    FORCEINLINE FText GetItemName() const { return ItemName; }
+    FORCEINLINE TSoftObjectPtr<UTexture2D> GetIcon() const { return Icon; }
+    FORCEINLINE FGameplayTagContainer GetItemTags() const { return ItemTags; }
+    FORCEINLINE int32 GetMaxStackCount() const { return MaxStackCount; }
 protected:
     // 아이템 이름 (표시용)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
