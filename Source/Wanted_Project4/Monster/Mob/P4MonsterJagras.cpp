@@ -49,3 +49,9 @@ AP4MonsterJagras::AP4MonsterJagras()
 		DeadMontage = DeadMontageRef.Object;
 	}
 }
+
+void AP4MonsterJagras::AttackByAI()
+{
+	FName MontageSectionName = TEXT("MonsterAttack");
+	AttackActionBegin(MontageSectionName, 3.f);
+}

@@ -18,6 +18,9 @@ public:
 	AP4MonsterJagras();
 
 protected:
+	virtual void AttackByAI() override;
+
+protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Collision, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UBoxComponent> BoxCollision;
 	
