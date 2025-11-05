@@ -76,22 +76,52 @@ void UBTService_Detect::TickNode(UBehaviorTreeComponent& OwnerComp, uint8* NodeM
 			{
 				// 감지된 폰 정보를 블랙보드에 타겟으로
 				OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), Pawn);
-				
+
 				// 감지 영역 디버그
-				// DrawDebugSphere(
-				// 	World,
-				// 	MonsterPos,
-				// 	)
+				DrawDebugSphere(
+					World,
+					MonsterPos,
+					DetectRange,
+					16,
+					FColor::Red,
+					false,
+					0.5f
+				);
+
 				// 감지 지점 점으로 디버그
+				DrawDebugPoint(
+					World,
+					Pawn->GetActorLocation(),
+					10.f,
+					FColor::Green,
+					false,
+					0.6f
+				);
 
 				// 감지 방향 선으로 디버그
-				
+				DrawDebugLine(
+					World,
+					MonsterPos,
+					Pawn->GetActorLocation(),
+					FColor::Green,
+					false,
+					0.5f
+				);
 			}
 		}
 	}
-	
+
 	// 감지 실패 시 타겟에 nullptr
 	OwnerComp.GetBlackboardComponent()->SetValueAsObject(TEXT("Target"), nullptr);
 
 	// 감지 영역 빨간색으로 디버그
+	DrawDebugSphere(
+		World,
+		MonsterPos,
+		DetectRange,
+		16,
+		FColor::Red,
+		false,
+		0.5f
+	);
 }

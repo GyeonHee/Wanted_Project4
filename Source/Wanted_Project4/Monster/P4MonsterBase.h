@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "Interface/MonsterAIInterface.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
 #include "P4MonsterBase.generated.h"
@@ -13,7 +14,8 @@ UCLASS()
 class WANTED_PROJECT4_API AP4MonsterBase
 	: public ACharacter,
 	  public IAbilitySystemInterface,
-	  public IAnimationAttackInterface
+	  public IAnimationAttackInterface,
+	  public IMonsterAIInterface
 {
 	GENERATED_BODY()
 
@@ -31,6 +33,24 @@ public:
 	// 애님 노티파이에서 실행할 Interface 함수 구현
 	// 몬스터 공격 판정 함수
 	virtual void AttackHitCheck() override;
+
+	// Monster AI Interface 구현
+public:
+	// AttributeSet 에 있음
+	FORCEINLINE virtual float GetAIDetectRange() override { return AttributeSet->GetDetectRange(); }
+	FORCEINLINE virtual float GetAIChaseRange() override { return AttributeSet->GetChaseRange(); }
+	FORCEINLINE virtual float GetAITurnSpeed() override { return AttributeSet->GetTurnSpeed(); }
+
+	// @Todo: AttributeSet 에 없는 애들을 일단 어떻게 할 것인가
+	// AttributeSet 에 없음
+	FORCEINLINE virtual float GetAIAttackRange() override { return 50.f; }
+	FORCEINLINE virtual float GetAIPatrolRadius() override { return 500.f; }
+
+	// 공격 요청 함수
+	virtual void AttackByAI() override;
+
+	// 공격 종료 시점 델리게이트 호출 함수 (종료 시점임을 알림)
+	virtual void SetAIAttackDelegate(const FAIMonsterAttackFinished& InOnAttackFinished) override;
 
 	// ASC
 	// 몬스터의 경우 일시적이므로 Character 에 붙임

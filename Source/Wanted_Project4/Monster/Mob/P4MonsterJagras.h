@@ -16,5 +16,9 @@ class WANTED_PROJECT4_API AP4MonsterJagras : public AP4MonsterBase
 
 public:
 	AP4MonsterJagras();
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Collision, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UBoxComponent> BoxCollision;
 	
 };
