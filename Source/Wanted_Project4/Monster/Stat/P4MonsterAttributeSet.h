@@ -24,6 +24,8 @@ public:
 	// SETTER : FGameplayAttributeData 안의 값을 수정
 	// INITTER : 기본 값 설정
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, MaxHP);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, CurHP);
+	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, DamageAmount);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, DetectRange);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, ChaseRange);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, MovementSpeed);
@@ -31,12 +33,23 @@ public:
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, TurnSpeed);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, Attack);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4MonsterAttributeSet, AttackSpeed);
-	
+
 protected:
+	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+	
+public:
 	// 스탯=======================================================
 	// 최대 체력
 	UPROPERTY(BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
 	FGameplayAttributeData MaxHP;
+
+	// 현재 체력
+	UPROPERTY(BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
+	FGameplayAttributeData CurHP;
+
+	// 받아야할 데미지(받는 데미지 처리용)
+	UPROPERTY(BlueprintReadOnly, Category = "Stat", meta = (AllowPrivateAccess = "true"))
+	FGameplayAttributeData DamageAmount;
 
 	// 범위=======================================================
 	// 탐지 범위

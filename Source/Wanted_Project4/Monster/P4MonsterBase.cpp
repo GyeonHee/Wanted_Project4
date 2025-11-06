@@ -46,10 +46,12 @@ void AP4MonsterBase::BeginPlay()
 		if (AttributeSet)
 		{
 			// 데이터 테이블에서 이름으로 Row 값 받아와서 값 설정하기
-			if (const FP4MonsterStat* Row = MonsterStatData->FindRow<FP4MonsterStat>(MonsterID, TEXT("Monster Data Init")))
+			if (const FP4MonsterStat* Row = MonsterStatData->FindRow<FP4MonsterStat>(
+				MonsterID, TEXT("Monster Data Init")))
 			{
 				// AttributeSet 세팅
 				AttributeSet->SetMaxHP(Row->MaxHP);
+				AttributeSet->SetCurHP(Row->MaxHP);
 				AttributeSet->SetDetectRange(Row->DetectRange);
 				AttributeSet->SetChaseRange(Row->ChaseRange);
 				AttributeSet->SetMovementSpeed(Row->MovementSpeed);
@@ -62,6 +64,7 @@ void AP4MonsterBase::BeginPlay()
 				bIsAgressive = Row->bIsAggressive;
 
 				UE_LOG(LogTemp, Log, TEXT("MaxHP: %f"), AttributeSet->GetMaxHP());
+				UE_LOG(LogTemp, Log, TEXT("CurHP: %f"), AttributeSet->GetCurHP());
 				UE_LOG(LogTemp, Log, TEXT("DetectRange: %f"), AttributeSet->GetDetectRange());
 				UE_LOG(LogTemp, Log, TEXT("ChaseRange: %f"), AttributeSet->GetChaseRange());
 				UE_LOG(LogTemp, Log, TEXT("MovementSpeed: %f"), AttributeSet->GetMovementSpeed());
@@ -74,7 +77,43 @@ void AP4MonsterBase::BeginPlay()
 void AP4MonsterBase::AttackHitCheck()
 {
 	// @Todo: 공격 판정 구현 필요
-	
+}
+
+void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
+{
+	if (ASC)
+	{
+		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+		Context.AddSourceObject(this);
+
+		// 받을 데미지 설정
+		AttributeSet->SetDamageAmount(DamageAmount);
+
+		// 블루프린트로 생성한 GameplayEffect 클래스 불러오기
+		FSoftClassPath GEPath(TEXT("/Game/Monster/GE/BPGE_MonsterDamaged.BPGE_MonsterDamaged_C"));
+		TSoftClassPtr<UGameplayEffect> DamagedEffectSoftClass(GEPath);
+
+		// 메모리에 아직 BPGE_MonsterDamaged 가 없으면
+		if (DamagedEffectSoftClass.IsPending())
+		{
+			// 동기 로드
+			DamagedEffectSoftClass.LoadSynchronous();
+		}
+
+		// 로드 성공 시 사용
+		TSubclassOf<UGameplayEffect> DamagedEffectClass = DamagedEffectSoftClass.Get();
+		if (DamagedEffectClass)
+		{
+			FGameplayEffectSpecHandle SpecHandle
+				= ASC->MakeOutgoingSpec(DamagedEffectClass, 1.f, Context);
+			if (SpecHandle.IsValid())
+			{
+				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				UE_LOG(LogTemp, Log, TEXT("몬스터 데미지 호출"));
+				UE_LOG(LogTemp, Log, TEXT("CurHP: %f"), AttributeSet->GetCurHP());
+			}
+		}
+	}
 }
 
 void AP4MonsterBase::AttackByAI()
@@ -107,7 +146,7 @@ void AP4MonsterBase::AttackActionBegin(FName& InAttackMontageSectionName, const 
 	{
 		// 입력받은 섹션으로 몽타주 섹션 변경
 		AnimInstance->Montage_JumpToSection(InAttackMontageSectionName, AttackActionMontage);
-		
+
 		// 몽타주 실행 
 		AnimInstance->Montage_Play(AttackActionMontage, AttackSpeed);
 
@@ -117,8 +156,6 @@ void AP4MonsterBase::AttackActionBegin(FName& InAttackMontageSectionName, const 
 
 		// 몽타주 재생 종료 시 바인딩한 델리게이트 실행
 		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, AttackActionMontage);
-
-		
 	}
 }
 

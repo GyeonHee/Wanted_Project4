@@ -35,6 +35,11 @@ public:
 	// 몬스터 공격 판정 함수
 	virtual void AttackHitCheck() override;
 
+public:
+	// 공격 받았을 경우 처리 함수
+	UFUNCTION(BlueprintCallable, Category = Monster)
+	void MonsterApplyDamage(const float DamageAmount);
+
 	// Monster AI Interface 구현
 public:
 	// AttributeSet 에 있음
