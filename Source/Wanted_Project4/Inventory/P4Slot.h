@@ -7,21 +7,25 @@
 #include "GameplayTagContainer.h"
 #include "P4Slot.generated.h"
 
-// 업데이트 델리게이트 선언
-DECLARE_DELEGATE(FOnUpdateSlotDelegate);
-
-// Wrapper 구조체 선언
 USTRUCT(BlueprintType)
-struct FUpdateSlotDelegateWrapper
+struct FItemData
 {
 	GENERATED_BODY()
 
-	FUpdateSlotDelegateWrapper() {}
-	FUpdateSlotDelegateWrapper(const FOnUpdateSlotDelegate& InSlotDelegate) : SlotDelegate(InSlotDelegate) {}
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	TObjectPtr<class UItemDataBase> ItemDataAsset;
 
-	FOnUpdateSlotDelegate SlotDelegate;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 Quantity;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	int32 SlotIndex;
+
+	FItemData()
+		: ItemDataAsset(nullptr), Quantity(0), SlotIndex(-1)
+	{
+	}
 };
-
 /**
  * 
  */
@@ -31,37 +35,31 @@ class WANTED_PROJECT4_API UP4Slot : public UP4CustomWidget
 	GENERATED_BODY()
 	
 public:
-	// 슬롯 초기화 함수
-	void Init();
-	// 슬롯 업데이트 함수
-	void UpdateSlot();
+	UP4Slot(const FObjectInitializer& ObjectInitializer);
 
-protected:
 	virtual void NativeConstruct() override;
 
+	void SetItem(const struct FItemData& InItemData);
+
+	void ClearSlot();
 public:
-	// 슬롯 이미지
-	UPROPERTY(VisibleAnywhere, Category = "Slot", meta = (BindWidget = "true"))
+	UPROPERTY(EditAnywhere, Category = "Slot")
+	TObjectPtr<class UItemDataBase> ItemData;
+
+	UPROPERTY(EditAnywhere, Category = "Slot")
 	TObjectPtr<class UImage> IMG_Item;
 
-	// 슬롯 아이템 수량
-	UPROPERTY(VisibleAnywhere, Category = "Slot", meta = (BindWidget = "true"))
+	// 기본 빈 슬롯 텍스처
+	UPROPERTY(EditAnywhere, Category = "Slot")
+	TObjectPtr<class UTexture2D> DefaultTexture;
+
+	UPROPERTY(EditAnywhere, Category = "Slot")
 	TObjectPtr<class UTextBlock> TXT_Quantity;
 
-	// 현재 슬롯의 인덱스
 	UPROPERTY(EditAnywhere, Category = "Slot")
 	int32 SlotIndex;
 
 protected:
-	// 빈 칸에 적용하기 위한 투명 테스쳐
-	UPROPERTY(EditAnywhere, Category = "Slot")
-	TObjectPtr<class UTexture2D> DefaultTexture;
-
-	// 개별 슬롯 업데이트 함수
-	void UpdateEquipmentSlot();
-	void UpdateConsumableSlot();
-
-	// 아이템 태그 별로 델리게이트 호출
-	UPROPERTY()
-	TMap<FGameplayTag, FUpdateSlotDelegateWrapper> SlotUpdateActions;
+	// 슬롯이 현재 가진 아이템 정보
+	FItemData CurrentItem;
 };

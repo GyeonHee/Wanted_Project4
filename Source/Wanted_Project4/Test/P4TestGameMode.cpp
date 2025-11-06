@@ -3,6 +3,9 @@
 
 #include "Test/P4TestGameMode.h"
 #include "Test/P4TestPlayerController.h"
+#include "Test/P4TestCharacter.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
 
 AP4TestGameMode::AP4TestGameMode()
 {
