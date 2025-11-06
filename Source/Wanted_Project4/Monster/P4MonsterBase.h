@@ -10,6 +10,8 @@
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
 #include "P4MonsterBase.generated.h"
 
+// 몬스터 공격 시 각 공격을 실행할 델리게이트
+DECLARE_DELEGATE(FMonsterAttackDelegate);
 
 UCLASS()
 class WANTED_PROJECT4_API AP4MonsterBase
@@ -31,8 +33,12 @@ public:
 public:
 	virtual void BeginPlay() override;
 
+	// 컴포넌트 초기화 끝나면 호출되는 함수
+	virtual void PostInitializeComponents() override;
+
 	// 애님 노티파이에서 실행할 Interface 함수 구현
 	// 몬스터 공격 판정 함수
+	// 현재 델리게이트 배열로 공격들 관리하면서 안쓰는 중
 	virtual void AttackHitCheck() override;
 
 public:
@@ -67,6 +73,14 @@ public:
 	// 입력받은 섹션 네임의 공격 몽타주를 실행할 함수
 	virtual void AttackActionBegin(FName& InAttackMontageSectionName, const float AttackSpeed);
 	void AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+
+	// Hit 몽타주 실행 및 종료 시 호출될 함수
+	void HitActionBegin();
+	void HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+
+protected:
+	// 몬스터가 죽었을 시 실행 될 함수
+	virtual void SetDead();
 	
 	// ASC
 	// 몬스터의 경우 일시적이므로 Character 에 붙임
@@ -97,7 +111,28 @@ protected:
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> AttackActionMontage;
 
+	// 몬스터 피격 몽타주
+	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> HitMontage;
+	
 	// 몬스터 사망 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
+
+
+	// 몬스터 공격 관리 섹션
+protected:
+	// 공격 델리게이트를 배열로 저장
+	TArray<FMonsterAttackDelegate> AttackDelegates;
+
+	// 공격 몽타주 섹션 이름 배열
+	// 실제 섹션 배치와 이름이 동일해야 함
+	UPROPERTY(EditAnywhere, Category = Attack)
+	TArray<FName> AttackSectionNames;
+
+	// 공격 델리게이트 배열을 설정 (자식이 오버라이드)
+	virtual void SetupAttackDelegate();
+
+public:
+	void ExecuteAttackSection(const FName& SectionName);
 };

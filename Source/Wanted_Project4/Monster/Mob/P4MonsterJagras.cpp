@@ -6,7 +6,7 @@
 #include "Components/BoxComponent.h"
 
 AP4MonsterJagras::AP4MonsterJagras()
-{	
+{
 	// Mesh 설정
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -80.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
@@ -16,7 +16,7 @@ AP4MonsterJagras::AP4MonsterJagras()
 	BoxCollision->SetupAttachment(GetMesh(), TEXT("Armature_ems049_00"));
 	BoxCollision->SetRelativeLocation(FVector(0.f, -64.f, -90.f));
 	BoxCollision->SetBoxExtent(FVector(30.f, 65.f, 165.f));
-	
+
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> MeshRef(
 		TEXT("/Game/Monster/Model/Jagras/Jagras.Jagras")
 	);
@@ -41,6 +41,14 @@ AP4MonsterJagras::AP4MonsterJagras()
 		AttackActionMontage = AttackActionMontageRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitMontageRef(
+		TEXT("/Game/Monster/Model/Jagras/AM_Jagras_Hit.AM_Jagras_Hit")
+	);
+	if (HitMontageRef.Succeeded())
+	{
+		HitMontage = HitMontageRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(
 		TEXT("/Game/Monster/Model/Jagras/AM_Jagras_Dead.AM_Jagras_Dead")
 	);
@@ -54,4 +62,87 @@ void AP4MonsterJagras::AttackByAI()
 {
 	FName MontageSectionName = TEXT("MonsterAttack");
 	AttackActionBegin(MontageSectionName, 3.f);
+}
+
+void AP4MonsterJagras::AttackHitCheck()
+{
+	Super::AttackHitCheck();
+
+	// 현재 공격 몽타주 갖고오기
+
+	// 섹션 이름 받아오기
+
+	// 섹션 이름에 따른 각 패턴 별 판정 함수 호출
+}
+
+void AP4MonsterJagras::SetupAttackDelegate()
+{
+	Super::SetupAttackDelegate();
+
+	// 몽타주 섹션에 맞게 섹션 이름들 설정
+	AttackSectionNames = {"MonsterAttack"};
+
+	// 각 섹션에 맞는 공격함수 델리게이트로 바인드
+	FMonsterAttackDelegate Patern1;
+	Patern1.BindUObject(this, &AP4MonsterJagras::MeleeAttack);
+
+	// 바인딩한 델리게이트로 AttackDelegates 배열 설정
+	AttackDelegates = {Patern1};
+}
+
+void AP4MonsterJagras::MeleeAttack()
+{
+	FVector Start =
+		GetActorLocation() +
+		GetActorForwardVector() *
+		(BoxCollision->GetScaledBoxExtent().Z + BoxCollision->GetRelativeLocation().Z);
+
+	// 공격 범위 설정
+	// @Todo: 나중에 변수 값으로 변경하기
+	const float AttackRange = 50.f;
+	FVector End = Start + GetActorForwardVector() * AttackRange;
+
+	const float AttackRadius = 50.f;
+
+	// 자신은 판정 제외
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(Attack), false, this);
+
+	FHitResult OutHitResult;
+	bool HitDetected = GetWorld()->SweepSingleByChannel(
+		OutHitResult,
+		Start,
+		End,
+		FQuat::Identity,
+		ECC_GameTraceChannel1,
+		FCollisionShape::MakeSphere(AttackRadius),
+		Params
+	);
+
+	// 몬스터 공격 범위 디버그 표시
+#if ENABLE_DRAW_DEBUG
+
+	FVector CapsuleOrigin = Start + (End - Start) * 0.5f;
+
+	float CapsuleHalfHeight = AttackRange * 0.5f;
+
+	FColor DrawColor = HitDetected ? FColor::Green : FColor::Red;
+
+	DrawDebugCapsule(
+		GetWorld(),
+		CapsuleOrigin,
+		CapsuleHalfHeight,
+		AttackRadius,
+		FRotationMatrix::MakeFromZ(GetActorForwardVector()).ToQuat(),
+		DrawColor,
+		false,
+		5.0f
+	);
+#endif
+	
+
+	if (HitDetected)
+	{
+		// @Todo: 다른 액터가 공격 당했을 시 처리
+		UE_LOG(LogTemp, Log, TEXT("Hit: %s"), *OutHitResult.GetActor()->GetName());
+	}
 }

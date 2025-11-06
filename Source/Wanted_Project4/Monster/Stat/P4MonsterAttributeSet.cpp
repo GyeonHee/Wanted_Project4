@@ -25,7 +25,13 @@ void UP4MonsterAttributeSet::PostGameplayEffectExecute(const struct FGameplayEff
 		if (NewHP <= 0.f)
 		{
 			// @Todo: 사망 처리
-			// 몬스터 사망 이벤트 broadcast 등등
+			
+			// 어딘가에 OnHpZeroDelegate 델리게이트 생성
+
+			// 사망 함수 만들고 바인드
+			
+			// 여기서 몬스터 사망 이벤트 broadcast 등등
+			OnHpZero.Broadcast();
 		}
 	}
 }

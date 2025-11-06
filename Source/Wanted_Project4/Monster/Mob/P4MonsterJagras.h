@@ -19,6 +19,13 @@ public:
 
 protected:
 	virtual void AttackByAI() override;
+	virtual void AttackHitCheck() override;
+
+	virtual void SetupAttackDelegate() override;
+
+	// 몬스터 스킬별 공격 판정 함수
+protected:
+	void MeleeAttack();
 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Collision, meta = (AllowPrivateAccess = "true"))

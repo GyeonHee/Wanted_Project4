@@ -7,6 +7,9 @@
 #include "AbilitySystemComponent.h"
 #include "P4MonsterAttributeSet.generated.h"
 
+// 체력이 다 소진되어 죽음 상태 시 발행할 델리게이트
+DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
+
 /**
  * 
  */
@@ -36,6 +39,10 @@ public:
 
 protected:
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
+
+public:
+	// 발행할 이벤트 델리게이트
+	FOnHpZeroDelegate OnHpZero;
 	
 public:
 	// 스탯=======================================================
