@@ -16,7 +16,7 @@ class WANTED_PROJECT4_API UItemDataBase : public UPrimaryDataAsset
 	GENERATED_BODY()
 	
 public:
-    /** PrimaryAssetId는 UPrimaryDataAsset일 때 필요 (AssetManager용) */
+    //PrimaryAssetId는 UPrimaryDataAsset일 때 필요 (AssetManager용)
     virtual FPrimaryAssetId GetPrimaryAssetId() const override
     {
         return FPrimaryAssetId(GetClass()->GetFName(), GetFName());
@@ -42,14 +42,14 @@ public:
     }
 
     // Getter
-    FORCEINLINE FText GetItemName() const { return ItemName; }
+    FORCEINLINE FName GetItemName() const { return ItemName; }
     FORCEINLINE TSoftObjectPtr<UTexture2D> GetIcon() const { return Icon; }
     FORCEINLINE FGameplayTagContainer GetItemTags() const { return ItemTags; }
     FORCEINLINE int32 GetMaxStackCount() const { return MaxStackCount; }
 protected:
     // 아이템 이름 (표시용)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    FText ItemName;
+    FName ItemName;
 
     // 아이템 아이콘
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")

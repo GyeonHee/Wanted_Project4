@@ -21,6 +21,12 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
 
+protected:
+	// 캐릭터에 빙의했을 때 호출
+	virtual void OnPossess(APawn* InPawn) override;
+
+	void ConnectInventoryWidget();
+
 	// 인벤토리 토글 함수
 	void ToggleInventory();
 
