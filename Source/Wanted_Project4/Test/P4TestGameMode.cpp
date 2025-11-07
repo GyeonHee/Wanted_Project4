@@ -11,4 +11,5 @@ AP4TestGameMode::AP4TestGameMode()
 {
 	PlayerControllerClass = AP4TestPlayerController::StaticClass();
 	DefaultPawnClass = nullptr;
+	// 에디터에 배치된 캐릭터의 AIPosses에서 player0으로 등록함.
 }

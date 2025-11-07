@@ -21,12 +21,17 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	void SetItem(const struct FInventoryItem& InItemData);
+	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+
+	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
+	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+
+	void SetItem(const FInventoryItem& InItemData);
 
 	void ClearSlot();
 public:
-	UPROPERTY(EditAnywhere, Category = "Slot")
-	TObjectPtr<class UItemDataBase> ItemData;
+	/*UPROPERTY(EditAnywhere, Category = "Slot")
+	TObjectPtr<class UItemDataBase> ItemData;*/
 
 	UPROPERTY(EditAnywhere, Category = "Slot")
 	TObjectPtr<class UImage> IMG_Item;
@@ -44,4 +49,11 @@ public:
 protected:
 	// 슬롯이 현재 가진 아이템 정보
 	FInventoryItem CurrentItem;
+
+	UPROPERTY()
+	TObjectPtr<class UP4ItemIconLoader> IconLoader;
+
+	// 드래그 할때 사용될 슬롯 위젯
+	UPROPERTY(EditAnywhere, Category = "Slot")
+	TSubclassOf<UP4Slot> DragWidgetClass;
 };

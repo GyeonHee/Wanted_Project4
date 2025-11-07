@@ -38,47 +38,47 @@ void AP4TestPlayerController::ConnectInventoryWidget()
 
 	if (!InventoryWidget)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ InventoryWidget이 nullptr!"));
+		UE_LOG(LogTemp, Error, TEXT("InventoryWidget이 nullptr!"));
 		return;
 	}
 
 	ACharacter* MyChar = GetCharacter();
 	if (!MyChar)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("⚠️ GetCharacter() 실패 - 아직 캐릭터 빙의 안 됨"));
+		UE_LOG(LogTemp, Warning, TEXT("GetCharacter() 실패 - 아직 캐릭터 빙의 안 됨"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("✅ 캐릭터 찾음: %s"), *MyChar->GetName());
+	UE_LOG(LogTemp, Warning, TEXT("캐릭터 찾음: %s"), *MyChar->GetName());
 
 	AP4TestCharacter* TestChar = Cast<AP4TestCharacter>(MyChar);
 	if (!TestChar)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ AP4TestCharacter로 캐스트 실패!"));
+		UE_LOG(LogTemp, Error, TEXT("AP4TestCharacter로 캐스트 실패!"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("✅ TestCharacter 캐스트 성공"));
+	UE_LOG(LogTemp, Warning, TEXT("TestCharacter 캐스트 성공"));
 
 	if (!TestChar->InventoryComp)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ InventoryComp가 nullptr!"));
+		UE_LOG(LogTemp, Error, TEXT("InventoryComp가 nullptr!"));
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("✅ InventoryComp 존재 확인"));
-	UE_LOG(LogTemp, Warning, TEXT("📦 현재 인벤토리 아이템 개수: %d"),
+	UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재 확인"));
+	UE_LOG(LogTemp, Warning, TEXT("현재 인벤토리 아이템 개수: %d"),
 		TestChar->InventoryComp->GetInventoryItems().Num());
 
 	UP4InventoryWidget* InvWidget = Cast<UP4InventoryWidget>(InventoryWidget);
 	if (!InvWidget)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ UP4InventoryWidget으로 캐스트 실패!"));
+		UE_LOG(LogTemp, Error, TEXT("UP4InventoryWidget으로 캐스트 실패!"));
 		UE_LOG(LogTemp, Error, TEXT("   실제 클래스: %s"), *InventoryWidget->GetClass()->GetName());
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("✅ InventoryWidget 캐스트 성공"));
+	UE_LOG(LogTemp, Warning, TEXT("InventoryWidget 캐스트 성공"));
 
 	//  이미 연결되어 있으면 다시 안 함
 	if (InvWidget->InventoryComp)
