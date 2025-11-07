@@ -6,11 +6,13 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Interface/AnimationAttackInterface.h"
+#include "Interface/P4CharacterWidgetInterface.h"
 #include "P4CharacterBase.generated.h"
 
 UCLASS()
 class WANTED_PROJECT4_API AP4CharacterBase : 
-	public ACharacter, public IAbilitySystemInterface, public IAnimationAttackInterface
+	public ACharacter, public IAbilitySystemInterface, public IAnimationAttackInterface,
+	public IP4CharacterWidgetInterface
 {
 	GENERATED_BODY()
 
@@ -31,6 +33,7 @@ public:
 	FORCEINLINE virtual class UAnimMontage* GetComboActionMontage() const { return ComboActionMontage; }
 	//FORCEINLINE class UABComboActionData* GetComboActionData() const { return ComboActionData; }
 	FORCEINLINE class UAnimMontage* GetDeadMontage() const { return DeadMontage; }
+
 
 protected:
 	virtual void PostInitializeComponents() override;

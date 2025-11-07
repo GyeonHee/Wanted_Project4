@@ -7,6 +7,7 @@
 #include "InputMappingContext.h"
 #include "Character/P4CharacterPlayer.h"
 #include "AbilitySystemComponent.h"
+#include "UI/P4HUDWidget.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -40,6 +41,15 @@ AP4PlayerController::AP4PlayerController()
 	{
 		AttackAction = AttackActionRef.Object;
 	}
+
+
+	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
+	static ConstructorHelpers::FClassFinder<UP4HUDWidget> P4HUDWidgetRef(TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
+
+	if (P4HUDWidgetRef.Succeeded() == true)
+	{
+		P4HUDWidgetClass = P4HUDWidgetRef.Class;
+	}
 }
 
 void AP4PlayerController::BeginPlay()
@@ -70,7 +80,17 @@ void AP4PlayerController::BeginPlay()
 
 	ConsoleCommand(TEXT("showdebug abilitysystem"));
 
+
+	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
+	P4HUDWidget = CreateWidget<UP4HUDWidget>(this, P4HUDWidgetClass);
+
+	if (P4HUDWidget != nullptr)
+	{
+		P4HUDWidget->AddToViewport();
+	}
+	
 }
+//
 
 void AP4PlayerController::OnPossess(APawn* InPawn)
 {

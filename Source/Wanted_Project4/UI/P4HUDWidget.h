@@ -29,6 +29,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UP4HpBarWidget> HpBar;
 
-	UPROPERTY()
-	TObjectPtr<class UP4MiniMapWidget> MiniMap;
+	//UPROPERTY()
+	//TObjectPtr<class UP4MiniMapWidget> MiniMap;
 };
