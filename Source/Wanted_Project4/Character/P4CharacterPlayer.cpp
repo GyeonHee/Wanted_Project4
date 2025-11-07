@@ -5,38 +5,39 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
+#include "AbilitySystemComponent.h"
 
 
 AP4CharacterPlayer::AP4CharacterPlayer()
 {
-	bUseControllerRotationPitch = false;
-	bUseControllerRotationRoll = false;
-	bUseControllerRotationYaw = false;
+	//bUseControllerRotationPitch = false;
+	//bUseControllerRotationRoll = false;
+	//bUseControllerRotationYaw = false;
 
-	GetCharacterMovement()->bOrientRotationToMovement = true;
-	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
-	GetCharacterMovement()->JumpZVelocity = 300.0f;
-	
-	// 
-	GetMesh()->SetRelativeLocationAndRotation(
-		FVector(0.0f, 0.0f, -38.0f),
-		FRotator(0.0f, -90.0f, 0.0f)
-	);
+	//GetCharacterMovement()->bOrientRotationToMovement = true;
+	//GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
+	//GetCharacterMovement()->JumpZVelocity = 300.0f;
+	//
+	//// 
+	//GetMesh()->SetRelativeLocationAndRotation(
+	//	FVector(0.0f, 0.0f, -38.0f),
+	//	FRotator(0.0f, -90.0f, 0.0f)
+	//);
 
-	// Set Assets
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(
-		TEXT("/Game/Character/Model/Hunter_King/King.King"));
-	if (CharacterMesh.Succeeded())
-	{
-		GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
-	}
+	//// Set Assets
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMesh(
+	//	TEXT("/Game/Character/Model/Hunter_King/King.King"));
+	//if (CharacterMesh.Succeeded())
+	//{
+	//	GetMesh()->SetSkeletalMesh(CharacterMesh.Object);
+	//}
 
-	static ConstructorHelpers::FClassFinder<UAnimInstance> CharacterAnim(
-		TEXT("/Game/Character/Animation/ABP_P4Character.ABP_P4Character_C"));
-	if (CharacterAnim.Succeeded())
-	{
-		GetMesh()->SetAnimInstanceClass(CharacterAnim.Class);
-	}
+	//static ConstructorHelpers::FClassFinder<UAnimInstance> CharacterAnim(
+	//	TEXT("/Game/Character/Animation/ABP_P4Character.ABP_P4Character_C"));
+	//if (CharacterAnim.Succeeded())
+	//{
+	//	GetMesh()->SetAnimInstanceClass(CharacterAnim.Class);
+	//}
 
 	SpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("SpringArm"));
 	SpringArm->SetupAttachment(RootComponent);
@@ -47,8 +48,46 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 	Camera->SetupAttachment(SpringArm);
 
 }
-
 //
+
+void AP4CharacterPlayer::GASInputPressed(int32 InputId)
+{
+	if (!ASC) return;
+
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
+	if (Spec)
+	{
+		Spec->InputPressed = true;
+
+		// 어빌리티 발동 중인가?
+		if (Spec->IsActive())
+		{
+			// 발동 중에 입력 들어옴
+			ASC->AbilitySpecInputPressed(*Spec);
+		}
+		else
+		{
+			ASC->TryActivateAbility(Spec->Handle);
+		}
+	}
+}
+
+void AP4CharacterPlayer::GASInputReleased(int32 InputId)
+{
+	if (!ASC) return;
+
+	FGameplayAbilitySpec* Spec = ASC->FindAbilitySpecFromInputID(InputId);
+	if (Spec)
+	{
+		Spec->InputPressed = false;
+
+		if (Spec->IsActive())
+		{
+			ASC->AbilitySpecInputReleased(*Spec);
+		}
+	}
+}
+
 
 void AP4CharacterPlayer::HandleMove(const FInputActionValue& Value)
 {

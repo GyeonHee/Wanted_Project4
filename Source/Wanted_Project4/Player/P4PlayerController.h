@@ -12,6 +12,7 @@
  */
 class UInputMappingContext;
 class UInputAction;
+class UAbilitySystemComponent;
 
 UCLASS()
 class WANTED_PROJECT4_API AP4PlayerController : public APlayerController
@@ -23,30 +24,35 @@ public:
 
 protected:
     virtual void BeginPlay() override;
+    virtual void OnPossess(APawn* InPawn) override;
+
+    // 입력 바인딩
     virtual void SetupInputComponent() override;
+    // GAS 입력 바인딩
+    void SetupGASInputBindings(UAbilitySystemComponent* ASC);
 
 private:
     // 입력 매핑
-    UPROPERTY(EditAnywhere, Category = "Input")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputMappingContext> InputMappingContext;
 
-    UPROPERTY(EditAnywhere, Category = "Input")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> MoveAction;
 
-    UPROPERTY(EditAnywhere, Category = "Input")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> LookAction;
 
-    UPROPERTY(EditAnywhere, Category = "Input")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> JumpAction;
 
-    //UPROPERTY(EditAnywhere, Category = "Input")
-    //TObjectPtr<UInputAction> AttackAction;
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UInputAction> AttackAction;
 
 private:
+    // GAS 
+    void HandleAbilityPressed(int32 InputID);
+    void HandleAbilityReleased(int32 InputID);
     // 입력 처리 함수
     void HandleMove(const FInputActionValue& Value);
     void HandleLook(const FInputActionValue& Value);
-    void HandleJumpStart(const FInputActionValue& Value);
-    void HandleJumpEnd(const FInputActionValue& Value);
-    //void HandleAttack(const FInputActionValue& Value);
 };
