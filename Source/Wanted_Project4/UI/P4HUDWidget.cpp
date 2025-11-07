@@ -1,0 +1,49 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "UI/P4HUDWidget.h"
+#include "P4HpBarWidget.h"
+#include "P4MiniMapWidget.h"
+#include "Interface/P4CharacterHUDInterface.h"
+
+UP4HUDWidget::UP4HUDWidget(const FObjectInitializer& ObjectInitalizer)
+	:Super(ObjectInitalizer)
+{
+
+}
+
+void UP4HUDWidget::UpdateHpBar(float NewCurrentHp)
+{
+
+}
+
+void UP4HUDWidget::UpdataMiniMap(FVector PlayerLocation)
+{
+}
+
+void UP4HUDWidget::NativeConstruct()
+{
+	Super::NativeConstruct();
+
+	//데이터 연동.
+	HpBar =  Cast<UP4HpBarWidget>(
+		GetWidgetFromName(TEXT("WidgetHpBar"))
+	);
+
+	ensureAlways(HpBar);
+
+	MiniMap = Cast<UP4MiniMapWidget>(
+		GetWidgetFromName(TEXT("WidgetMiniMap"))
+	);
+
+	ensureAlways(MiniMap);
+
+	IP4CharacterHUDInterface* HUDPawn
+		= Cast<IP4CharacterHUDInterface>(GetOwningPlayer()->GetPawn());
+
+	if (HUDPawn != nullptr)
+	{
+		HUDPawn->SetupHUDWidget(this);
+	}
+
+}
