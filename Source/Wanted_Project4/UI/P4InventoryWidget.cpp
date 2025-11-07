@@ -7,6 +7,7 @@
 #include "Components/UniformGridPanel.h"
 #include "Inventory/P4InventoryComponent.h"
 #include "Components/Widget.h"
+#include "Inventory/P4InventoryTags.h"
 
 
 UP4InventoryWidget::UP4InventoryWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
@@ -93,14 +94,14 @@ void UP4InventoryWidget::RefreshUI()
     UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 개수: %d, 소비템 슬롯 개수: %d"), EquipmentSlots.Num(),
         ConsumableSlots.Num());
 
-    // Equipment 태그를 정의 (프로젝트 설정에서 만든 태그 사용)
-    FGameplayTag EquipmentTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment"));
-    FGameplayTag ConsumableTag = FGameplayTag::RequestGameplayTag(FName("Item.Consumable"));
+    //// Equipment 태그를 정의 (프로젝트 설정에서 만든 태그 사용)
+    //FGameplayTag EquipmentTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment"));
+    //FGameplayTag ConsumableTag = FGameplayTag::RequestGameplayTag(FName("Item.Consumable"));
 
-    UE_LOG(LogTemp, Warning, TEXT("EquipmentTag Valid: %s"), EquipmentTag.IsValid() ? TEXT("Yes") :
-        TEXT("No"));
-    UE_LOG(LogTemp, Warning, TEXT("ConsumableTag Valid: %s"), ConsumableTag.IsValid() ? TEXT("Yes") :
-        TEXT("No"));
+    //UE_LOG(LogTemp, Warning, TEXT("EquipmentTag Valid: %s"), EquipmentTag.IsValid() ? TEXT("Yes") :
+    //    TEXT("No"));
+    //UE_LOG(LogTemp, Warning, TEXT("ConsumableTag Valid: %s"), ConsumableTag.IsValid() ? TEXT("Yes") :
+    //    TEXT("No"));
 
     // 장비 슬롯 인덱스, 소비템 슬롯 인덱스
     int32 EquipSlotIndex = 0;
@@ -128,19 +129,19 @@ void UP4InventoryWidget::RefreshUI()
         }
 
         // FItemData 구조체 생성 (슬롯이 이해하는 형식)
-        FItemData SlotData;
-        SlotData.ItemDataAsset = Item.ItemData;
+        FInventoryItem SlotData;
+        SlotData.ItemData = Item.ItemData;
         SlotData.Quantity = Item.Quantity;
 
         // 아이템 타입에 따라 적절한 슬롯에 배치
-        if (Item.ItemData->HasTag(EquipmentTag))
+        if (Item.ItemData->HasTag(P4InventoryTags::Item::Equipment))
         {
             UE_LOG(LogTemp, Warning, TEXT("장비 아이템으로 분류됨"));
             // 장비 슬롯에 추가
             if (EquipSlotIndex < EquipmentSlots.Num())
             {
                 UE_LOG(LogTemp, Warning, TEXT("장비 슬롯[%d]에 추가"), EquipSlotIndex);
-                EquipmentSlots[EquipSlotIndex]->SetItem(SlotData);
+                //EquipmentSlots[EquipSlotIndex]->SetItem(SlotData);
                 EquipSlotIndex++;
             }
             else
@@ -148,14 +149,14 @@ void UP4InventoryWidget::RefreshUI()
                 UE_LOG(LogTemp, Error, TEXT("장비 슬롯이 꽉 참!"));
             }
         }
-        else if (Item.ItemData->HasTag(ConsumableTag))
+        else if (Item.ItemData->HasTag(P4InventoryTags::Item::Consumable))
         {
             UE_LOG(LogTemp, Warning, TEXT("소비템으로 분류됨"));
             // 소비템 슬롯에 추가
             if (ConsumSlotIndex < ConsumableSlots.Num())
             {
                 UE_LOG(LogTemp, Warning, TEXT("소비템 슬롯[%d]에 추가"), ConsumSlotIndex);
-                ConsumableSlots[ConsumSlotIndex]->SetItem(SlotData);
+                //ConsumableSlots[ConsumSlotIndex]->SetItem(SlotData);
                 ConsumSlotIndex++;
             }
             else

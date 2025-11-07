@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
 #include "GameplayTagContainer.h"
+#include "GameplayEffect.h"
 #include "ItemDataBase.generated.h"
 
 /**
@@ -46,6 +47,18 @@ public:
     FORCEINLINE TSoftObjectPtr<UTexture2D> GetIcon() const { return Icon; }
     FORCEINLINE FGameplayTagContainer GetItemTags() const { return ItemTags; }
     FORCEINLINE int32 GetMaxStackCount() const { return MaxStackCount; }
+
+    FORCEINLINE TSubclassOf<UGameplayEffect> GetItemEffect() const { return ItemEffect; }
+
+public:
+    // 아이템 사용 시 적용될 GameplayEffect
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Gameplay")
+    TSubclassOf<UGameplayEffect> ItemEffect;
+
+    // 장비 아이템인 경우 착용 중 지속되는 효과
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Gameplay")
+    TSubclassOf<UGameplayEffect> EquipmentPassiveEffect;
+
 protected:
     // 아이템 이름 (표시용)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
@@ -62,4 +75,5 @@ protected:
     // 스택 수량
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Stats")
     int32 MaxStackCount = 99;
+
 };

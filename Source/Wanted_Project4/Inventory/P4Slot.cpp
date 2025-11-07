@@ -23,13 +23,13 @@ void UP4Slot::NativeConstruct()
 	ensureAlways(TXT_Quantity);
 }
 
-void UP4Slot::SetItem(const FItemData& InItemData)
+void UP4Slot::SetItem(const FInventoryItem& InItemData)
 {
 	UE_LOG(LogTemp, Warning, TEXT("슬롯 SetItem 호출됨"));
 
 	CurrentItem = InItemData;
 
-	if (!InItemData.ItemDataAsset)
+	if (!InItemData.ItemData)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("ItemDataAsset이 nullptr - 기본 텍스처 사용"));
 		IMG_Item->SetBrushFromTexture(DefaultTexture);
@@ -37,9 +37,9 @@ void UP4Slot::SetItem(const FItemData& InItemData)
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("아이템: %s, 수량: %d"),
-		*InItemData.ItemDataAsset->GetItemName().ToString(), InItemData.Quantity);
+		*InItemData.ItemData->GetItemName().ToString(), InItemData.Quantity);
 
-	TSoftObjectPtr<UTexture2D> SoftIcon = InItemData.ItemDataAsset->GetIcon();
+	TSoftObjectPtr<UTexture2D> SoftIcon = InItemData.ItemData->GetIcon();
 	if (SoftIcon.IsNull())
 	{
 		IMG_Item->SetBrushFromTexture(DefaultTexture);
@@ -85,7 +85,7 @@ void UP4Slot::SetItem(const FItemData& InItemData)
 
 void UP4Slot::ClearSlot()
 {
-	CurrentItem = FItemData();
+	CurrentItem = FInventoryItem();
 	IMG_Item->SetBrushFromTexture(DefaultTexture);
 
 	// 수량 텍스트도 숨기기
