@@ -30,11 +30,14 @@ protected:
 	UFUNCTION()
 	void OnInterruptedCallback();
 
-	//FName GetNextSection();
+	FName GetNextSection();
 	//void StartComboTimer();
 	//void CheckComboInput();
 
 protected:
+	uint8 CurrentIndex = 0;
+	uint8 MaxCount = 2;
+
 	//UPROPERTY()
 	//TObjectPtr<class UABComboActionData> CurrentComboData;
 
