@@ -5,6 +5,7 @@
 
 #include "AbilitySystemComponent.h"
 #include "AI/P4MonsterAIController.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Stat/P4MonsterStatComponent.h"
 
@@ -45,10 +46,12 @@ void AP4MonsterBase::BeginPlay()
 		if (AttributeSet)
 		{
 			// 데이터 테이블에서 이름으로 Row 값 받아와서 값 설정하기
-			if (const FP4MonsterStat* Row = MonsterStatData->FindRow<FP4MonsterStat>(MonsterID, TEXT("Monster Data Init")))
+			if (const FP4MonsterStat* Row = MonsterStatData->FindRow<FP4MonsterStat>(
+				MonsterID, TEXT("Monster Data Init")))
 			{
 				// AttributeSet 세팅
 				AttributeSet->SetMaxHP(Row->MaxHP);
+				AttributeSet->SetCurHP(Row->MaxHP);
 				AttributeSet->SetDetectRange(Row->DetectRange);
 				AttributeSet->SetChaseRange(Row->ChaseRange);
 				AttributeSet->SetMovementSpeed(Row->MovementSpeed);
@@ -61,6 +64,7 @@ void AP4MonsterBase::BeginPlay()
 				bIsAgressive = Row->bIsAggressive;
 
 				UE_LOG(LogTemp, Log, TEXT("MaxHP: %f"), AttributeSet->GetMaxHP());
+				UE_LOG(LogTemp, Log, TEXT("CurHP: %f"), AttributeSet->GetCurHP());
 				UE_LOG(LogTemp, Log, TEXT("DetectRange: %f"), AttributeSet->GetDetectRange());
 				UE_LOG(LogTemp, Log, TEXT("ChaseRange: %f"), AttributeSet->GetChaseRange());
 				UE_LOG(LogTemp, Log, TEXT("MovementSpeed: %f"), AttributeSet->GetMovementSpeed());
@@ -68,18 +72,199 @@ void AP4MonsterBase::BeginPlay()
 			}
 		}
 	}
+
+	// 공격 델리게이트 배열 설정
+	SetupAttackDelegate();
+}
+
+void AP4MonsterBase::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+
+	// 몬스터 사망 시 발행될 델리게이트 함수 세팅
+	AttributeSet->OnHpZero.AddUObject(this, &AP4MonsterBase::SetDead);
 }
 
 void AP4MonsterBase::AttackHitCheck()
 {
+	// @Todo: 공격 판정 구현 필요(델리게이트로 바꾸면서 미사용)
+}
+
+void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
+{
+	if (ASC)
+	{
+		// Hit 몽타주 실행
+		HitActionBegin();
+
+		// 체력 감소 적용 부분
+		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+		Context.AddSourceObject(this);
+
+		// 받을 데미지 설정
+		AttributeSet->SetDamageAmount(DamageAmount);
+
+		// 블루프린트로 생성한 GameplayEffect 클래스 불러오기
+		FSoftClassPath GEPath(TEXT("/Game/Monster/GE/BPGE_MonsterDamaged.BPGE_MonsterDamaged_C"));
+		TSoftClassPtr<UGameplayEffect> DamagedEffectSoftClass(GEPath);
+
+		// 메모리에 아직 BPGE_MonsterDamaged 가 없으면
+		if (DamagedEffectSoftClass.IsPending())
+		{
+			// 동기 로드
+			DamagedEffectSoftClass.LoadSynchronous();
+		}
+
+		// 로드 성공 시 사용
+		TSubclassOf<UGameplayEffect> DamagedEffectClass = DamagedEffectSoftClass.Get();
+		if (DamagedEffectClass)
+		{
+			FGameplayEffectSpecHandle SpecHandle
+				= ASC->MakeOutgoingSpec(DamagedEffectClass, 1.f, Context);
+			if (SpecHandle.IsValid())
+			{
+				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+				UE_LOG(LogTemp, Log, TEXT("몬스터 데미지 호출"));
+				UE_LOG(LogTemp, Log, TEXT("CurHP: %f"), AttributeSet->GetCurHP());
+			}
+		}
+	}
 }
 
 void AP4MonsterBase::AttackByAI()
 {
+	// 각 몬스터 Class 에서 AttackActionBegin(FName& InAttackMontageSectionName) 으로
+	// 공격 몽타주 섹션 이름 넘겨줘서 공격 실행
 }
 
 void AP4MonsterBase::SetAIAttackDelegate(const FAIMonsterAttackFinished& InOnAttackFinished)
 {
+	// 전달받은 델리게이트 저장
+	OnAttackFinished = InOnAttackFinished;
+}
+
+void AP4MonsterBase::NotifyActionEnd()
+{
+	// 공격 끝날 시 전달받은 델리게이트 호출
+	// 여기서는 공격 완료 상태 전달
+	OnAttackFinished.ExecuteIfBound();
+}
+
+void AP4MonsterBase::AttackActionBegin(FName& InAttackMontageSectionName, const float AttackSpeed)
+{
+	// 공격 모션동안 이동 막기
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 몽타주 재생을 위해 AnimInstance 갖고 오기
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		// 입력받은 섹션으로 몽타주 섹션 변경
+		AnimInstance->Montage_JumpToSection(InAttackMontageSectionName, AttackActionMontage);
+
+		// 몽타주 실행 
+		AnimInstance->Montage_Play(AttackActionMontage, AttackSpeed);
+
+		// 몽타주 재생이 끝날 때 실행될 함수 바인딩
+		FOnMontageEnded OnMontageEnded;
+		OnMontageEnded.BindUObject(this, &AP4MonsterBase::AttackActionEnd);
+
+		// 몽타주 재생 종료 시 바인딩한 델리게이트 실행
+		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, AttackActionMontage);
+	}
+}
+
+void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
+{
+	// 무브먼트 모드 복구
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
+	// 공격이 끝났음을 알림
+	NotifyActionEnd();
+}
+
+void AP4MonsterBase::HitActionBegin()
+{
+	// Hit 몽타주 실행
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		// Hit 모션동안 이동 막기
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+		// Hit 몽타주 재생
+		AnimInstance->Montage_Play(HitMontage, 1.8f);
+
+		FOnMontageEnded OnMontageEnded;
+		OnMontageEnded.BindUObject(
+			this, &AP4MonsterBase::HitActionEnd
+		);
+
+		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, HitMontage);
+	}
+}
+
+void AP4MonsterBase::HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
+{
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+}
+
+void AP4MonsterBase::SetDead()
+{
+	// 이동 못하게 막기
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 사망 몽타주 재생
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(0.f);
+		AnimInstance->Montage_Play(DeadMontage, 3.f);
+	}
+
+	// 콜리전 끄기
+	SetActorEnableCollision(false);
+
+	// AI 재생 멈추기
+	AP4MonsterAIController* P4MonsterAIController = Cast<AP4MonsterAIController>(GetController());
+	if (P4MonsterAIController)
+	{
+		P4MonsterAIController->StopAI();
+	}
+
+	// DeadEventDelayTime 후 액터 삭제
+	FTimerHandle DeadTimerHandle;
+	float DeadEventDelayTime = 5.f;
+	GetWorld()->GetTimerManager().SetTimer(
+		DeadTimerHandle,
+		[&]()
+		{
+			Destroy();
+		},
+		DeadEventDelayTime,
+		false
+	);
+}
+
+void AP4MonsterBase::SetupAttackDelegate()
+{
+}
+
+void AP4MonsterBase::ExecuteAttackSection(const FName& SectionName)
+{
+	// 섹션 이름을 Index로 변경
+	int32 Index = AttackSectionNames.IndexOfByKey(SectionName);
+	if (AttackDelegates.IsValidIndex(Index) && AttackDelegates[Index].IsBound())
+	{
+		// 해당 인덱스의 함수 실행
+		AttackDelegates[Index].Execute();
+	}
+
+	// 함수 없으면 로그 띄움
+	else
+	{
+		UE_LOG(LogTemp, Log, TEXT("%s 에 해당하는 함수가 없습니다."), *SectionName.ToString());
+	}
 }
 
 UAbilitySystemComponent* AP4MonsterBase::GetAbilitySystemComponent() const

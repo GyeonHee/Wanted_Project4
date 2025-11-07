@@ -3,21 +3,31 @@
 
 #include "P4CharacterBase.h"
 #include "AbilitySystemComponent.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 
 // Sets default values
 AP4CharacterBase::AP4CharacterBase()
 {
- 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	// GAS 초기화
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 }
 
 void AP4CharacterBase::PostInitializeComponents()
 {
-	Super::PostInitializeComponents();
+    Super::PostInitializeComponents();
 
-	ASC->InitAbilityActorInfo(this, this);
+    if (ASC)
+    {
+        ASC->InitAbilityActorInfo(this, this);
+        AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
+
+        //// 기본 어빌리티 바로 등록
+        //ASC->GiveAbility(FGameplayAbilitySpec(UBasicAttackAbility::StaticClass()));
+        //ASC->GiveAbility(FGameplayAbilitySpec(UDodgeAbility::StaticClass()));
+        //ASC->GiveAbility(FGameplayAbilitySpec(USkillAbility::StaticClass()));
+    }
 }
 
 UAbilitySystemComponent* AP4CharacterBase::GetAbilitySystemComponent() const
@@ -30,24 +40,4 @@ void AP4CharacterBase::AttackHitCheck()
 	// 충돌 판정 로직 작성.
 }
 
-// Called when the game starts or when spawned
-void AP4CharacterBase::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
-
-// Called every frame
-void AP4CharacterBase::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
-}
-
-// Called to bind functionality to input
-void AP4CharacterBase::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
-{
-	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
-}
 
