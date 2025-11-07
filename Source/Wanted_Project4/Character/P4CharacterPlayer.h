@@ -18,6 +18,12 @@ class WANTED_PROJECT4_API AP4CharacterPlayer : public AP4CharacterBase
 public:
 	AP4CharacterPlayer();
 
+	// 컨트롤러가 호출하는 함수들
+public:
+	// 입력 제어 함수
+	void GASInputPressed(int32 InputId);
+	void GASInputReleased(int32 InputId);
+
 	// 입력 처리 함수
 	void HandleMove(const FInputActionValue& Value);
 	void HandleLook(const FInputActionValue& Value);
@@ -31,13 +37,22 @@ protected:
 	TObjectPtr<class UCameraComponent> Camera;
 
 protected:
+	///Script/Engine.AnimMontage'/Game/Character/Animation/AM_Rolling.AM_Rolling'
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> RollingMontage;
+
+	///Script/Engine.AnimMontage'/Game/Character/Animation/AM_Rolling.AM_Rolling'
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> RunMontage;
+public:
 	// GAS
-	UPROPERTY(EditAnywhere, Category = GAS)
-	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
+	//UPROPERTY(EditAnywhere, Category = GAS)
+	//TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
 
+private:
 	//UPROPERTY(EditAnywhere, Category = Weapon)
 	//TObjectPtr<class USkeletalMesh> WeaponMesh;
 };
