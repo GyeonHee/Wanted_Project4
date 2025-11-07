@@ -29,6 +29,7 @@ void UP4InventoryWidget::NativeConstruct()
 			if (UP4Slot* SlotWidget = Cast<UP4Slot>(Child))
 			{
 				EquipmentSlots.Add(SlotWidget);
+
 				UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 추가됨: %s"), *SlotWidget->GetName());
 			}
 		}
@@ -94,15 +95,6 @@ void UP4InventoryWidget::RefreshUI()
     UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 개수: %d, 소비템 슬롯 개수: %d"), EquipmentSlots.Num(),
         ConsumableSlots.Num());
 
-    //// Equipment 태그를 정의 (프로젝트 설정에서 만든 태그 사용)
-    //FGameplayTag EquipmentTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment"));
-    //FGameplayTag ConsumableTag = FGameplayTag::RequestGameplayTag(FName("Item.Consumable"));
-
-    //UE_LOG(LogTemp, Warning, TEXT("EquipmentTag Valid: %s"), EquipmentTag.IsValid() ? TEXT("Yes") :
-    //    TEXT("No"));
-    //UE_LOG(LogTemp, Warning, TEXT("ConsumableTag Valid: %s"), ConsumableTag.IsValid() ? TEXT("Yes") :
-    //    TEXT("No"));
-
     // 장비 슬롯 인덱스, 소비템 슬롯 인덱스
     int32 EquipSlotIndex = 0;
     int32 ConsumSlotIndex = 0;
@@ -141,7 +133,7 @@ void UP4InventoryWidget::RefreshUI()
             if (EquipSlotIndex < EquipmentSlots.Num())
             {
                 UE_LOG(LogTemp, Warning, TEXT("장비 슬롯[%d]에 추가"), EquipSlotIndex);
-                //EquipmentSlots[EquipSlotIndex]->SetItem(SlotData);
+                EquipmentSlots[EquipSlotIndex]->SetItem(SlotData);
                 EquipSlotIndex++;
             }
             else
@@ -156,7 +148,7 @@ void UP4InventoryWidget::RefreshUI()
             if (ConsumSlotIndex < ConsumableSlots.Num())
             {
                 UE_LOG(LogTemp, Warning, TEXT("소비템 슬롯[%d]에 추가"), ConsumSlotIndex);
-                //ConsumableSlots[ConsumSlotIndex]->SetItem(SlotData);
+                ConsumableSlots[ConsumSlotIndex]->SetItem(SlotData);
                 ConsumSlotIndex++;
             }
             else

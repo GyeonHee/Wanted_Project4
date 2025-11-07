@@ -4,6 +4,7 @@
 #include "Inventory/P4InventoryComponent.h"
 #include "GameplayAbilities/Public/AbilitySystemInterface.h"
 #include "GameplayAbilities/Public/AbilitySystemComponent.h"
+#include "Inventory/P4InventoryTags.h"
 
 // Sets default values for this component's properties
 UP4InventoryComponent::UP4InventoryComponent()
@@ -91,6 +92,8 @@ bool UP4InventoryComponent::UseItem(UItemDataBase* ItemData)
 {
     if (!ItemData) return false;
 
+    UE_LOG(LogTemp, Log, TEXT("UseItem 함수 호출"));
+
     // 1. 인벤토리에 아이템이 있는지 확인
     if (GetItemCount(ItemData) <= 0)
     {
@@ -100,14 +103,28 @@ bool UP4InventoryComponent::UseItem(UItemDataBase* ItemData)
 
     // 2. Owner의 AbilitySystemComponent 가져오기
     AActor* Owner = GetOwner();
-    if (!Owner) return false;
+    if (!Owner)
+    {
+        UE_LOG(LogTemp, Log, TEXT("GetOwner 실패"));
+        return false;
+    }
+    
 
     IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(Owner);
-    if (!ASI) return false;
+    if (!ASI)
+    {
+        UE_LOG(LogTemp, Log, TEXT("IAbilitySystemInterface 캐스트 실패"));
+        return false;
+    }
+   
 
     UAbilitySystemComponent* ASC = ASI->GetAbilitySystemComponent();
-    if (!ASC) return false;
-
+    if (!ASC)
+    {
+        UE_LOG(LogTemp, Log, TEXT("GetAbilitySystemComponent() 실패"));
+        return false;
+    }
+    
     // 3. GameplayEffect 적용
     TSubclassOf<UGameplayEffect> Effect = ItemData->GetItemEffect();
     if (Effect)
@@ -121,6 +138,10 @@ bool UP4InventoryComponent::UseItem(UItemDataBase* ItemData)
             ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
             UE_LOG(LogTemp, Log, TEXT("아이템 효과 적용: %s"), *ItemData->GetItemName().ToString());
         }
+        else
+        {
+            UE_LOG(LogTemp, Log, TEXT("SpecHandle.IsValid() 실패"));
+        }
     }
 
     // 4. 소비 아이템이면 수량 감소
@@ -130,12 +151,15 @@ bool UP4InventoryComponent::UseItem(UItemDataBase* ItemData)
         RemoveItem(ItemData, 1);
     }
 
+    UE_LOG(LogTemp, Log, TEXT("UseItem 함수 리턴"));
     return true;
 }
 
 bool UP4InventoryComponent::EquipItem(UItemDataBase* ItemData)
 {
     if (!ItemData) return false;
+
+    UE_LOG(LogTemp, Log, TEXT("EquipItem 함수 호출"));
 
     // 장비 태그 확인
     FGameplayTag EquipmentTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment"));
@@ -179,6 +203,7 @@ bool UP4InventoryComponent::EquipItem(UItemDataBase* ItemData)
         }
     }
 
+    UE_LOG(LogTemp, Log, TEXT("EquipItem 함수 리턴"));
     return true;
 }
 
@@ -217,8 +242,8 @@ bool UP4InventoryComponent::HasSpace(UItemDataBase* ItemData) const
     if (!ItemData) return false;
 
     // 아이템 타입에 따라 슬롯 개수 확인
-    FGameplayTag EquipmentTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment"));
-    FGameplayTag ConsumableTag = FGameplayTag::RequestGameplayTag(FName("Item.Consumable"));
+    /*FGameplayTag EquipmentTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment"));
+    FGameplayTag ConsumableTag = FGameplayTag::RequestGameplayTag(FName("Item.Consumable"));*/
 
     int32 CurrentEquipCount = 0;
     int32 CurrentConsumCount = 0;
@@ -227,14 +252,15 @@ bool UP4InventoryComponent::HasSpace(UItemDataBase* ItemData) const
     {
         if (Item.ItemData)
         {
-            if (Item.ItemData->HasTag(EquipmentTag)) CurrentEquipCount++;
-            else if (Item.ItemData->HasTag(ConsumableTag)) CurrentConsumCount++;
+            
+            if (Item.ItemData->HasTag(P4InventoryTags::Item::Equipment)) CurrentEquipCount++;
+            else if (Item.ItemData->HasTag(P4InventoryTags::Item::Consumable)) CurrentConsumCount++;
         }
     }
 
-    if (ItemData->HasTag(EquipmentTag))
+    if (ItemData->HasTag(P4InventoryTags::Item::Equipment))
         return CurrentEquipCount < MaxEquipmentSlots;
-    else if (ItemData->HasTag(ConsumableTag))
+    else if (ItemData->HasTag(P4InventoryTags::Item::Consumable))
         return CurrentConsumCount < MaxConsumableSlots;
 
     return false;
