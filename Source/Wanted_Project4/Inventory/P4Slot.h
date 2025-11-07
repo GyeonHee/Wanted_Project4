@@ -5,27 +5,9 @@
 #include "CoreMinimal.h"
 #include "UI/P4CustomWidget.h"
 #include "GameplayTagContainer.h"
+#include "P4InventoryComponent.h"
 #include "P4Slot.generated.h"
 
-USTRUCT(BlueprintType)
-struct FItemData
-{
-	GENERATED_BODY()
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	TObjectPtr<class UItemDataBase> ItemDataAsset;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 Quantity;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	int32 SlotIndex;
-
-	FItemData()
-		: ItemDataAsset(nullptr), Quantity(0), SlotIndex(-1)
-	{
-	}
-};
 /**
  * 
  */
@@ -39,7 +21,7 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	void SetItem(const struct FItemData& InItemData);
+	void SetItem(const struct FInventoryItem& InItemData);
 
 	void ClearSlot();
 public:
@@ -61,5 +43,5 @@ public:
 
 protected:
 	// 슬롯이 현재 가진 아이템 정보
-	FItemData CurrentItem;
+	FInventoryItem CurrentItem;
 };
