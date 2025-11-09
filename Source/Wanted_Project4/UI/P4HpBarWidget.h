@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "UI/P4CustomWidget.h"
+#include "GamePlayEffectTypes.h"
 #include "P4HpBarWidget.generated.h"
 
 /**
@@ -21,23 +22,28 @@ public:
 
 	void UpdateStat();
 
-	void UpdateHpBar(float NewCurrentHp);
+	void UpdateHpBar();
+
+
+	virtual void SetAbilitySystemComponent(AActor* InOwner) override;
 protected:
 	// 위젯이 모두 초기화가 된 후에 호출되는 함수.
 	// 위젯을 참조할 때 생성됐다는 것을 보장 받을 수 있음.
 	virtual void NativeConstruct() override;
 
 
+	virtual void OnHealthChanged(const FOnAttributeChangeData& ChangedData);
+	virtual void OnMaxHealthChanged(const FOnAttributeChangeData& ChangedData);
 //Var Sections
 public:
 
 protected:
-	UPROPERTY()
-	TObjectPtr<class UProgressBar> HpProgressBar;
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UProgressBar> P4HpBar;
 
 	UPROPERTY()
-	float CurrentHp = 70.0f; //플레이어 캐릭터의 현재 체력.
+	float CurrentHp = 0.0f; //플레이어 캐릭터의 현재 체력.
 
 	UPROPERTY()
-	float MaxHp; //플레이어 캐릭터의 최대 체력.
+	float MaxHp = 0.1f; //플레이어 캐릭터의 최대 체력.
 };

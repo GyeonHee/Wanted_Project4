@@ -31,4 +31,6 @@ protected:
 
 	//UPROPERTY()
 	//TObjectPtr<class UP4MiniMapWidget> MiniMap;
+
+
 };

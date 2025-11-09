@@ -4,6 +4,8 @@
 #include "UI/P4HpBarWidget.h"
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "AbilitySystemComponent.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 //#include "Interface/P4CharacterWidgetInterface.h"
 UP4HpBarWidget::UP4HpBarWidget(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -14,16 +16,17 @@ UP4HpBarWidget::UP4HpBarWidget(const FObjectInitializer& ObjectInitializer)
 }
 
 
-void UP4HpBarWidget::UpdateHpBar(float NewCurrentHp)
+void UP4HpBarWidget::UpdateHpBar()
 {
-	CurrentHp = NewCurrentHp;
+	//CurrentHp = NewCurrentHp;
 
 	ensureAlways(MaxHp > 0.0f);
 
-	if (HpProgressBar != nullptr)
+	if (P4HpBar != nullptr)
 	{
-		HpProgressBar->SetPercent(CurrentHp / MaxHp);
+		P4HpBar->SetPercent(CurrentHp / MaxHp);
 	}
+
 }
 
 void UP4HpBarWidget::NativeConstruct()
@@ -31,12 +34,12 @@ void UP4HpBarWidget::NativeConstruct()
 	Super::NativeConstruct();
 
 	//위젯 참조를 위한 코드 작성.
-	HpProgressBar
+	P4HpBar
 		= Cast<UProgressBar>(
 			GetWidgetFromName(TEXT("P4HpBar"))
 		);
 
-	ensureAlways(HpProgressBar);
+	ensureAlways(P4HpBar != nullptr);
 
 	//IP4CharacterWidgetInterface* CharacterWidget
 	//	= Cast<IP4CharacterWidgetInterface>(OwningActor);
@@ -46,4 +49,36 @@ void UP4HpBarWidget::NativeConstruct()
 	//	CharacterWidget->SetupCharacterWidget(this);
 	//}
 	
+}
+
+void UP4HpBarWidget::SetAbilitySystemComponent(AActor* InOwner)
+{
+	Super::SetAbilitySystemComponent(InOwner);
+
+	if (ASC != nullptr)
+	{
+		ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetHealthAttribute()).AddUObject(this,&UP4HpBarWidget::OnHealthChanged);
+		ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetMaxHealthAttribute()).AddUObject(this,&UP4HpBarWidget::OnMaxHealthChanged);
+
+		const UP4PlayerAttributeSet* CurrentAttributeSet = ASC->GetSet<UP4PlayerAttributeSet>();
+
+		ensure(CurrentAttributeSet);
+
+		CurrentHp =  CurrentAttributeSet->GetHealth();
+		MaxHp = CurrentAttributeSet->GetMaxHealth();
+		ensure(MaxHp > 0.0f);
+
+	}
+}
+
+void UP4HpBarWidget::OnHealthChanged(const FOnAttributeChangeData& ChangedData)
+{
+	CurrentHp = ChangedData.NewValue;
+	UpdateHpBar();
+}
+
+void UP4HpBarWidget::OnMaxHealthChanged(const FOnAttributeChangeData& ChangedData)
+{
+	MaxHp = ChangedData.NewValue;
+	UpdateHpBar();
 }

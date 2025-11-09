@@ -12,10 +12,11 @@ UP4HUDWidget::UP4HUDWidget(const FObjectInitializer& ObjectInitalizer)
 
 }
 
-void UP4HUDWidget::UpdateHpBar(float NewCurrentHp)
-{
-	HpBar->UpdateHpBar(NewCurrentHp);
-}
+//작성 한승헌 GAS사용시 이건 필요가 없음
+//void UP4HUDWidget::UpdateHpBar(float NewCurrentHp)
+//{
+//	HpBar->UpdateHpBar(NewCurrentHp);
+//}
 
 void UP4HUDWidget::UpdataMiniMap(FVector PlayerLocation)
 {
@@ -32,6 +33,17 @@ void UP4HUDWidget::NativeConstruct()
 	);
 
 	ensureAlways(HpBar != nullptr);
+
+
+	if (HpBar != nullptr && GetOwningPlayer() != nullptr)
+	{
+		APawn* Pawn = GetOwningPlayer()->GetPawn();
+
+		if (Pawn != nullptr)
+		{
+			HpBar->SetAbilitySystemComponent(Pawn);
+		}
+	}
 
 	//MiniMap = Cast<UP4MiniMapWidget>(
 	//	GetWidgetFromName(TEXT("WidgetMiniMap"))
