@@ -6,6 +6,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 //#include "ArenaBattleGAS.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "P4GA_Jump.h"
 //#include "Character/ABComboActionData.h"
 
 UP4GA_Attack::UP4GA_Attack()
