@@ -48,6 +48,11 @@ private:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> AttackAction;
 
+
+    //작성 - 한승헌 2025-11-10
+    //디버그용 데미지 주기.
+    UFUNCTION(Exec)
+    void DebugDamage(float Amount = 20.f);
 private:
     // GAS 
     void HandleAbilityPressed(int32 InputID);
@@ -55,4 +60,16 @@ private:
     // 입력 처리 함수
     void HandleMove(const FInputActionValue& Value);
     void HandleLook(const FInputActionValue& Value);
+
+
+//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
+protected:
+    //생성할 위젯의 클래스.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
+    TSubclassOf<class UP4HUDWidget> P4HUDWidgetClass;
+
+    //생성된 위젯의 객체.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
+    TObjectPtr<class UP4HUDWidget> P4HUDWidget;
+
 };

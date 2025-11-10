@@ -22,6 +22,8 @@ public:
 	void UpdataMiniMap(FVector PlayerLocation);
 
 
+	TObjectPtr<class UP4HpBarWidget> GetHpBar() const;
+
 protected:
 	virtual void NativeConstruct() override;
 
@@ -29,6 +31,8 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UP4HpBarWidget> HpBar;
 
-	UPROPERTY()
-	TObjectPtr<class UP4MiniMapWidget> MiniMap;
+	//UPROPERTY()
+	//TObjectPtr<class UP4MiniMapWidget> MiniMap;
+
+
 };

@@ -20,11 +20,11 @@ void AP4StageGimmck::BeginPlay()
 	Super::BeginPlay();
 	
 
-	Vx = TileOffsetCoordB - TileOffsetCoordA;
-	Vy = TileOffsetCoordC - TileOffsetCoordA;
+	Vx = (TileOffsetCoordB - TileOffsetCoordA);
+	Vy = (TileOffsetCoordC - TileOffsetCoordA);
 
-	Vx.Z = 0.f;
-	Vy.Z = 0.f;
+	//Vx.Z = 0.f;
+	//Vy.Z = 0.f;
 
 	//플레이어 가져오기.
 	//AP4CharacterBase* PlayerCharacter 
@@ -99,24 +99,24 @@ FVector AP4StageGimmck::CellToWorld(const FIntPoint& cell) const
 	//셀 기반 맵파츠 A의 위치.
 	FVector Pos = GetActorLocation() + (Vx * cell.X) + (Vy * cell.Y);
 
-	switch (GetCellType(cell))
-	{
-	case ETileType::A:
-		Pos += TileOffsetCoordA;
-		break;
+	//switch (GetCellType(cell))
+	//{
+	//case ETileType::A:
+	//	Pos += TileOffsetCoordA;
+	//	break;
 
-	case ETileType::B:
-		Pos += TileOffsetCoordB;
-		break;
+	//case ETileType::B:
+	//	Pos += TileOffsetCoordB;
+	//	break;
 
-	case ETileType::C:
-		Pos += TileOffsetCoordC;
-		break;
+	//case ETileType::C:
+	//	Pos += TileOffsetCoordC;
+	//	break;
 
-	case ETileType::D:
-		Pos += TileOffsetCoordD;
-		break;
-	}
+	//case ETileType::D:
+	//	Pos += TileOffsetCoordD;
+	//	break;
+	//}
 
 	return Pos;
 }

@@ -6,7 +6,8 @@
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "AbilitySystemComponent.h"
-
+#include "Components/SceneCaptureComponent2D.h"
+#include "Components/SceneComponent.h"
 
 AP4CharacterPlayer::AP4CharacterPlayer()
 {
@@ -47,8 +48,24 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm);
 
+	
+	//미니맵을 위한 코드입니다.
+	//-작성: 한승헌 -일시: 2025.11.07
+	MapSpringArm = CreateDefaultSubobject<USpringArmComponent>(TEXT("MiniMap SpringArm"));
+	MapSpringArm->SetupAttachment(RootComponent);
+	MapSpringArm->TargetArmLength = 300.0f;
+	MapSpringArm->SetRelativeRotation(FRotator(-90.0f, 0.0f, 0.0f));
+	MapSpringArm->bUsePawnControlRotation = false;  // 컨트롤러 회전 영향 X
+	MapSpringArm->bDoCollisionTest = false;         // 지형에 밀려 짧아지는 것 방지
+	/*Cast<USceneComponent>MapSpringArm->bAbsoluteRotation = true;  */       // 월드 고정 회전
+
+	MapViewrCapture = CreateDefaultSubobject<USceneCaptureComponent2D>(TEXT("MiniMapCapture"));
+	MapViewrCapture->SetupAttachment(MapSpringArm);
+	MapViewrCapture->ProjectionType = ECameraProjectionMode::Orthographic;
+	MapViewrCapture->OrthoWidth = 32768.0f;
+	MapViewrCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorHDR;
+	//여기까지가 미니맵 코드입니다. - 작성: 한승헌.
 }
-//
 
 void AP4CharacterPlayer::GASInputPressed(int32 InputId)
 {
@@ -126,6 +143,14 @@ void AP4CharacterPlayer::HandleLook(const FInputActionValue& Value)
 	// 마우스 좌우 드래그 입력을 컨트롤러의 Y축 회전(피치, Pitch)에 적용.
 	AddControllerPitchInput(LookValue.Y);
 }
+
+//void AP4CharacterPlayer::SetupHUDWidget(UP4HUDWidget* InHudWidtet)
+//{
+//	if (InHudWidtet != nullptr)
+//	{
+//		
+//	}
+//}
 
 //void AP4CharacterPlayer::HandleAttack(const FInputActionValue& Value)
 //{

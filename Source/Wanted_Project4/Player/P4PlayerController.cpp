@@ -7,6 +7,9 @@
 #include "InputMappingContext.h"
 #include "Character/P4CharacterPlayer.h"
 #include "AbilitySystemComponent.h"
+#include "UI/P4HUDWidget.h"
+#include "UI/P4HpBarWidget.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -40,6 +43,15 @@ AP4PlayerController::AP4PlayerController()
 	{
 		AttackAction = AttackActionRef.Object;
 	}
+
+
+	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
+	static ConstructorHelpers::FClassFinder<UP4HUDWidget> P4HUDWidgetRef(TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
+
+	if (P4HUDWidgetRef.Succeeded() == true)
+	{
+		P4HUDWidgetClass = P4HUDWidgetRef.Class;
+	}
 }
 
 void AP4PlayerController::BeginPlay()
@@ -70,7 +82,28 @@ void AP4PlayerController::BeginPlay()
 
 	ConsoleCommand(TEXT("showdebug abilitysystem"));
 
+
+	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
+	P4HUDWidget = CreateWidget<UP4HUDWidget>(this, P4HUDWidgetClass);
+
+	if (P4HUDWidget != nullptr)
+	{
+		P4HUDWidget->AddToViewport();
+
+		if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(GetPawn()))
+		{
+			if (UAbilitySystemComponent* ASC = CharacterPlayer->GetAbilitySystemComponent())
+			{
+				if (UP4HpBarWidget* HpBar = P4HUDWidget->GetHpBar())
+				{
+					HpBar->SetAbilitySystemComponent(CharacterPlayer);
+				}
+			}
+		}
+	}
+	
 }
+//
 
 void AP4PlayerController::OnPossess(APawn* InPawn)
 {
@@ -92,6 +125,15 @@ void AP4PlayerController::OnPossess(APawn* InPawn)
 			//		ASC->GiveAbility(Spec);
 			//	}
 			//}
+
+			// 블루프린트에서 설정해준 초기 어빌리티 부여(인풋X)
+			for (const auto& StartAbility : CharacterPlayer->StartAbilities)
+			{
+				FGameplayAbilitySpec StartSpec(StartAbility);
+				ASC->GiveAbility(StartSpec);
+			}
+
+			// 블루프린트에서 설정해준 초기 어빌리티 부여(인풋O)
 			for (const auto& StartInputAbility : CharacterPlayer->StartInputAbilities)
 			{
 				FGameplayAbilitySpec StartSpec(StartInputAbility.Value);
@@ -100,6 +142,11 @@ void AP4PlayerController::OnPossess(APawn* InPawn)
 			}
 
 			SetupGASInputBindings(ASC);
+
+			if (P4HUDWidget != nullptr && P4HUDWidget->GetHpBar() != nullptr)
+			{
+				P4HUDWidget->GetHpBar()->SetAbilitySystemComponent(CharacterPlayer);
+			}
 		}
 	}
 }
@@ -130,6 +177,8 @@ void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
 		EIC->BindAction(JumpAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 0);
 		EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &AP4PlayerController::HandleAbilityReleased, 0);
 		EIC->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 1);
+		//EIC->BindAction(RollAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
+		//EIC->BindAction(RollAction, ETriggerEvent::Completed, this, &AP4PlayerController::HandleAbilityReleased, 2);
 	}
 }
 
@@ -164,4 +213,19 @@ void AP4PlayerController::HandleLook(const FInputActionValue& Value)
 	{
 		CharacterPlayer->HandleLook(Value);
 	}
+}
+
+
+//작성 - 한승헌 2025-11-10
+//임시
+void AP4PlayerController::DebugDamage(float Amount)
+{
+	if (auto* CP = Cast<AP4CharacterPlayer>(GetPawn()))
+		if (auto* ASC = CP->GetAbilitySystemComponent())
+		{
+			// Health에서 Amount만큼 감소
+			ASC->ApplyModToAttribute(UP4PlayerAttributeSet::GetHealthAttribute(),
+				EGameplayModOp::Additive, -FMath::Abs(Amount));
+			UE_LOG(LogTemp, Log, TEXT("[DebugDamage] HP -%0.1f"), Amount);
+		}
 }

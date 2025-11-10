@@ -24,5 +24,5 @@ class WANTED_PROJECT4_API IP4CharacterHUDInterface
 public:
 
 	//HUD 호출 인터페이스 함수.
-	virtual void SetupHUDWidget(class UP4HUDWidget* HudWidget) = 0;
+	//virtual void SetupHUDWidget(class UP4HUDWidget* HudWidget) = 0;
 };

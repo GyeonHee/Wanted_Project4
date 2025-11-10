@@ -4,6 +4,7 @@
 #include "P4CharacterBase.h"
 #include "AbilitySystemComponent.h"
 #include "Attribute/P4PlayerAttributeSet.h"
+#include "Physics/P4Collision.h"
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -16,7 +17,7 @@ AP4CharacterBase::AP4CharacterBase()
 
 	// GAS 초기화
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
-
+	AttributeSet = CreateDefaultSubobject<UP4PlayerAttributeSet>(TEXT("AttributeSet"));
 	// Pawn
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -24,7 +25,7 @@ AP4CharacterBase::AP4CharacterBase()
 
 	// Capsule
 	//GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	//GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_ABCAPSULE);
+	GetCapsuleComponent()->SetCollisionProfileName(CPROPILE_P4CAPSULE);
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -40,8 +41,8 @@ AP4CharacterBase::AP4CharacterBase()
 		FVector(0.0f, 0.0f, -38.0f),
 		FRotator(0.0f, -90.0f, 0.0f)
 	);
-	//GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	//GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	// Set Assets
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(
@@ -70,7 +71,7 @@ AP4CharacterBase::AP4CharacterBase()
 	//	CharacterControlManager.Add(ECharacterControlType::Quater, QuaterDataRef.Object);
 	//}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Character/Animation/AM_Rolling.AM_Rolling"));
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Character/Animation/Katana/ForUse/AM_KatanaDefaultAttack.AM_KatanaDefaultAttack"));
 	if (ComboActionMontageRef.Object)
 	{
 		ComboActionMontage = ComboActionMontageRef.Object;
@@ -100,7 +101,7 @@ void AP4CharacterBase::PostInitializeComponents()
     if (ASC)
     {
         ASC->InitAbilityActorInfo(this, this);
-        AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
+        //AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
     }
 }
 
@@ -109,9 +110,9 @@ UAbilitySystemComponent* AP4CharacterBase::GetAbilitySystemComponent() const
 	return ASC;
 }
 
-void AP4CharacterBase::AttackHitCheck()
-{
-	// 충돌 판정 로직 작성.
-}
+//void AP4CharacterBase::AttackHitCheck()
+//{
+//	// 충돌 판정 로직 작성.
+//}
 
 

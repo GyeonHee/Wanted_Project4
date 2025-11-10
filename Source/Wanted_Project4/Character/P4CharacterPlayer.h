@@ -5,13 +5,15 @@
 #include "CoreMinimal.h"
 #include "Character/P4CharacterBase.h"
 #include "InputActionValue.h"
+#include "Interface/P4CharacterHUDInterface.h"
 #include "P4CharacterPlayer.generated.h"
 
 /**
  * 
  */
 UCLASS()
-class WANTED_PROJECT4_API AP4CharacterPlayer : public AP4CharacterBase
+class WANTED_PROJECT4_API AP4CharacterPlayer : public AP4CharacterBase,
+	public IP4CharacterHUDInterface
 {
 	GENERATED_BODY()
 
@@ -36,6 +38,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> Camera;
 
+	//MapComponents
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USpringArmComponent> MapSpringArm;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class USceneCaptureComponent2D> MapViewrCapture;
 protected:
 	///Script/Engine.AnimMontage'/Game/Character/Animation/AM_Rolling.AM_Rolling'
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
@@ -46,8 +54,8 @@ protected:
 	TObjectPtr<class UAnimMontage> RunMontage;
 public:
 	// GAS
-	//UPROPERTY(EditAnywhere, Category = GAS)
-	//TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
+	UPROPERTY(EditAnywhere, Category = GAS)
+	TArray<TSubclassOf<class UGameplayAbility>> StartAbilities;
 
 	UPROPERTY(EditAnywhere, Category = GAS)
 	TMap<int32, TSubclassOf<class UGameplayAbility>> StartInputAbilities;
@@ -55,4 +63,9 @@ public:
 private:
 	//UPROPERTY(EditAnywhere, Category = Weapon)
 	//TObjectPtr<class USkeletalMesh> WeaponMesh;
+
+
+//HUD/UI 섹션
+protected:
+	//virtual void SetupHUDWidget(class UP4HUDWidget* InHudWidtet) override;
 };

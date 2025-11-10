@@ -6,6 +6,7 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 //#include "ArenaBattleGAS.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "P4GA_Jump.h"
 //#include "Character/ABComboActionData.h"
 
 UP4GA_Attack::UP4GA_Attack()
@@ -21,9 +22,22 @@ void UP4GA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	//CurrentComboData = P4Character->GetComboActionData();
 	P4Character->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
 
+
+
+	//FVector ForwardDir = P4Character->GetActorForwardVector();
+	//float RollDistance = 9000.f; // 구르기 거리
+	//float RollDuration = 1.f;  // 구르기 시간
+
+	//// 이동 속도 계산
+	//FVector LaunchVelocity = ForwardDir * (RollDistance / RollDuration);
+
+	//// 움직임 중 중력 무시
+	//P4Character->LaunchCharacter(LaunchVelocity, true, false);
+
+
 	if (P4Character->GetComboActionMontage())
 	{
-		UAbilityTask_PlayMontageAndWait* PlayAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), P4Character->GetComboActionMontage());
+		UAbilityTask_PlayMontageAndWait* PlayAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), P4Character->GetComboActionMontage(),1.f, GetNextSection());
 		PlayAttackTask->OnCompleted.AddDynamic(this, &UP4GA_Attack::OnCompleteCallback);
 		PlayAttackTask->OnInterrupted.AddDynamic(this, &UP4GA_Attack::OnInterruptedCallback);
 		PlayAttackTask->ReadyForActivation();
@@ -33,9 +47,19 @@ void UP4GA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	//StartComboTimer();
 }
 
+FName UP4GA_Attack::GetNextSection()
+{
+	CurrentIndex = (CurrentIndex % MaxCount) + 1;
+
+	//FName NextSection = *FString::Printf(TEXT("%s%d"), *CurrentComboData->MontageSectionNamePrefix, CurrentIndex);
+	FName NextSection = *FString::Printf(TEXT("DefaultAttack%d"), CurrentIndex);
+	return NextSection;
+}
+
 void UP4GA_Attack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	UE_LOG(LogTemp, Log, TEXT("InputPressed"));
+	//UE_LOG(LogTemp, Log, TEXT("InputPressed"));
+
 	//if (!ComboTimerHandle.IsValid())
 	//{
 	//	HasNextComboInput = false;
