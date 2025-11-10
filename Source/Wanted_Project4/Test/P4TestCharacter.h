@@ -16,10 +16,6 @@ public:
 	// Sets default values for this character's properties
 	AP4TestCharacter();
 
-	void CreateInventoryWidget();
-
-	void ToggleInventory();
-
 	// IAbilitySystemInterface 구현
 	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override { return AbilitySystemComp; }
 
@@ -28,7 +24,7 @@ protected:
 	virtual void BeginPlay() override;
 
 public:
-	// 인벤토리 컴포넌트
+	// 인벤토리 컴포넌트 (컨트롤러에서 접근)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	TObjectPtr<class UP4InventoryComponent> InventoryComp;
 
@@ -36,15 +32,4 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ability")
 	TObjectPtr<class UAbilitySystemComponent> AbilitySystemComp;
 
-	// 인벤토리 UI 위젯 클래스 (디자이너에서 지정할 수 있게)
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UP4InventoryWidget> InventoryWidgetClass;
-
-	// 실제 생성된 인벤토리 위젯 인스턴스
-	UPROPERTY()
-	TObjectPtr<class UP4InventoryWidget> InventoryWidgetInstance;
-
-
-private:
-	bool bIsInventoryVisible = false;
 };
