@@ -33,7 +33,7 @@ AP4MonsterBase::AP4MonsterBase()
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 
 	// @Todo: 테스트용 임시
-	MonsterID = FName("Jagras");
+	//MonsterID = FName("Jagras");
 }
 
 void AP4MonsterBase::BeginPlay()

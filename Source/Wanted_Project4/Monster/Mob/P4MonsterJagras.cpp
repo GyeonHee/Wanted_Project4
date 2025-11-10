@@ -7,6 +7,8 @@
 
 AP4MonsterJagras::AP4MonsterJagras()
 {
+	MonsterID = FName("Jagras");
+	
 	// Mesh 설정
 	GetMesh()->SetRelativeLocation(FVector(0.f, 0.f, -80.f));
 	GetMesh()->SetRelativeRotation(FRotator(0.f, -90.f, 0.f));
