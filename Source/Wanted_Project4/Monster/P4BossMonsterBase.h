@@ -26,6 +26,23 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+public:
+	virtual UAbilitySystemComponent* GetAbilitySystemComponent() const override
+	{
+		return ASC;
+	}
+
 	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+
+
+	// ASC 섹션
+protected:
+	// ASC
+	UPROPERTY(EditAnywhere, Category = GAS)
+	TObjectPtr<class UAbilitySystemComponent> ASC;
+
+	// 보스몬스터 스탯 AttributeSet
+	
+
 };

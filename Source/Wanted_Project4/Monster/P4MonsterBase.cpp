@@ -5,7 +5,9 @@
 
 #include "AbilitySystemComponent.h"
 #include "AI/P4MonsterAIController.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "Physics/P4Collision.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Stat/P4MonsterStatComponent.h"
 
@@ -17,6 +19,8 @@ AP4MonsterBase::AP4MonsterBase()
 	AttributeSet = CreateDefaultSubobject<UP4MonsterAttributeSet>(TEXT("AttributeSet"));
 	ASC->AddAttributeSetSubobject<UP4MonsterAttributeSet>(AttributeSet);
 
+	//GetCapsuleComponent()->SetCollisionProfileName(CPROPILE_P4CAPSULE);
+	
 	// Monster Stat Data Table
 	static ConstructorHelpers::FObjectFinder<UDataTable> DataTableRef(
 		TEXT("/Game/Monster/Data/MonsterData.MonsterData")
