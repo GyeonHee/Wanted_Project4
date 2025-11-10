@@ -92,6 +92,15 @@ void AP4PlayerController::OnPossess(APawn* InPawn)
 			//		ASC->GiveAbility(Spec);
 			//	}
 			//}
+
+			// 블루프린트에서 설정해준 초기 어빌리티 부여(인풋X)
+			for (const auto& StartAbility : CharacterPlayer->StartAbilities)
+			{
+				FGameplayAbilitySpec StartSpec(StartAbility);
+				ASC->GiveAbility(StartSpec);
+			}
+
+			// 블루프린트에서 설정해준 초기 어빌리티 부여(인풋O)
 			for (const auto& StartInputAbility : CharacterPlayer->StartInputAbilities)
 			{
 				FGameplayAbilitySpec StartSpec(StartInputAbility.Value);

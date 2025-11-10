@@ -58,7 +58,8 @@ FName UP4GA_Attack::GetNextSection()
 
 void UP4GA_Attack::InputPressed(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
-	UE_LOG(LogTemp, Log, TEXT("InputPressed"));
+	//UE_LOG(LogTemp, Log, TEXT("InputPressed"));
+
 	//if (!ComboTimerHandle.IsValid())
 	//{
 	//	HasNextComboInput = false;
