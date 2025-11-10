@@ -112,6 +112,45 @@ void AP4CharacterBase::PostInitializeComponents()
         ASC->InitAbilityActorInfo(this, this);
         //AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
     }
+	UP4PlayerAttributeSet* PlayerAttributeSet = Cast<UP4PlayerAttributeSet>(AttributeSet);
+	PlayerAttributeSet->OnHpZero.AddUObject(this, &AP4CharacterBase::SetDead);
+}
+
+void AP4CharacterBase::SetDead()
+{
+	// 이동 못하게 막기
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 사망 몽타주 재생
+	PlayDeadAnimation();
+
+	// 콜리전 끄기
+	SetActorEnableCollision(false);
+
+	// DeadEventDelayTime 후 액터 삭제
+	//FTimerHandle DeadTimerHandle;
+	//float DeadEventDelayTime = 5.f;
+	//GetWorld()->GetTimerManager().SetTimer(
+	//	DeadTimerHandle,
+	//	[&]()
+	//	{
+	//		Destroy();
+	//	},
+	//	DeadEventDelayTime,
+	//	false
+	//);
+}
+
+void AP4CharacterBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(0.f);
+
+		const float PlayRate = 3.0f;
+		AnimInstance->Montage_Play(DeadMontage, PlayRate);
+	}
 }
 
 UAbilitySystemComponent* AP4CharacterBase::GetAbilitySystemComponent() const

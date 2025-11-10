@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "P4MonsterBase.h"
@@ -69,13 +69,6 @@ void AP4MonsterBase::BeginPlay()
 
 				// MonsterBase 의 선공 여부 세팅
 				bIsAgressive = Row->bIsAggressive;
-
-				UE_LOG(LogTemp, Log, TEXT("MaxHP: %f"), AttributeSet->GetMaxHP());
-				UE_LOG(LogTemp, Log, TEXT("CurHP: %f"), AttributeSet->GetCurHP());
-				UE_LOG(LogTemp, Log, TEXT("DetectRange: %f"), AttributeSet->GetDetectRange());
-				UE_LOG(LogTemp, Log, TEXT("ChaseRange: %f"), AttributeSet->GetChaseRange());
-				UE_LOG(LogTemp, Log, TEXT("MovementSpeed: %f"), AttributeSet->GetMovementSpeed());
-				UE_LOG(LogTemp, Log, TEXT("Attack: %f"), AttributeSet->GetAttack());
 			}
 		}
 	}
@@ -152,7 +145,7 @@ void AP4MonsterBase::MonsterGiveDamage(AActor* TargetActor, const float DamageAm
 		return;
 	}
 	
-	// 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
+	// todo: 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
 	TargetAttribute->SetHealth(TargetAttribute->GetHealth() - DamageAmount);
 }
 

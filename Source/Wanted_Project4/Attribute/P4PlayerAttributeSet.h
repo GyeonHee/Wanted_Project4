@@ -11,7 +11,7 @@
  * 
  */
 
-//DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOutOfHealthDelegate);
+DECLARE_MULTICAST_DELEGATE(FOnHpZeroDelegate);
 
 UCLASS()
 class WANTED_PROJECT4_API UP4PlayerAttributeSet : public UAttributeSet
@@ -36,7 +36,8 @@ public:
 	virtual bool PreGameplayEffectExecute(struct FGameplayEffectModCallbackData& Data) override;
 	virtual void PostGameplayEffectExecute(const struct FGameplayEffectModCallbackData& Data) override;
 
-	//mutable FOutOfHealthDelegate OnOutOfHealth;
+	// const를 무시해주기 위함. 죽음 델리게이트
+	mutable FOnHpZeroDelegate OnHpZero;
 
 protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
@@ -66,7 +67,7 @@ protected:
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData Damage;
 
-	//bool bOutOfHealth = false;
+	bool bOutOfHealth = false;
 
-	//friend class UABGE_AttackDamage;
+	friend class UP4GE_AttackDamage;
 };
