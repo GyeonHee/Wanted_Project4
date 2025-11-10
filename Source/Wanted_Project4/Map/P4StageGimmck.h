@@ -79,17 +79,18 @@ private:
 	}
 public:
 	//맵 타일의 상대좌표(타일 A가 기준점).
-	UPROPERTY(EditAnywhere, Category = Grid)
+	UPROPERTY(VisibleAnywhere, Category = Grid)
 	FVector TileOffsetCoordA = FVector::ZeroVector; //타일 A 좌표
 
-	UPROPERTY(EditAnywhere, Category = Grid)
-	FVector TileOffsetCoordB = FVector(9950.f, 3750.0f, -1000.0f); //타일 B 좌표
+	UPROPERTY(VisibleAnywhere, Category = Grid)
+	FVector TileOffsetCoordB = FVector(3750.0f, -9950.0, -1000.0f); //타일 B 좌표
 
-	UPROPERTY(EditAnywhere, Category = Grid)
-	FVector TileOffsetCoordC = FVector(2800.0f, -3800.0f, -1000.0f); //타일 C 좌표
+	UPROPERTY(VisibleAnywhere, Category = Grid)
+	FVector TileOffsetCoordC = FVector(12060.0f, 5410.8f, 100.0f); //타일 C 좌표
 
-	UPROPERTY(EditAnywhere, Category = Grid)
-	FVector TileOffsetCoordD = FVector(5000.0f, 0.0f, -1000.0f); //타일 D 좌표
+	UPROPERTY(VisibleAnywhere, Category = Grid)
+	//FVector TileOffsetCoordD = FVector(5025.9f, -15159.0f, 0.0f); //타일 D 좌표
+	FVector TileOffsetCoordD = FVector(7799.0f, -5025.9f, 0.0f); //타일 D 좌표
 
 	//UPROPERTY(EditAnywhere, Category = Grid)
 	//FVector TileOffsetCoordD; //타일 D 좌표
@@ -122,4 +123,7 @@ private:
 	FVector Vx;
 	FVector Vy;
 
+	//파츠 D 보정값.
+	//FVector DCorrection = FVector::ZeroVector;
+	FVector BaseAB, BaseAC; // A->B, A->C (Z는 0으로 맞춘 값)
 };
