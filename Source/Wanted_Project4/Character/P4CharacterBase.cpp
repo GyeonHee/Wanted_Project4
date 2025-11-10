@@ -4,6 +4,7 @@
 #include "P4CharacterBase.h"
 #include "AbilitySystemComponent.h"
 #include "Attribute/P4PlayerAttributeSet.h"
+#include "Physics/P4Collision.h"
 
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -24,7 +25,7 @@ AP4CharacterBase::AP4CharacterBase()
 
 	// Capsule
 	//GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
-	//GetCapsuleComponent()->SetCollisionProfileName(CPROFILE_ABCAPSULE);
+	GetCapsuleComponent()->SetCollisionProfileName(CPROPILE_P4CAPSULE);
 
 	// Movement
 	GetCharacterMovement()->bOrientRotationToMovement = true;
@@ -40,8 +41,8 @@ AP4CharacterBase::AP4CharacterBase()
 		FVector(0.0f, 0.0f, -38.0f),
 		FRotator(0.0f, -90.0f, 0.0f)
 	);
-	//GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
-	//GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
+	GetMesh()->SetAnimationMode(EAnimationMode::AnimationBlueprint);
+	GetMesh()->SetCollisionProfileName(TEXT("NoCollision"));
 
 	// Set Assets
 	static ConstructorHelpers::FObjectFinder<USkeletalMesh> CharacterMeshRef(
