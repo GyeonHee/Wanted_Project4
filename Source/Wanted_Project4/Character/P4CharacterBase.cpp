@@ -17,7 +17,7 @@ AP4CharacterBase::AP4CharacterBase()
 
 	// GAS 초기화
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
-
+	AttributeSet = CreateDefaultSubobject<UP4PlayerAttributeSet>(TEXT("AttributeSet"));
 	// Pawn
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -101,7 +101,7 @@ void AP4CharacterBase::PostInitializeComponents()
     if (ASC)
     {
         ASC->InitAbilityActorInfo(this, this);
-        AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
+        //AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
     }
 }
 

@@ -2,7 +2,7 @@
 
 
 #include "Attribute/P4PlayerAttributeSet.h"
-
+#include "GameplayEffectExtension.h"
 UP4PlayerAttributeSet::UP4PlayerAttributeSet() :
 	AttackRange(100.0f),
 	MaxAttackRange(300.0f),
@@ -71,4 +71,22 @@ void UP4PlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 	}
 
 	bOutOfHealth = (GetHealth() <= 0.0f);*/
+
+
+
+	//작성 한승헌 - 2025-11-10
+	const float MinHealth = 0.0f;
+
+	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
+	{
+		SetHealth(FMath::Clamp(GetHealth(), MinHealth, GetMaxHealth()));
+	}
+	else if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	{
+		const float NewHealth = FMath::Clamp(GetHealth() - GetDamage(), MinHealth, GetMaxHealth());
+
+		SetHealth(NewHealth);
+
+		SetDamage(0.0f);
+	}
 }

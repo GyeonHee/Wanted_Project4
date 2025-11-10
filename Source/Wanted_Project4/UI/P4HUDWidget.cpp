@@ -34,7 +34,24 @@ void UP4HUDWidget::NativeConstruct()
 
 	ensureAlways(HpBar != nullptr);
 
+	//ÀÛ¼º ÇÑ½ÂÇå - 2025 -11 - 10
 
+	//APawn* Pawn = GetOwningPlayer() ? GetOwningPlayer()->GetPawn() : nullptr;
+
+	//if (Pawn == nullptr)
+	//{
+	//	return;
+	//}
+
+	//UAbilitySystemComponent* ASC = nullptr;
+
+	//if (Pawn->GetClass()->ImplementsInterface(UAbilitySystemInterface::StaticClass()))
+	//{
+	//	ASC = IAbilitySystemInterface::GetAbilitySystemComponent(Pawn);
+	//}
+
+	//ÀÛ¼º Á¾·á
+	
 	//if (HpBar != nullptr && GetOwningPlayer() != nullptr)
 	//{
 	//	APawn* Pawn = GetOwningPlayer()->GetPawn();

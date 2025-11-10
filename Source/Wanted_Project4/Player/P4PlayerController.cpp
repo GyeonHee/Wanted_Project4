@@ -9,6 +9,7 @@
 #include "AbilitySystemComponent.h"
 #include "UI/P4HUDWidget.h"
 #include "UI/P4HpBarWidget.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -212,4 +213,19 @@ void AP4PlayerController::HandleLook(const FInputActionValue& Value)
 	{
 		CharacterPlayer->HandleLook(Value);
 	}
+}
+
+
+//작성 - 한승헌 2025-11-10
+//임시
+void AP4PlayerController::DebugDamage(float Amount)
+{
+	if (auto* CP = Cast<AP4CharacterPlayer>(GetPawn()))
+		if (auto* ASC = CP->GetAbilitySystemComponent())
+		{
+			// Health에서 Amount만큼 감소
+			ASC->ApplyModToAttribute(UP4PlayerAttributeSet::GetHealthAttribute(),
+				EGameplayModOp::Additive, -FMath::Abs(Amount));
+			UE_LOG(LogTemp, Log, TEXT("[DebugDamage] HP -%0.1f"), Amount);
+		}
 }

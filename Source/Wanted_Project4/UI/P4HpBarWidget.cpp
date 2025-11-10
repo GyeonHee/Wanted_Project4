@@ -6,13 +6,16 @@
 #include "Components/TextBlock.h"
 #include "AbilitySystemComponent.h"
 #include "Attribute/P4PlayerAttributeSet.h"
+#include "AbilitySystemGlobals.h"
+#include "AbilitySystemInterface.h"
+
 //#include "Interface/P4CharacterWidgetInterface.h"
 UP4HpBarWidget::UP4HpBarWidget(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
 {
-	//MaxHp = -1.0f;
-	CurrentHp = 70.0f;
-	MaxHp = 100.0f;
+	////MaxHp = -1.0f;
+	//CurrentHp = 70.0f;
+	//MaxHp = 100.0f;
 }
 
 void UP4HpBarWidget::UpdateHpBar()
@@ -54,26 +57,31 @@ void UP4HpBarWidget::SetAbilitySystemComponent(AActor* InOwner)
 {
 	Super::SetAbilitySystemComponent(InOwner);
 
-
-
-	if (ASC != nullptr)
+	// 1) ASC 직접 확보
+	ASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(InOwner);
+	if (!ASC)
 	{
-		const UP4PlayerAttributeSet* Attr = ASC->GetSet<UP4PlayerAttributeSet>();
-		if (!IsValid(Attr)) return; // 아직 AttributeSet 안붙은 타이밍이면 그냥 패스
-
-		ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetHealthAttribute()).AddUObject(this,&UP4HpBarWidget::OnHealthChanged);
-		ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetMaxHealthAttribute()).AddUObject(this,&UP4HpBarWidget::OnMaxHealthChanged);
-
-		const UP4PlayerAttributeSet* CurrentAttributeSet = ASC->GetSet<UP4PlayerAttributeSet>();
-
-		ensure(CurrentAttributeSet);
-
-		MaxHp = CurrentAttributeSet->GetMaxHealth();
-		CurrentHp =  CurrentAttributeSet->GetHealth();
-
-		ensure(MaxHp > 0.0f);
-
+		if (InOwner && InOwner->GetClass()->ImplementsInterface(UAbilitySystemInterface::StaticClass()))
+		{
+			ASC = Cast<IAbilitySystemInterface>(InOwner)->GetAbilitySystemComponent();
+		}
 	}
+	if (!ASC) { UE_LOG(LogTemp, Error, TEXT("[HpBar] ASC not found")); return; }
+
+	// 2) AttributeSet 확보
+	const UP4PlayerAttributeSet* Attr = ASC->GetSet<UP4PlayerAttributeSet>();
+	if (!Attr) { UE_LOG(LogTemp, Error, TEXT("[HpBar] Attr not found")); return; }
+
+	// 3) 초기값 즉시 반영 (★ 중요: 처음에 0%로 보이는 문제 해결)
+	MaxHp = Attr->GetMaxHealth();
+	CurrentHp = Attr->GetHealth();
+	UpdateHpBar();
+
+	// 4) 델리게이트 바인딩
+	ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetHealthAttribute())
+		.AddUObject(this, &UP4HpBarWidget::OnHealthChanged);
+	ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetMaxHealthAttribute())
+		.AddUObject(this, &UP4HpBarWidget::OnMaxHealthChanged);
 }
 
 void UP4HpBarWidget::OnHealthChanged(const FOnAttributeChangeData& ChangedData)

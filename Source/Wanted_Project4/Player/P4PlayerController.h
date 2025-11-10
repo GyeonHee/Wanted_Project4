@@ -48,6 +48,11 @@ private:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> AttackAction;
 
+
+    //작성 - 한승헌 2025-11-10
+    //디버그용 데미지 주기.
+    UFUNCTION(Exec)
+    void DebugDamage(float Amount = 20.f);
 private:
     // GAS 
     void HandleAbilityPressed(int32 InputID);
