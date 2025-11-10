@@ -107,13 +107,13 @@ bool UP4InventoryComponent::RemoveItem(UItemDataBase* ItemData, int32 Quantity, 
             }
 
             OnInventoryUpdated.Broadcast(SlotType, SlotIndex);
-            UE_LOG(LogTemp, Log, TEXT("✅ RemoveItem: 슬롯[%d]에서 %s %d개 제거"),
+            UE_LOG(LogTemp, Log, TEXT("RemoveItem: 슬롯[%d]에서 %s %d개 제거"),
                 SlotIndex, *ItemData->GetItemName().ToString(), Quantity);
             return true;
         }
         else
         {
-            UE_LOG(LogTemp, Error, TEXT("❌ RemoveItem: 슬롯[%d]의 아이템이 일치하지 않음"), SlotIndex);
+            UE_LOG(LogTemp, Error, TEXT("RemoveItem: 슬롯[%d]의 아이템이 일치하지 않음"), SlotIndex);
             return false;
         }
     }

@@ -25,17 +25,15 @@ protected:
 	// 캐릭터에 빙의했을 때 호출
 	virtual void OnPossess(APawn* InPawn) override;
 
-	void ConnectInventoryWidget();
-
 	// 인벤토리 토글 함수
 	void ToggleInventory();
 
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TSubclassOf<class UP4CustomWidget> InventoryWidgetClass;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
+	TSubclassOf<class UP4InventoryWidget> InventoryWidgetClass;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "UI")
-	TObjectPtr<class UP4CustomWidget> InventoryWidget;
+	UPROPERTY()
+	TObjectPtr<class UP4InventoryWidget> InventoryWidget;
 
 	bool bIsInventoryVisible = false;
 };

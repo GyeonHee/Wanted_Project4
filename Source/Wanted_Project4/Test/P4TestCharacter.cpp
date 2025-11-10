@@ -26,7 +26,7 @@ void AP4TestCharacter::BeginPlay()
 {
     Super::BeginPlay();
 
-    // 테스트용 아이템 추가
+    // 테스트용 아이템 추가 (UI는 컨트롤러가 담당)
     if (InventoryComp)
     {
         UItemDataBase* TestSword = LoadObject<UItemDataBase>(nullptr,
@@ -57,107 +57,5 @@ void AP4TestCharacter::BeginPlay()
             InventoryComp->AddItem(TestPotion, 90);
             InventoryComp->AddItem(TestPotion2, 50);
         }
-    }
-
-    // 로컬 플레이어만 UI 생성 (약간의 딜레이)
-    if (IsLocallyControlled())
-    {
-        // 다음 프레임에 위젯 생성 시도
-        GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
-            {
-                CreateInventoryWidget();
-            });
-    }
-}
-
-void AP4TestCharacter::CreateInventoryWidget()
-{
-    UE_LOG(LogTemp, Warning, TEXT("=== CreateInventoryWidget 호출됨 ==="));
-
-    if (!InventoryWidgetClass)
-    {
-        UE_LOG(LogTemp, Error, TEXT("InventoryWidgetClass가 설정되지 않음!"));
-        return;
-    }
-
-    APlayerController* PC = Cast<APlayerController>(GetController());
-    if (!PC)
-    {
-        UE_LOG(LogTemp, Error, TEXT("PlayerController를 가져올 수 없음! 재시도합니다..."));
-
-        // 실패하면 0.1초 후 재시도
-        FTimerHandle RetryTimerHandle;
-        GetWorld()->GetTimerManager().SetTimer(RetryTimerHandle, [this]()
-            {
-                CreateInventoryWidget();
-            }, 0.1f, false);
-        return;
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT(" PlayerController 획득: %s"), *PC->GetName());
-
-    // CreateWidget 타입을 UUserWidget으로
-    UUserWidget* CreatedWidget = CreateWidget<UUserWidget>(PC, InventoryWidgetClass);
-    if (!CreatedWidget)
-    {
-        UE_LOG(LogTemp, Error, TEXT(" 위젯 생성 실패!"));
-        return;
-    }
-
-    // P4InventoryWidget으로 캐스팅
-    InventoryWidgetInstance = Cast<UP4InventoryWidget>(CreatedWidget);
-    if (!InventoryWidgetInstance)
-    {
-        UE_LOG(LogTemp, Error, TEXT(" P4InventoryWidget으로 캐스팅 실패!"));
-        UE_LOG(LogTemp, Error, TEXT("   위젯 클래스: %s"), *CreatedWidget->GetClass()->GetName());
-        UE_LOG(LogTemp, Error, TEXT("WBP_Inventory의 부모 클래스를 P4InventoryWidget으로 Reparent 해야합니다!"));
-            return;
-    }
-
-    UE_LOG(LogTemp, Warning, TEXT(" 인벤토리 위젯 생성 성공"));
-
-    InventoryWidgetInstance->AddToViewport();
-    InventoryWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
-
-    // 바로 연결!
-    InventoryWidgetInstance->BindInventory(InventoryComp);
-    UE_LOG(LogTemp, Warning, TEXT(" 인벤토리 위젯 연결 완료"));
-}
-
-void AP4TestCharacter::ToggleInventory()
-{
-    if (!InventoryWidgetInstance)
-    {
-        UE_LOG(LogTemp, Error, TEXT(" InventoryWidgetInstance가 nullptr!"));
-        return;
-    }
-
-    bIsInventoryVisible = !bIsInventoryVisible;
-
-    APlayerController* PC = Cast<APlayerController>(GetController());
-    if (!PC) return;
-
-    if (bIsInventoryVisible)
-    {
-        InventoryWidgetInstance->SetVisibility(ESlateVisibility::Visible);
-        PC->bShowMouseCursor = true;
-
-        FInputModeGameAndUI InputMode;
-        InputMode.SetWidgetToFocus(InventoryWidgetInstance->TakeWidget());
-        InputMode.SetHideCursorDuringCapture(false);
-        InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
-        PC->SetInputMode(InputMode);
-
-        UE_LOG(LogTemp, Warning, TEXT("인벤토리 열림"));
-    }
-    else
-    {
-        InventoryWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
-        PC->bShowMouseCursor = false;
-
-        FInputModeGameOnly InputMode;
-        PC->SetInputMode(InputMode);
-
-        UE_LOG(LogTemp, Warning, TEXT("인벤토리 닫힘"));
     }
 }
