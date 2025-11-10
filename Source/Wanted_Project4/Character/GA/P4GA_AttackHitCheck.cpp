@@ -6,6 +6,7 @@
 #include "Character/GA/AT/P4AT_Trace.h"
 #include "Character/GA/TA/P4TA_Trace.h"
 #include "Attribute/P4PlayerAttributeSet.h"
+#include "Monster/P4MonsterBase.h"
 #include "Monster/Stat/P4MonsterAttributeSet.h"
 
 UP4GA_AttackHitCheck::UP4GA_AttackHitCheck()
@@ -48,7 +49,12 @@ void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 		}
 
 		const float AttackDamage = SourceAttribute->GetAttackRate();
-		TargetAttribute->SetCurHP(TargetAttribute->GetCurHP() - AttackDamage);
+		// 수정 전: 몬스터 Attribute 에서 체력에 접근해서 HP 감소
+		//TargetAttribute->SetCurHP(TargetAttribute->GetCurHP() - AttackDamage);
+
+		// 수정 후: 인터페이스로 접근, 체력 감소 함수에 데미지를 인자로 넣어서 호출
+		IP4MonsterDamageInterface* Monster = Cast<IP4MonsterDamageInterface>(TargetASC->GetOwner());
+		Monster->MonsterApplyDamage(AttackDamage);
 	}
 
 
