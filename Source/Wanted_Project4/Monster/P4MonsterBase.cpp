@@ -3,14 +3,17 @@
 
 #include "P4MonsterBase.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AI/P4MonsterAIController.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Physics/P4Collision.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Stat/P4MonsterStatComponent.h"
 
+class UP4PlayerAttributeSet;
 // Sets default values
 AP4MonsterBase::AP4MonsterBase()
 {
@@ -133,6 +136,24 @@ void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
 			}
 		}
 	}
+}
+
+void AP4MonsterBase::MonsterGiveDamage(AActor* TargetActor, const float DamageAmount)
+{
+	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	if (!TargetASC)
+	{
+		return;
+	}
+
+	UP4PlayerAttributeSet* TargetAttribute = const_cast<UP4PlayerAttributeSet*>(TargetASC->GetSet<UP4PlayerAttributeSet>());
+	if (!TargetAttribute)
+	{
+		return;
+	}
+	
+	// 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
+	TargetAttribute->SetHealth(TargetAttribute->GetHealth() - DamageAmount);
 }
 
 void AP4MonsterBase::AttackByAI()

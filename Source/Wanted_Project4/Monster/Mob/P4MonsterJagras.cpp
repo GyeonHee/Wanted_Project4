@@ -3,6 +3,8 @@
 
 #include "P4MonsterJagras.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/BoxComponent.h"
 #include "Physics/P4Collision.h"
 
@@ -146,7 +148,7 @@ void AP4MonsterJagras::MeleeAttack()
 
 	if (HitDetected)
 	{
-		// @Todo: 다른 액터가 공격 당했을 시 처리
-		UE_LOG(LogTemp, Log, TEXT("Hit: %s"), *OutHitResult.GetActor()->GetName());
+		// 다른 액터가 공격 당했을 시 처리
+		MonsterGiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
 	}
 }

@@ -4,7 +4,7 @@
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "GameplayEffectExtension.h"
 UP4PlayerAttributeSet::UP4PlayerAttributeSet() :
-	AttackRange(200.0f),
+	AttackRange(250.0f),
 	MaxAttackRange(300.0f),
 	AttackRadius(50.f),
 	MaxAttackRadius(150.0f),

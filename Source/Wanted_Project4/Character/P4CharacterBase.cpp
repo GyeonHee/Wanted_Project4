@@ -74,7 +74,7 @@ AP4CharacterBase::AP4CharacterBase()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Character/Animation/Katana/ForUse/AM_KatanaDefaultAttack.AM_KatanaDefaultAttack"));
 	if (ComboActionMontageRef.Object)
 	{
-		ComboActionMontage = ComboActionMontageRef.Object;
+		DefaultAttackMontage = ComboActionMontageRef.Object;
 	}
 
 	//static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
@@ -91,7 +91,16 @@ AP4CharacterBase::AP4CharacterBase()
 
 	// Weapon Component
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+
+	//todo: Load Weapon through Inventory
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshRef(
+		TEXT("/Game/Weapon/Katana.Katana"));
+	if (WeaponMeshRef.Succeeded())
+	{
+		Weapon->SetSkeletalMesh(WeaponMeshRef.Object);
+	}
+	
 }
 
 void AP4CharacterBase::PostInitializeComponents()
