@@ -30,7 +30,8 @@ public:
 	//void SetupGASInputComponent();
 
 public:
-	FORCEINLINE virtual class UAnimMontage* GetComboActionMontage() const { return ComboActionMontage; }
+	FORCEINLINE virtual class UAnimMontage* GetDefaultAttackMontage() const { return DefaultAttackMontage; }
+	FORCEINLINE virtual class UAnimMontage* GetJumpMontage() const { return JumpMontage; }
 	//FORCEINLINE class UABComboActionData* GetComboActionData() const { return ComboActionData; }
 	FORCEINLINE class UAnimMontage* GetDeadMontage() const { return DeadMontage; }
 
@@ -59,7 +60,10 @@ protected:
 	//TMap<ECharacterControlType, class UABCharacterControlData*> CharacterControlManager;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> ComboActionMontage;
+	TObjectPtr<class UAnimMontage> DefaultAttackMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> JumpMontage;
 
 	//UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Attack, Meta = (AllowPrivateAccess = "true"))
 	//TObjectPtr<class UABComboActionData> ComboActionData;
