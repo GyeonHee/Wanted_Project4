@@ -50,6 +50,11 @@ protected:
 	// 애님 노티파이 기반으로 충돌 판정하는 목적으로 사용.
 	//virtual void AttackHitCheck() override;
 
+	// 몬스터가 죽었을 시 실행 될 함수
+	virtual void SetDead();
+
+	// 죽음 애니메이션 재생.
+	void PlayDeadAnimation();
 protected:
 	// AbilitySystem
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")

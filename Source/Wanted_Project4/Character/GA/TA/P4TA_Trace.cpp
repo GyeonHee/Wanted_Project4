@@ -54,19 +54,22 @@ FGameplayAbilityTargetDataHandle AP4TA_Trace::MakeTargetData() const
 	const float AttackRadius = PlayerAttributeSet->GetAttackRadius();
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(UP4TA_Trace), false, Character);
-	FHitResult OutHitResult;
+	TArray<FHitResult> OutHitResults;
 
 	const FVector Forward = Character->GetActorForwardVector();
 	const FVector Start = Character->GetActorLocation() + Forward * Character->GetCapsuleComponent()->GetScaledCapsuleRadius();
 	const FVector End = Start + Forward * AttackRange;
-
-	bool HitDetected = GetWorld()->SweepSingleByChannel(OutHitResult, Start, End, FQuat::Identity, CCHANNEL_P4ACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
+	//GetWorld()->SweepMultiByChannel
+	bool HitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, Start, End, FQuat::Identity, CCHANNEL_P4ACTION, FCollisionShape::MakeSphere(AttackRadius), Params);
 
 	FGameplayAbilityTargetDataHandle DataHandle;
 	if (HitDetected)
 	{
-		FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(OutHitResult);
-		DataHandle.Add(TargetData);
+		for (const FHitResult& HitResult : OutHitResults)
+		{
+			FGameplayAbilityTargetData_SingleTargetHit* TargetData = new FGameplayAbilityTargetData_SingleTargetHit(HitResult);
+			DataHandle.Add(TargetData);
+		}
 	}
 
 #if ENABLE_DRAW_DEBUG
