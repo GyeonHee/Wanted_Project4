@@ -7,6 +7,9 @@
 #include "Components/CapsuleComponent.h"
 #include "Physics/P4Collision.h"
 #include "DrawDebugHelpers.h"
+#include "AbilitySystemComponent.h"
+#include "Attribute/P4PlayerAttributeSet.h"
+#include "AbilitySystemBlueprintLibrary.h"
 
 AP4TA_Trace::AP4TA_Trace()
 {
@@ -32,9 +35,23 @@ FGameplayAbilityTargetDataHandle AP4TA_Trace::MakeTargetData() const
 {
 	ACharacter* Character = CastChecked<ACharacter>(SourceActor);
 
-	//todo: Attribute Set에서 스탯 받아오기
-	const float AttackRange = 200.f;
-	const float AttackRadius = 50.f;
+	UAbilitySystemComponent* ASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(SourceActor);
+	if (!ASC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ASC not found!"));
+		return FGameplayAbilityTargetDataHandle();
+	}
+
+	const UP4PlayerAttributeSet* PlayerAttributeSet = ASC->GetSet<UP4PlayerAttributeSet>();
+	if (!PlayerAttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("P4PlayerAttributeSet not found!"));
+		return FGameplayAbilityTargetDataHandle();
+	}
+
+	//Attribute Set에서 스탯 받아오기
+	const float AttackRange = PlayerAttributeSet->GetAttackRange();
+	const float AttackRadius = PlayerAttributeSet->GetAttackRadius();
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(UP4TA_Trace), false, Character);
 	FHitResult OutHitResult;

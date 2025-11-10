@@ -5,13 +5,13 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
-#include "Interface/AnimationAttackInterface.h"
+//#include "Interface/AnimationAttackInterface.h"
 #include "Interface/P4CharacterWidgetInterface.h"
 #include "P4CharacterBase.generated.h"
 
 UCLASS()
 class WANTED_PROJECT4_API AP4CharacterBase : 
-	public ACharacter, public IAbilitySystemInterface, public IAnimationAttackInterface,
+	public ACharacter, public IAbilitySystemInterface,
 	public IP4CharacterWidgetInterface
 {
 	GENERATED_BODY()
@@ -41,7 +41,7 @@ protected:
 protected:
 	// IABAnimationAttackInterface 함수 구현.
 	// 애님 노티파이 기반으로 충돌 판정하는 목적으로 사용.
-	virtual void AttackHitCheck() override;
+	//virtual void AttackHitCheck() override;
 
 protected:
 	// AbilitySystem

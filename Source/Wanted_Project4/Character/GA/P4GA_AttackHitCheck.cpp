@@ -5,6 +5,8 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Character/GA/AT/P4AT_Trace.h"
 #include "Character/GA/TA/P4TA_Trace.h"
+#include "Attribute/P4PlayerAttributeSet.h"
+#include "Monster/Stat/P4MonsterAttributeSet.h"
 
 UP4GA_AttackHitCheck::UP4GA_AttackHitCheck()
 {
@@ -28,6 +30,25 @@ void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	{
 		FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
 		UE_LOG(LogTemp, Log, TEXT("Target %s Detected"), *(HitResult.GetActor()->GetName()));
+
+		UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
+		UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
+		if (!SourceASC || !TargetASC)
+		{
+			UE_LOG(LogTemp, Error, TEXT("ASC not found!"));
+			return;
+		}
+
+		const UP4PlayerAttributeSet* SourceAttribute = SourceASC->GetSet<UP4PlayerAttributeSet>();
+		UP4MonsterAttributeSet* TargetAttribute = const_cast<UP4MonsterAttributeSet*>(TargetASC->GetSet<UP4MonsterAttributeSet>());
+		if (!SourceAttribute || !TargetAttribute)
+		{
+			UE_LOG(LogTemp, Error, TEXT("AttributeSet not found!"));
+			return;
+		}
+
+		const float AttackDamage = SourceAttribute->GetAttackRate();
+		TargetAttribute->SetCurHP(TargetAttribute->GetCurHP() - AttackDamage);
 	}
 
 

@@ -110,9 +110,9 @@ UAbilitySystemComponent* AP4CharacterBase::GetAbilitySystemComponent() const
 	return ASC;
 }
 
-void AP4CharacterBase::AttackHitCheck()
-{
-	// 충돌 판정 로직 작성.
-}
+//void AP4CharacterBase::AttackHitCheck()
+//{
+//	// 충돌 판정 로직 작성.
+//}
 
 
