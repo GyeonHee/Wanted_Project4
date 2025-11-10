@@ -10,9 +10,16 @@
 #include "UI/P4HUDWidget.h"
 #include "UI/P4HpBarWidget.h"
 #include "Attribute/P4PlayerAttributeSet.h"
+#include "Inventory/P4InventoryComponent.h"
+#include "UI/P4InventoryWidget.h"
 
 AP4PlayerController::AP4PlayerController()
 {
+	// 게임 시작 시 커서 숨김
+	// -작성: 노현기 -일시: 2025.11.10
+	bShowMouseCursor = false;
+
+
 	//bShowMouseCursor = false;
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingRef(TEXT("/Game/Character/Input/IMC_Default.IMC_Default"));
 	if (DefaultMappingRef.Succeeded())
@@ -149,6 +156,47 @@ void AP4PlayerController::OnPossess(APawn* InPawn)
 			}
 		}
 	}
+
+	// -작성: 노현기 -일시: 2025.11.10
+	// @Todo: InventoryComp 오류 해결 됐는지 체크할 것
+	if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(InPawn))
+	{
+		// 인벤토리 컴포넌트 체크
+		if (!CharacterPlayer->GetInventoryComponent())
+		{
+			UE_LOG(LogTemp, Error, TEXT("InventoryComp가 nullptr!"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재 확인"));
+
+		// 위젯이 아직 생성되지 않았으면 생성
+		if (!InventoryWidget)
+		{
+			if (!InventoryWidgetClass)
+			{
+				UE_LOG(LogTemp, Error, TEXT("InventoryWidgetClass가 설정되지 않음!"));
+				return;
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 위젯 생성 시작..."));
+
+			InventoryWidget = CreateWidget<UP4InventoryWidget>(this, InventoryWidgetClass);
+			if (!InventoryWidget)
+			{
+				UE_LOG(LogTemp, Error, TEXT("인벤토리 위젯 생성 실패!"));
+				return;
+			}
+
+			InventoryWidget->AddToViewport();
+			InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 위젯 생성 완료"));
+		}
+
+		// 인벤토리 바인딩
+		InventoryWidget->BindInventory(CharacterPlayer->GetInventoryComponent());
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리 위젯 바인딩 완료\n"));
+	}
 }
 
 void AP4PlayerController::SetupInputComponent()
@@ -165,6 +213,11 @@ void AP4PlayerController::SetupInputComponent()
 		//EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleAttack);
 		//SetupPlayerGAS();
 	}
+
+	// 입력 바인딩 ('I' 키눌러서 인벤토리 토글) 
+	// @Todo: 이거 프로젝트 세팅에서 입력 바인딩에서 키 설정해야하는거로 알고있어요 메인 레벨에서 해야함
+	// -작성: 노현기 -일시: 2025.11.10
+	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AP4PlayerController::ToggleInventory);
 }
 
 void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
@@ -228,4 +281,45 @@ void AP4PlayerController::DebugDamage(float Amount)
 				EGameplayModOp::Additive, -FMath::Abs(Amount));
 			UE_LOG(LogTemp, Log, TEXT("[DebugDamage] HP -%0.1f"), Amount);
 		}
+}
+
+// -작성: 노현기 -일시: 2025.11.10
+void AP4PlayerController::ToggleInventory()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ToggleInventory 입력 감지"));
+
+	if (!InventoryWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("InventoryWidget이 nullptr!"));
+		return;
+	}
+
+	// 상태 토글
+	bIsInventoryVisible = !bIsInventoryVisible;
+
+	if (bIsInventoryVisible)
+	{
+		// 인벤토리 열기
+		InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+		bShowMouseCursor = true;
+
+		FInputModeGameAndUI InputMode;
+		InputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
+		InputMode.SetHideCursorDuringCapture(false);
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		SetInputMode(InputMode);
+
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리 열림"));
+	}
+	else
+	{
+		// 인벤토리 닫기
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+		bShowMouseCursor = false;
+
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리 닫힘"));
+	}
 }
