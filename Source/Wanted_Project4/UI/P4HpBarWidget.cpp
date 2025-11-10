@@ -15,7 +15,6 @@ UP4HpBarWidget::UP4HpBarWidget(const FObjectInitializer& ObjectInitializer)
 	MaxHp = 100.0f;
 }
 
-
 void UP4HpBarWidget::UpdateHpBar()
 {
 	//CurrentHp = NewCurrentHp;
@@ -55,8 +54,13 @@ void UP4HpBarWidget::SetAbilitySystemComponent(AActor* InOwner)
 {
 	Super::SetAbilitySystemComponent(InOwner);
 
+
+
 	if (ASC != nullptr)
 	{
+		const UP4PlayerAttributeSet* Attr = ASC->GetSet<UP4PlayerAttributeSet>();
+		if (!IsValid(Attr)) return; // 아직 AttributeSet 안붙은 타이밍이면 그냥 패스
+
 		ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetHealthAttribute()).AddUObject(this,&UP4HpBarWidget::OnHealthChanged);
 		ASC->GetGameplayAttributeValueChangeDelegate(UP4PlayerAttributeSet::GetMaxHealthAttribute()).AddUObject(this,&UP4HpBarWidget::OnMaxHealthChanged);
 
@@ -64,8 +68,9 @@ void UP4HpBarWidget::SetAbilitySystemComponent(AActor* InOwner)
 
 		ensure(CurrentAttributeSet);
 
-		CurrentHp =  CurrentAttributeSet->GetHealth();
 		MaxHp = CurrentAttributeSet->GetMaxHealth();
+		CurrentHp =  CurrentAttributeSet->GetHealth();
+
 		ensure(MaxHp > 0.0f);
 
 	}

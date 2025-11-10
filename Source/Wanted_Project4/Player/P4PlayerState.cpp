@@ -9,8 +9,14 @@ AP4PlayerState::AP4PlayerState()
 {
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	//ASC->SetIsReplicated(true);
-	AttributeSet = CreateDefaultSubobject<UP4PlayerAttributeSet>(TEXT("AttributeSet"));
+	//AttributeSet = CreateDefaultSubobject<UP4PlayerAttributeSet>(TEXT("AttributeSet"));
 	//SkillAttributeSet = CreateDefaultSubobject<UP4SkillAttributeSet>(TEXT("SkillAttributeSet"));
+
+
+	//작성 한승헌
+	ASC->SetIsReplicated(true);
+	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	AttributeSet = CreateDefaultSubobject<UP4PlayerAttributeSet>(TEXT("AttributeSet"));
 }
 
 UAbilitySystemComponent* AP4PlayerState::GetAbilitySystemComponent() const

@@ -35,15 +35,15 @@ void UP4HUDWidget::NativeConstruct()
 	ensureAlways(HpBar != nullptr);
 
 
-	if (HpBar != nullptr && GetOwningPlayer() != nullptr)
-	{
-		APawn* Pawn = GetOwningPlayer()->GetPawn();
+	//if (HpBar != nullptr && GetOwningPlayer() != nullptr)
+	//{
+	//	APawn* Pawn = GetOwningPlayer()->GetPawn();
 
-		if (Pawn != nullptr)
-		{
-			HpBar->SetAbilitySystemComponent(Pawn);
-		}
-	}
+	//	if (Pawn != nullptr)
+	//	{
+	//		//HpBar->SetAbilitySystemComponent(Pawn);
+	//	}
+	//}
 
 	//MiniMap = Cast<UP4MiniMapWidget>(
 	//	GetWidgetFromName(TEXT("WidgetMiniMap"))
@@ -59,4 +59,10 @@ void UP4HUDWidget::NativeConstruct()
 	//	HUDPawn->SetupHUDWidget(this);
 	//}
 
+}
+
+
+TObjectPtr<class UP4HpBarWidget> UP4HUDWidget::GetHpBar() const
+{
+	return HpBar;
 }

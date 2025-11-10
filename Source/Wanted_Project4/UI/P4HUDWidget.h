@@ -22,6 +22,8 @@ public:
 	void UpdataMiniMap(FVector PlayerLocation);
 
 
+	TObjectPtr<class UP4HpBarWidget> GetHpBar() const;
+
 protected:
 	virtual void NativeConstruct() override;
 

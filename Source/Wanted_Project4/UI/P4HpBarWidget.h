@@ -19,6 +19,7 @@ class WANTED_PROJECT4_API UP4HpBarWidget : public UP4CustomWidget
 public:
 	UP4HpBarWidget(const FObjectInitializer& ObjectInitializer);
 
+	//void BindAsc(class UAbilitySystemComponent* InAsc);
 
 	void UpdateStat();
 

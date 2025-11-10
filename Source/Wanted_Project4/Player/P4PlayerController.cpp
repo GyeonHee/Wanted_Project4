@@ -8,6 +8,7 @@
 #include "Character/P4CharacterPlayer.h"
 #include "AbilitySystemComponent.h"
 #include "UI/P4HUDWidget.h"
+#include "UI/P4HpBarWidget.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -87,6 +88,17 @@ void AP4PlayerController::BeginPlay()
 	if (P4HUDWidget != nullptr)
 	{
 		P4HUDWidget->AddToViewport();
+
+		if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(GetPawn()))
+		{
+			if (UAbilitySystemComponent* ASC = CharacterPlayer->GetAbilitySystemComponent())
+			{
+				if (UP4HpBarWidget* HpBar = P4HUDWidget->GetHpBar())
+				{
+					HpBar->SetAbilitySystemComponent(CharacterPlayer);
+				}
+			}
+		}
 	}
 	
 }
@@ -129,6 +141,11 @@ void AP4PlayerController::OnPossess(APawn* InPawn)
 			}
 
 			SetupGASInputBindings(ASC);
+
+			if (P4HUDWidget != nullptr && P4HUDWidget->GetHpBar() != nullptr)
+			{
+				P4HUDWidget->GetHpBar()->SetAbilitySystemComponent(CharacterPlayer);
+			}
 		}
 	}
 }
