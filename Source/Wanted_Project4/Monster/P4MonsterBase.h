@@ -48,6 +48,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = Monster)
 	virtual void MonsterApplyDamage(const float DamageAmount) override;
 
+	// 공격할 시 데미지 주는 처리 함수
+	UFUNCTION(BlueprintCallable, Category = Monster)
+	virtual void MonsterGiveDamage(AActor* TargetActor, const float DamageAmount) override;
+
 	// Monster AI Interface 구현
 public:
 	// AttributeSet 에 있음
