@@ -26,6 +26,10 @@ public:
 	// AttributeSet 접근용
 	class UAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
+	// -작성: 노현기 -일시: 2025.11.10
+	// 인벤토리 컴포넌트 접근용
+	FORCEINLINE class UP4InventoryComponent* GetInventoryComponent() const { return InventoryComp; }
+
 	// todo: 플레이어에 직접 둘지 아니면 플레이어가 오버라이드해야할지 모르겠음.
 	//void SetupGASInputComponent();
 
@@ -34,11 +38,13 @@ public:
 	FORCEINLINE virtual class UAnimMontage* GetJumpMontage() const { return JumpMontage; }
 	//FORCEINLINE class UABComboActionData* GetComboActionData() const { return ComboActionData; }
 	FORCEINLINE class UAnimMontage* GetDeadMontage() const { return DeadMontage; }
+	
 
 
 protected:
 	virtual void PostInitializeComponents() override;
 
+	virtual void BeginPlay() override;
 protected:
 	// IABAnimationAttackInterface 함수 구현.
 	// 애님 노티파이 기반으로 충돌 판정하는 목적으로 사용.
@@ -52,6 +58,11 @@ protected:
 	// AttributeSet
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
 	TObjectPtr<class UAttributeSet> AttributeSet;
+
+	// -작성: 노현기 -일시: 2025.11.10
+	// 인벤토리 컴포넌트 (컨트롤러에서 접근)
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
+	TObjectPtr<class UP4InventoryComponent> InventoryComp;
 
 protected:
 	//virtual void SetCharacterControlData(const class UABCharacterControlData* CharacterControlData);
