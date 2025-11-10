@@ -5,7 +5,6 @@
 #include "Item/ItemDataBase.h"
 #include "Inventory/P4Slot.h"
 #include "Components/UniformGridPanel.h"
-#include "Inventory/P4InventoryComponent.h"
 #include "Components/Widget.h"
 #include "Inventory/P4InventoryTags.h"
 
@@ -28,9 +27,10 @@ void UP4InventoryWidget::NativeConstruct()
 		{
 			if (UP4Slot* SlotWidget = Cast<UP4Slot>(Child))
 			{
+                SlotWidget->SlotType = EInventorySlotType::Equipment;
 				EquipmentSlots.Add(SlotWidget);
 
-				UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 추가됨: %s"), *SlotWidget->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 추가됨: %s, 인덱스: %d"), *SlotWidget->GetName(), SlotWidget->SlotIndex);
 			}
 		}
 	}
@@ -41,8 +41,9 @@ void UP4InventoryWidget::NativeConstruct()
 		{
 			if (UP4Slot* SlotWidget = Cast<UP4Slot>(Child))
 			{
+                SlotWidget->SlotType = EInventorySlotType::Consumable;
 				ConsumableSlots.Add(SlotWidget);
-				UE_LOG(LogTemp, Warning, TEXT("소비 슬롯 추가됨: %s"), *SlotWidget->GetName());
+				UE_LOG(LogTemp, Warning, TEXT("소비 슬롯 추가됨: %s, 인덱스: %d"), *SlotWidget->GetName(), SlotWidget->SlotIndex);
 			}
 		}
 	}
@@ -67,7 +68,7 @@ void UP4InventoryWidget::BindInventory(UP4InventoryComponent* InInventoryComp)
     InventoryComp = InInventoryComp;
 
     // 2. 델리게이트 바인딩 (인벤토리가 변경되면 RefreshUI 자동 호출)
-    InventoryComp->OnInventoryUpdated.AddUObject(this, &UP4InventoryWidget::RefreshUI);
+    InventoryComp->OnInventoryUpdated.AddUObject(this, &UP4InventoryWidget::RefreshSlot);
     UE_LOG(LogTemp, Warning, TEXT("델리게이트 바인딩 완료"));
 
     // 3. 처음 한 번 UI 업데이트
@@ -87,93 +88,74 @@ void UP4InventoryWidget::RefreshUI()
 
     UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재함"));
 
-    // 인벤토리 데이터 가져오기
-    const TArray<FInventoryItem>& Items = InventoryComp->GetInventoryItems();
-    UE_LOG(LogTemp, Warning, TEXT("인벤토리 아이템 개수: %d"), Items.Num());
-
-    // 슬롯 개수 확인
-    UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 개수: %d, 소비템 슬롯 개수: %d"), EquipmentSlots.Num(),
-        ConsumableSlots.Num());
-
-    // 장비 슬롯 인덱스, 소비템 슬롯 인덱스
-    int32 EquipSlotIndex = 0;
-    int32 ConsumSlotIndex = 0;
-
-    // 모든 아이템을 순회하면서 슬롯에 배치
-    for (const FInventoryItem& Item : Items)
+    // 장비 인벤토리 갱신
+    const TArray<FInventoryItem>* EquipItems = InventoryComp->GetInventoryByType(EInventorySlotType::Equipment);
+    if (EquipItems)
     {
-        if (!Item.ItemData)
+        for (int32 i = 0; i < EquipmentSlots.Num() && i < EquipItems->Num(); ++i)
         {
-            UE_LOG(LogTemp, Warning, TEXT("ItemData가 nullptr인 아이템 발견"));
-            continue;
-        }
-
-        UE_LOG(LogTemp, Warning, TEXT("아이템: %s, 수량: %d"), *Item.ItemData->GetItemName().ToString(),
-            Item.Quantity);
-
-        // 아이템의 태그 확인
-        FGameplayTagContainer ItemTags = Item.ItemData->GetItemTags();
-        UE_LOG(LogTemp, Warning, TEXT("   태그 개수: %d"), ItemTags.Num());
-
-        for (const FGameplayTag& Tag : ItemTags)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("   - 태그: %s"), *Tag.ToString());
-        }
-
-        // FItemData 구조체 생성 (슬롯이 이해하는 형식)
-        FInventoryItem SlotData;
-        SlotData.ItemData = Item.ItemData;
-        SlotData.Quantity = Item.Quantity;
-
-        // 아이템 타입에 따라 적절한 슬롯에 배치
-        if (Item.ItemData->HasTag(P4InventoryTags::Item::Equipment))
-        {
-            UE_LOG(LogTemp, Warning, TEXT("장비 아이템으로 분류됨"));
-            // 장비 슬롯에 추가
-            if (EquipSlotIndex < EquipmentSlots.Num())
-            {
-                UE_LOG(LogTemp, Warning, TEXT("장비 슬롯[%d]에 추가"), EquipSlotIndex);
-                EquipmentSlots[EquipSlotIndex]->SetItem(SlotData);
-                EquipSlotIndex++;
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("장비 슬롯이 꽉 참!"));
-            }
-        }
-        else if (Item.ItemData->HasTag(P4InventoryTags::Item::Consumable))
-        {
-            UE_LOG(LogTemp, Warning, TEXT("소비템으로 분류됨"));
-            // 소비템 슬롯에 추가
-            if (ConsumSlotIndex < ConsumableSlots.Num())
-            {
-                UE_LOG(LogTemp, Warning, TEXT("소비템 슬롯[%d]에 추가"), ConsumSlotIndex);
-                ConsumableSlots[ConsumSlotIndex]->SetItem(SlotData);
-                ConsumSlotIndex++;
-            }
-            else
-            {
-                UE_LOG(LogTemp, Error, TEXT("소비템 슬롯이 꽉 참!"));
-            }
-        }
-        else
-        {
-            UE_LOG(LogTemp, Error, TEXT("아이템 태그가 Equipment도 Consumable도 아님!"));
+            EquipmentSlots[i]->SetItem((*EquipItems)[i]);
         }
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("최종 배치 개수 - 장비: %d, 소비템: %d"), EquipSlotIndex, ConsumSlotIndex);
-
-    // 남은 빈 슬롯들은 클리어
-    for (int32 i = EquipSlotIndex; i < EquipmentSlots.Num(); ++i)
+    // 소비 인벤토리 갱신
+    const TArray<FInventoryItem>* ConsumItems = InventoryComp->GetInventoryByType(EInventorySlotType::Consumable);
+    if (ConsumItems)
     {
-        EquipmentSlots[i]->ClearSlot();
-    }
-
-    for (int32 i = ConsumSlotIndex; i < ConsumableSlots.Num(); ++i)
-    {
-        ConsumableSlots[i]->ClearSlot();
+        for (int32 i = 0; i < ConsumableSlots.Num() && i < ConsumItems->Num(); ++i)
+        {
+            ConsumableSlots[i]->SetItem((*ConsumItems)[i]);
+        }
     }
 
     UE_LOG(LogTemp, Warning, TEXT("=== RefreshUI 완료 ===\n"));
+}
+
+void UP4InventoryWidget::RefreshSlot(EInventorySlotType SlotType, int32 SlotIndex)
+{
+    if (!InventoryComp)
+    {
+        UE_LOG(LogTemp, Error, TEXT("RefreshSlot: InventoryComp가 nullptr"));
+        return;
+    }
+
+    // 해당 타입의 인벤토리 배열 가져오기
+    const TArray<FInventoryItem>* TargetArray = InventoryComp->GetInventoryByType(SlotType);
+    if (!TargetArray || !TargetArray->IsValidIndex(SlotIndex))
+    {
+        UE_LOG(LogTemp, Error, TEXT("RefreshSlot: 잘못된 타입[%d] 또는 인덱스[%d]"), (int32)SlotType, SlotIndex);
+        return;
+    }
+
+    // 해당 타입의 UI 슬롯 배열 가져오기
+    TArray<TObjectPtr<UP4Slot>>* SlotArray = nullptr;
+
+    switch (SlotType)
+    {
+    case EInventorySlotType::Equipment:
+        SlotArray = &EquipmentSlots;
+        break;
+    case EInventorySlotType::Consumable:
+        SlotArray = &ConsumableSlots;
+        break;
+        //  나중에 타입 추가 시
+        // case EInventorySlotType::Material:
+        //     SlotArray = &MaterialSlots;
+        //     break;
+    default:
+        UE_LOG(LogTemp, Error, TEXT("RefreshSlot: 알 수 없는 SlotType[%d]"), (int32)SlotType);
+        return;
+    }
+
+    // UI 슬롯 배열 유효성 검사
+    if (!SlotArray || !SlotArray->IsValidIndex(SlotIndex))
+    {
+        UE_LOG(LogTemp, Error, TEXT("RefreshSlot: UI 슬롯 배열 인덱스[%d] 유효하지 않음"), SlotIndex);
+        return;
+    }
+
+    // 해당 슬롯만 갱신
+    (*SlotArray)[SlotIndex]->SetItem((*TargetArray)[SlotIndex]);
+
+    UE_LOG(LogTemp, Log, TEXT("RefreshSlot: 타입[%d] 인덱스[%d] 갱신 완료"), (int32)SlotType, SlotIndex);
 }

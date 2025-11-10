@@ -67,8 +67,6 @@ void AP4TestPlayerController::ConnectInventoryWidget()
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재 확인"));
-	UE_LOG(LogTemp, Warning, TEXT("현재 인벤토리 아이템 개수: %d"),
-		TestChar->InventoryComp->GetInventoryItems().Num());
 
 	UP4InventoryWidget* InvWidget = Cast<UP4InventoryWidget>(InventoryWidget);
 	if (!InvWidget)
@@ -119,8 +117,6 @@ void AP4TestPlayerController::OnPossess(APawn* InPawn)
 	}
 
 	UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재 확인"));
-	UE_LOG(LogTemp, Warning, TEXT("현재 인벤토리 아이템 개수: %d"),
-		TestChar->InventoryComp->GetInventoryItems().Num());
 
 	UP4InventoryWidget* InvWidget = Cast<UP4InventoryWidget>(InventoryWidget);
 	if (!InvWidget)
