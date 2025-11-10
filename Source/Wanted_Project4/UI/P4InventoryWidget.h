@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "UI/P4CustomWidget.h"
 #include "GameplayTagContainer.h"
+#include "Inventory/P4InventoryComponent.h"
 #include "P4InventoryWidget.generated.h"
 
 /**
@@ -25,6 +26,9 @@ public:
 
 	// UI 업데이트
 	void RefreshUI();
+
+	// 특정 슬롯만 업데이트
+	void RefreshSlot(EInventorySlotType SlotType, int32 SlotIndex);
 
 public:
 	// 인벤토리 컴포넌트로 인벤토리 데이터 참조

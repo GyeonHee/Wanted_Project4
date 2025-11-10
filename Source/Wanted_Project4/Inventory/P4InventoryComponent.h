@@ -7,7 +7,17 @@
 #include "Item/ItemDataBase.h"
 #include "P4InventoryComponent.generated.h"
 
-DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
+//DECLARE_MULTICAST_DELEGATE(FOnInventoryUpdated);
+DECLARE_MULTICAST_DELEGATE_TwoParams(FOnInventoryUpdated, EInventorySlotType /*SlotType*/, int32 /*SlotIndex*/);
+
+// 인벤토리 슬롯 타입(확장을 위해)
+UENUM(BlueprintType)
+enum class EInventorySlotType : uint8
+{
+	Equipment	UMETA(DisplayName = "Equipment"),	// 장비
+	Consumable	UMETA(DisplayName = "Consumable "), // 소비
+	MAX			UMETA(Hidden)						// 타입 개수
+};
 
 USTRUCT(BlueprintType)
 struct FInventoryItem
@@ -23,12 +33,16 @@ struct FInventoryItem
 	UPROPERTY(EditAnywhere, BlueprintReadWrite) 
 	int32 SlotIndex = -1;
 
+	// 슬롯 타입 추가
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EInventorySlotType SlotType = EInventorySlotType::Equipment;
+
 	FInventoryItem()
 		: ItemData(nullptr), Quantity(0), SlotIndex(-1)
 	{
 	}
 
-	// 비교 연산자 추가 (나중에 유용)
+	// 비교 연산자 추가
 	bool operator==(const FInventoryItem& Other) const
 	{
 		return ItemData == Other.ItemData && SlotIndex == Other.SlotIndex;
@@ -50,11 +64,11 @@ public:
 	bool AddItem(UItemDataBase* ItemData, int32 Quantity);
 
 	// 아이템 제거 함수
-	bool RemoveItem(UItemDataBase* ItemData, int32 Quantity);
+	bool RemoveItem(UItemDataBase* ItemData, int32 Quantity, int32 SlotIndex = -1);
 
 	// 아이템 사용 함수 추가
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	bool UseItem(UItemDataBase* ItemData);
+	bool UseItem(UItemDataBase* ItemData, int32 SlotIndex = -1);
 
 	// 장비 착용/해제 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
@@ -63,12 +77,20 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	bool UnequipItem(UItemDataBase* ItemData);
 
+	// 슬롯 교환
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SwapSlots(int32 SlotIndexA, int32 SlotIndexB, EInventorySlotType SlotType);
+
 	// 인벤토리 공간 확인 함수 추가
 	bool HasSpace(UItemDataBase* ItemData) const;
 	int32 GetItemCount(UItemDataBase* ItemData) const;
 
-	// 인벤토리 데이터 가져오기
-	const TArray<FInventoryItem>& GetInventoryItems() const { return InventoryItems; }
+	// 타입별 인벤토리 데이터 가져오기
+	TArray<FInventoryItem>* GetInventoryByType(EInventorySlotType SlotType);
+	const TArray<FInventoryItem>* GetInventoryByType(EInventorySlotType SlotType) const;
+
+	// 아이템 태그로 슬롯 타입 결정
+	EInventorySlotType GetSlotTypeFromItemData(UItemDataBase* ItemData) const;
 
 	// 인벤토리가 변경되었을 때 알림을 보내는 델리게이트
 	FOnInventoryUpdated OnInventoryUpdated;
@@ -76,14 +98,19 @@ public:
 public:
 	// 최대 슬롯 개수 설정
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	int32 MaxEquipmentSlots = 16;
+	TMap<EInventorySlotType, int32> MaxSlotsPerType;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Inventory")
-	int32 MaxConsumableSlots = 16;
 protected:
 	UPROPERTY(EditAnywhere, Category = "Inventory")
-	TArray<FInventoryItem> InventoryItems;
+	TArray<FInventoryItem> EquipmentItems;
+
+	UPROPERTY(EditAnywhere, Category = "Inventory")
+	TArray<FInventoryItem> ConsumableItems;
 
 	// 착용 중인 장비 효과 핸들 저장
 	TMap<UItemDataBase*, FActiveGameplayEffectHandle> ActiveEquipmentEffects;
+
+private:
+	// 초기화
+	void InitiailizeInventoryArrays();
 };
