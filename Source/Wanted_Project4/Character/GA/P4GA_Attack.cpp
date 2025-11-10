@@ -34,10 +34,10 @@ void UP4GA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 	//// 움직임 중 중력 무시
 	//P4Character->LaunchCharacter(LaunchVelocity, true, false);
 
-
-	if (P4Character->GetComboActionMontage())
+	UAnimMontage* DefaultAttackMontage = P4Character->GetDefaultAttackMontage();
+	if (DefaultAttackMontage)
 	{
-		UAbilityTask_PlayMontageAndWait* PlayAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), P4Character->GetComboActionMontage(),1.f, GetNextSection());
+		UAbilityTask_PlayMontageAndWait* PlayAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), DefaultAttackMontage,1.f, GetNextSection());
 		PlayAttackTask->OnCompleted.AddDynamic(this, &UP4GA_Attack::OnCompleteCallback);
 		PlayAttackTask->OnInterrupted.AddDynamic(this, &UP4GA_Attack::OnInterruptedCallback);
 		PlayAttackTask->ReadyForActivation();
