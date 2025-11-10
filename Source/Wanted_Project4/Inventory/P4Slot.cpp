@@ -61,13 +61,13 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 			// 올바른 접근 방법
 			if (APlayerController* PC = GetOwningPlayer())
 			{
-				UE_LOG(LogTemp, Log, TEXT("[1] 플레이어 컨트롤러 찾음: %s"), *PC->GetName());
+				UE_LOG(LogTemp, Log, TEXT("플레이어 컨트롤러 찾음: %s"), *PC->GetName());
 				if (APawn* Pawn = PC->GetPawn())
 				{
-					UE_LOG(LogTemp, Log, TEXT("[2] 폰 찾음: %s"), *Pawn->GetName());
+					UE_LOG(LogTemp, Log, TEXT("폰 찾음: %s"), *Pawn->GetName());
 					if (UP4InventoryComponent* InvComp = Pawn->FindComponentByClass<UP4InventoryComponent>())
 					{
-						UE_LOG(LogTemp, Log, TEXT("[3] 인벤토리 컴포넌트 찾음"));
+						UE_LOG(LogTemp, Log, TEXT("인벤토리 컴포넌트 찾음"));
 						UE_LOG(LogTemp, Log, TEXT(" -> Owner: %s"), InvComp->GetOwner() ? *InvComp->GetOwner()->GetName() : TEXT("None"));
 
 						if (CurrentItem.ItemData->HasTag(P4InventoryTags::Item::Equipment))
@@ -81,17 +81,17 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 					}
 					else
 					{
-						UE_LOG(LogTemp, Error, TEXT("[3] ❌ 인벤토리 컴포넌트를 찾지 못함"));
+						UE_LOG(LogTemp, Error, TEXT("인벤토리 컴포넌트를 찾지 못함"));
 					}
 				}
 				else
 				{
-					UE_LOG(LogTemp, Error, TEXT("[2] ❌ 폰을 찾지 못함"));
+					UE_LOG(LogTemp, Error, TEXT("폰을 찾지 못함"));
 				}
 			}
 			else
 			{
-				UE_LOG(LogTemp, Error, TEXT("[1] ❌ 플레이어 컨트롤러를 찾지 못함"));
+				UE_LOG(LogTemp, Error, TEXT("플레이어 컨트롤러를 찾지 못함"));
 			}
 		}
 		else
@@ -122,21 +122,21 @@ void UP4Slot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEv
 	// 1️⃣ 아이템 유효성 확인
 	if (!CurrentItem.ItemData)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("❌ CurrentItem.ItemData가 nullptr 입니다."));
+		UE_LOG(LogTemp, Warning, TEXT("CurrentItem.ItemData가 nullptr 입니다."));
 		return;
 	}
 
 	// 2️⃣ 드래그 비주얼 클래스 확인
 	if (!DragWidgetClass)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ DragVisualClass가 에디터에서 설정되지 않았습니다."));
+		UE_LOG(LogTemp, Error, TEXT("DragVisualClass가 에디터에서 설정되지 않았습니다."));
 		return;
 	}
 
 	// 3️⃣ 월드 유효성 체크
 	if (!GetWorld())
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ GetWorld()가 nullptr 입니다."));
+		UE_LOG(LogTemp, Error, TEXT("GetWorld()가 nullptr 입니다."));
 		return;
 	}
 
@@ -175,7 +175,7 @@ void UP4Slot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEv
 
 	OutOperation = DragOp;
 
-	UE_LOG(LogTemp, Log, TEXT("✅ DragDropOperation 생성 완료"));
+	UE_LOG(LogTemp, Log, TEXT("DragDropOperation 생성 완료"));
 }
 
 bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
@@ -188,38 +188,38 @@ bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& In
 	UP4ItemDragDropOperation* DropOp = Cast<UP4ItemDragDropOperation>(InOperation);
 	if (!DropOp)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ DragDropOperation 캐스팅 실패"));
+		UE_LOG(LogTemp, Error, TEXT("DragDropOperation 캐스팅 실패"));
 		return false;
 	}
 
 	if (!DropOp->FromSlot)
 	{
-		UE_LOG(LogTemp, Error, TEXT("❌ FromSlot이 nullptr입니다."));
+		UE_LOG(LogTemp, Error, TEXT("FromSlot이 nullptr입니다."));
 		return false;
 	}
 
 	// 같은 슬롯에 드롭한 경우 - 아무것도 하지 않음
 	if (DropOp->FromSlot == this)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("⚠️ 같은 슬롯에 드롭 - 무시"));
+		UE_LOG(LogTemp, Warning, TEXT("같은 슬롯에 드롭 - 무시"));
 		return true;
 	}
 
 	// 다른 타입의 슬롯으로 드래그 방지
 	if (DropOp->FromSlot->SlotType != this->SlotType)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("⚠️ 다른 타입 슬롯으로 드래그 불가 (출발: %d, 목적: %d)"),
+		UE_LOG(LogTemp, Warning, TEXT("다른 타입 슬롯으로 드래그 불가 (출발: %d, 목적: %d)"),
 			(int32)DropOp->FromSlot->SlotType, (int32)this->SlotType);
 		return false;
 	}
 
 	// 아이템 교환 시작
-	UE_LOG(LogTemp, Log, TEXT("📦 아이템 교환 시작"));
-	UE_LOG(LogTemp, Log, TEXT("  출발지 슬롯[%d]: %s (수량: %d)"),
+	UE_LOG(LogTemp, Log, TEXT("아이템 교환 시작"));
+	UE_LOG(LogTemp, Log, TEXT("출발지 슬롯[%d]: %s (수량: %d)"),
 		DropOp->FromSlot->SlotIndex,
 		DropOp->DraggedItem.ItemData ? *DropOp->DraggedItem.ItemData->GetItemName().ToString() : TEXT("없음"),
 		DropOp->DraggedItem.Quantity);
-	UE_LOG(LogTemp, Log, TEXT("  목적지 슬롯[%d]: %s (수량: %d)"),
+	UE_LOG(LogTemp, Log, TEXT("목적지 슬롯[%d]: %s (수량: %d)"),
 		SlotIndex,
 		CurrentItem.ItemData ? *CurrentItem.ItemData->GetItemName().ToString() : TEXT("없음"),
 		CurrentItem.Quantity);
@@ -233,12 +233,12 @@ bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& In
 			{
 				// 인벤토리 컴포넌트에서 교환 → OnInventoryUpdated 브로드캐스트 → RefreshUI 자동 호출
 				InvComp->SwapSlots(DropOp->FromSlot->SlotIndex, SlotIndex, SlotType);
-				UE_LOG(LogTemp, Log, TEXT("✅ 인벤토리 컴포넌트 교환 완료 (RefreshUI 자동 호출됨)"));
+				UE_LOG(LogTemp, Log, TEXT("인벤토리 컴포넌트 교환 완료 (RefreshUI 자동 호출됨)"));
 				return true;
 			}
 			else
 			{
-				UE_LOG(LogTemp, Error, TEXT("❌ 인벤토리 컴포넌트를 찾지 못함"));
+				UE_LOG(LogTemp, Error, TEXT("인벤토리 컴포넌트를 찾지 못함"));
 			}
 		}
 	}
