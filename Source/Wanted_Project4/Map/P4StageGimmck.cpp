@@ -18,13 +18,13 @@ AP4StageGimmck::AP4StageGimmck()
 void AP4StageGimmck::BeginPlay()
 {
 	Super::BeginPlay();
-	
+	SetActorRelativeRotation(FRotator(0.0f, 90.0f, 0.0f));
 
 	Vx = (TileOffsetCoordB - TileOffsetCoordA);
 	Vy = (TileOffsetCoordC - TileOffsetCoordA);
 
-	Vx.Z = 0.0f;
-	Vy.Z = 0.0f;
+	//Vx.Z = 0.0f;
+	//Vy.Z = 0.0f;
 
 
 	BaseAB = Vx;        // 헤더에 FVector BaseAB, BaseAC 추가
@@ -44,7 +44,6 @@ void AP4StageGimmck::BeginPlay()
 
 	RefreshTiles();
 
-	//DCorrection = TileOffsetCoordD - (TileOffsetCoordB + TileOffsetCoordC - TileOffsetCoordA);
 
 	const FVector AB = TileOffsetCoordB - TileOffsetCoordA;
 	const FVector AC = TileOffsetCoordC - TileOffsetCoordA;

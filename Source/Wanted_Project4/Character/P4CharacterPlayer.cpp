@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SceneComponent.h"
+#include "Engine/TextureRenderTarget2D.h"
 
 AP4CharacterPlayer::AP4CharacterPlayer()
 {
@@ -64,6 +65,17 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 	MapViewrCapture->ProjectionType = ECameraProjectionMode::Orthographic;
 	MapViewrCapture->OrthoWidth = 32768.0f;
 	MapViewrCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorHDR;
+
+	//작성: 한승헌 -일시 : 2025.11.11
+
+	MiniMapTexture = MapViewrCapture->TextureTarget;
+
+	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> MiniMapRef(TEXT("/Game/UI/MiniMap/MiniMapRenderTarget.MiniMapRenderTarget"));
+
+	if (MiniMapRef.Succeeded() == true)
+	{
+		MiniMapTexture = MiniMapRef.Object;
+	}
 	//여기까지가 미니맵 코드입니다. - 작성: 한승헌.
 }
 
