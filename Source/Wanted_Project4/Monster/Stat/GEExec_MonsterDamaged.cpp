@@ -14,7 +14,7 @@ struct FDamagedStatics
 	{
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UP4MonsterAttributeSet, DamageAmount, Source, true);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UP4MonsterAttributeSet, CurHP, Source, true);
-		 DEFINE_ATTRIBUTE_CAPTUREDEF(UP4MonsterAttributeSet, MaxHP, Source, true);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UP4MonsterAttributeSet, MaxHP, Source, true);
 	}
 };
 

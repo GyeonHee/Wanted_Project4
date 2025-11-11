@@ -19,7 +19,7 @@ AP4MonsterJagras::AP4MonsterJagras()
 	// Box Collision 설정
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxCollision->SetupAttachment(GetMesh(), TEXT("Armature_ems049_00"));
-	BoxCollision->SetRelativeLocation(FVector(0.f, -64.f, -90.f));
+	BoxCollision->SetRelativeLocation(FVector(0.f, -64.f, 10.f));
 	BoxCollision->SetBoxExtent(FVector(30.f, 65.f, 165.f));
 	BoxCollision->SetCollisionProfileName(CPROPILE_P4CAPSULE);
 

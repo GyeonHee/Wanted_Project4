@@ -36,6 +36,10 @@ public:
 	virtual float GetAIAttackRange() = 0;
 	virtual float GetAIPatrolRadius() = 0;
 
+	// 공격, 피격 재생 여부
+	virtual bool GetIsHitting() = 0;
+	virtual bool GetIsAttacking() = 0;
+	
 	// 공격 요청 함수
 	virtual void AttackByAI() = 0;
 

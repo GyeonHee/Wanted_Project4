@@ -172,11 +172,13 @@ void AP4MonsterBase::AttackActionBegin(FName& InAttackMontageSectionName, const 
 {
 	// 공격 모션동안 이동 막기
 	GetCharacterMovement()->SetMovementMode(MOVE_None);
-
+	
 	// 몽타주 재생을 위해 AnimInstance 갖고 오기
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		IsAttacking = true;
+		
 		// 입력받은 섹션으로 몽타주 섹션 변경
 		AnimInstance->Montage_JumpToSection(InAttackMontageSectionName, AttackActionMontage);
 
@@ -194,8 +196,14 @@ void AP4MonsterBase::AttackActionBegin(FName& InAttackMontageSectionName, const 
 
 void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
 {
+	IsAttacking = false;
+	
 	// 무브먼트 모드 복구
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	// 피격 모션이 진행중이 아니라면
+	if (IsHitting == false)
+	{
+	}
 
 	// 공격이 끝났음을 알림
 	NotifyActionEnd();
@@ -207,11 +215,16 @@ void AP4MonsterBase::HitActionBegin()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
+		IsHitting = true;
+				
+		// @Todo: 임시 Hit 모션 시작 로그
+		UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Hit Action Begin"));
+		
 		// Hit 모션동안 이동 막기
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
 
 		// Hit 몽타주 재생
-		AnimInstance->Montage_Play(HitMontage, 1.8f);
+		AnimInstance->Montage_Play(HitMontage, 1.f);
 
 		FOnMontageEnded OnMontageEnded;
 		OnMontageEnded.BindUObject(
@@ -223,7 +236,12 @@ void AP4MonsterBase::HitActionBegin()
 }
 
 void AP4MonsterBase::HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
-{
+{	
+	// @Todo: 임시 Hit 모션 끝 로그
+	UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Hit Action End"));
+
+	IsHitting = false;
+	
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
