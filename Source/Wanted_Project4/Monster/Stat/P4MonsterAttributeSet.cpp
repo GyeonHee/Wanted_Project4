@@ -24,8 +24,6 @@ void UP4MonsterAttributeSet::PostGameplayEffectExecute(const struct FGameplayEff
 		// 몬스터가 죽었는지 체크
 		if (NewHP <= 0.f)
 		{
-			// @Todo: 사망 처리
-			
 			// 어딘가에 OnHpZeroDelegate 델리게이트 생성
 
 			// 사망 함수 만들고 바인드
