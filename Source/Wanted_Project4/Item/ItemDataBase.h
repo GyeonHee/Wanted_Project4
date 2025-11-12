@@ -76,4 +76,5 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Stats")
     int32 MaxStackCount = 99;
 
+
 };
