@@ -159,3 +159,8 @@ void UP4InventoryWidget::RefreshSlot(EInventorySlotType SlotType, int32 SlotInde
 
     UE_LOG(LogTemp, Log, TEXT("RefreshSlot: 타입[%d] 인덱스[%d] 갱신 완료"), (int32)SlotType, SlotIndex);
 }
+
+FReply UP4InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    return FReply::Handled(); // 아무것도 안 해도 입력만 막음
+}

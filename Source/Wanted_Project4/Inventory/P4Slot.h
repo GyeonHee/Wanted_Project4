@@ -22,13 +22,21 @@ public:
 	virtual void NativeConstruct() override;
 
 	// 마우스 클릭 감지
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent) override;
 
 	// 마우스 드래그 감지
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
+	virtual void NativeOnDragDetected(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent,
+		UDragDropOperation*& OutOperation) override;
 	
 	// 마우스 드랍 감지
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+	virtual bool NativeOnDrop(
+		const FGeometry& InGeometry,
+		const FDragDropEvent& InDragDropEvent,
+		UDragDropOperation* InOperation) override;
 
 	// 아이템 인벤토리에 세팅
 	void SetItem(const FInventoryItem& InItemData);
