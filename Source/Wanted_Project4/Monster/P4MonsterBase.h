@@ -61,8 +61,8 @@ public:
 
 	// @Todo: AttributeSet 에 없는 애들을 일단 어떻게 할 것인가
 	// AttributeSet 에 없음
-	FORCEINLINE virtual float GetAIAttackRange() override { return 150.f; }
-	FORCEINLINE virtual float GetAIPatrolRadius() override { return 500.f; }
+	FORCEINLINE virtual float GetAIAttackRange() override { return 250.f; }
+	FORCEINLINE virtual float GetAIPatrolRadius() override { return 900.f; }
 
 	// 공격 요청 함수
 	virtual void AttackByAI() override;
@@ -81,8 +81,14 @@ public:
 	void AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
 
 	// Hit 몽타주 실행 및 종료 시 호출될 함수
-	void HitActionBegin();
+	virtual void HitActionBegin();
 	void HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+
+	// 공격, 피격 애니메이션 진행 여부를 확인하기 위한 변수
+	virtual bool GetIsHitting() override { return IsHitting; }
+	virtual bool GetIsAttacking() override { return IsAttacking; }
+	bool IsAttacking = false;
+	bool IsHitting = false;
 
 protected:
 	// 몬스터가 죽었을 시 실행 될 함수

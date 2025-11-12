@@ -51,6 +51,13 @@ AP4PlayerController::AP4PlayerController()
 		AttackAction = AttackActionRef.Object;
 	}
 
+	//작성- 한승헌 일시- 2025.11.12
+	//InteractionAction 지정
+	static ConstructorHelpers::FObjectFinder<UInputAction> InteractionActionRef(TEXT("/Game/Character/Input/Action/IA_Interaction.IA_Interaction"));
+	if (InteractionActionRef.Succeeded())
+	{
+		InteractionAction = InteractionActionRef.Object;
+	}
 
 	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
 	static ConstructorHelpers::FClassFinder<UP4HUDWidget> P4HUDWidgetRef(TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
@@ -231,6 +238,11 @@ void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
 		EIC->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 1);
 		//EIC->BindAction(RollAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
 		//EIC->BindAction(RollAction, ETriggerEvent::Completed, this, &AP4PlayerController::HandleAbilityReleased, 2);
+
+		//작성: 한승헌
+		//일시: 2025.11.12
+		//NPC와 상호작용을 위한 입력 키.
+		EIC->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
 	}
 }
 

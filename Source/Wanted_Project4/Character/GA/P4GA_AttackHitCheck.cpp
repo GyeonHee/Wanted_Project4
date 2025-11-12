@@ -68,10 +68,11 @@ void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	if (NumData == 0)
 	{
 		UE_LOG(LogTemp, Warning, TEXT("No target data found."));
+		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 		return;
 	}
 
-	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
+	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Ensured();
 	const UP4PlayerAttributeSet* SourceAttribute = SourceASC->GetSet<UP4PlayerAttributeSet>();
 
 	if (!SourceASC || !SourceAttribute)
