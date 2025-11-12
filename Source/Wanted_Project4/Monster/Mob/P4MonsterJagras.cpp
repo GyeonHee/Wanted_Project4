@@ -3,6 +3,8 @@
 
 #include "P4MonsterJagras.h"
 
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/BoxComponent.h"
 #include "Physics/P4Collision.h"
 
@@ -17,7 +19,7 @@ AP4MonsterJagras::AP4MonsterJagras()
 	// Box Collision 설정
 	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
 	BoxCollision->SetupAttachment(GetMesh(), TEXT("Armature_ems049_00"));
-	BoxCollision->SetRelativeLocation(FVector(0.f, -64.f, -90.f));
+	BoxCollision->SetRelativeLocation(FVector(0.f, -64.f, 10.f));
 	BoxCollision->SetBoxExtent(FVector(30.f, 65.f, 165.f));
 	BoxCollision->SetCollisionProfileName(CPROPILE_P4CAPSULE);
 
@@ -146,7 +148,7 @@ void AP4MonsterJagras::MeleeAttack()
 
 	if (HitDetected)
 	{
-		// @Todo: 다른 액터가 공격 당했을 시 처리
-		UE_LOG(LogTemp, Log, TEXT("Hit: %s"), *OutHitResult.GetActor()->GetName());
+		// 다른 액터가 공격 당했을 시 처리
+		MonsterGiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
 	}
 }

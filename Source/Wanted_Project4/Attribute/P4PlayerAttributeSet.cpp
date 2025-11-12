@@ -3,8 +3,10 @@
 
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "GameplayEffectExtension.h"
+#include "Tag/P4GameplayTag.h"
+
 UP4PlayerAttributeSet::UP4PlayerAttributeSet() :
-	AttackRange(200.0f),
+	AttackRange(250.0f),
 	MaxAttackRange(300.0f),
 	AttackRadius(50.f),
 	MaxAttackRadius(150.0f),
@@ -63,15 +65,7 @@ void UP4PlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 		SetHealth(FMath::Clamp(GetHealth() - GetDamage(), MinimumHealth, GetMaxHealth()));
 		SetDamage(0.0f);
 	}
-
-	if ((GetHealth() <= 0.0f) && !bOutOfHealth)
-	{
-		Data.Target.AddLooseGameplayTag(ABTAG_CHARACTER_ISDEAD);
-		OnOutOfHealth.Broadcast();
-	}
-
-	bOutOfHealth = (GetHealth() <= 0.0f);*/
-
+	*/
 
 
 	//작성 한승헌 - 2025-11-10
@@ -89,4 +83,14 @@ void UP4PlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 
 		SetDamage(0.0f);
 	}
+	//==================================================
+
+
+	if ((GetHealth() <= 0.0f) && !bOutOfHealth)
+	{
+		Data.Target.AddLooseGameplayTag(P4TAG_CHARACTER_ISDEAD);
+		OnHpZero.Broadcast();
+	}
+
+	bOutOfHealth = (GetHealth() <= 0.0f);
 }

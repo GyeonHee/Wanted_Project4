@@ -10,9 +10,16 @@
 #include "UI/P4HUDWidget.h"
 #include "UI/P4HpBarWidget.h"
 #include "Attribute/P4PlayerAttributeSet.h"
+#include "Inventory/P4InventoryComponent.h"
+#include "UI/P4InventoryWidget.h"
 
 AP4PlayerController::AP4PlayerController()
 {
+	// 게임 시작 시 커서 숨김
+	// -작성: 노현기 -일시: 2025.11.10
+	bShowMouseCursor = false;
+
+
 	//bShowMouseCursor = false;
 	static ConstructorHelpers::FObjectFinder<UInputMappingContext> DefaultMappingRef(TEXT("/Game/Character/Input/IMC_Default.IMC_Default"));
 	if (DefaultMappingRef.Succeeded())
@@ -44,6 +51,13 @@ AP4PlayerController::AP4PlayerController()
 		AttackAction = AttackActionRef.Object;
 	}
 
+	//작성- 한승헌 일시- 2025.11.12
+	//InteractionAction 지정
+	static ConstructorHelpers::FObjectFinder<UInputAction> InteractionActionRef(TEXT("/Game/Character/Input/Action/IA_Interaction.IA_Interaction"));
+	if (InteractionActionRef.Succeeded())
+	{
+		InteractionAction = InteractionActionRef.Object;
+	}
 
 	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
 	static ConstructorHelpers::FClassFinder<UP4HUDWidget> P4HUDWidgetRef(TEXT("/Game/UI/WBP_HUD.WBP_HUD_C"));
@@ -149,6 +163,46 @@ void AP4PlayerController::OnPossess(APawn* InPawn)
 			}
 		}
 	}
+
+	// -작성: 노현기 -일시: 2025.11.10
+	if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(InPawn))
+	{
+		// 인벤토리 컴포넌트 체크
+		if (!CharacterPlayer->GetInventoryComponent())
+		{
+			UE_LOG(LogTemp, Error, TEXT("InventoryComp가 nullptr!"));
+			return;
+		}
+
+		UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재 확인"));
+
+		// 위젯이 아직 생성되지 않았으면 생성
+		if (!InventoryWidget)
+		{
+			if (!InventoryWidgetClass)
+			{
+				UE_LOG(LogTemp, Error, TEXT("InventoryWidgetClass가 설정되지 않음!"));
+				return;
+			}
+
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 위젯 생성 시작..."));
+
+			InventoryWidget = CreateWidget<UP4InventoryWidget>(this, InventoryWidgetClass);
+			if (!InventoryWidget)
+			{
+				UE_LOG(LogTemp, Error, TEXT("인벤토리 위젯 생성 실패!"));
+				return;
+			}
+
+			InventoryWidget->AddToViewport();
+			InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 위젯 생성 완료"));
+		}
+
+		// 인벤토리 바인딩
+		InventoryWidget->BindInventory(CharacterPlayer->GetInventoryComponent());
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리 위젯 바인딩 완료\n"));
+	}
 }
 
 void AP4PlayerController::SetupInputComponent()
@@ -165,6 +219,11 @@ void AP4PlayerController::SetupInputComponent()
 		//EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleAttack);
 		//SetupPlayerGAS();
 	}
+
+	// 입력 바인딩 ('I' 키눌러서 인벤토리 토글) 
+	// @Todo: 이거 프로젝트 세팅에서 입력 바인딩에서 키 설정해야하는거로 알고있어요 메인 레벨에서 해야함(되어있음)
+	// -작성: 노현기 -일시: 2025.11.10
+	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AP4PlayerController::ToggleInventory);
 }
 
 void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
@@ -179,11 +238,29 @@ void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
 		EIC->BindAction(AttackAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 1);
 		//EIC->BindAction(RollAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
 		//EIC->BindAction(RollAction, ETriggerEvent::Completed, this, &AP4PlayerController::HandleAbilityReleased, 2);
+
+		//작성: 한승헌
+		//일시: 2025.11.12
+		//NPC와 상호작용을 위한 입력 키.
+		EIC->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
 	}
 }
 
 void AP4PlayerController::HandleAbilityPressed(int32 InputID)
 {
+	// -작성자: 노현기 -일시: 2025.11.12
+    // 공격 입력(1번)이고, 인벤토리가 열려있으면
+	if (InputID == 1 && bIsInventoryVisible && InventoryWidget)
+	{
+		// 인벤토리 위젯에게 마우스가 위에 있는지 물어봄
+		if (InventoryWidget->IsMouseOverInventory())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("인벤토리 위에서 클릭 - 공격 차단"));
+			return; // 공격 차단
+		}
+	}
+	
+
 	if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(GetPawn()))
 	{
 		CharacterPlayer->GASInputPressed(InputID);
@@ -229,3 +306,84 @@ void AP4PlayerController::DebugDamage(float Amount)
 			UE_LOG(LogTemp, Log, TEXT("[DebugDamage] HP -%0.1f"), Amount);
 		}
 }
+
+// -작성: 노현기 -일시: 2025.11.10
+void AP4PlayerController::ToggleInventory()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ToggleInventory 입력 감지"));
+
+	if (!InventoryWidget)
+	{
+		UE_LOG(LogTemp, Error, TEXT("InventoryWidget이 nullptr!"));
+		return;
+	}
+
+	// 상태 토글
+	bIsInventoryVisible = !bIsInventoryVisible;
+
+	if (bIsInventoryVisible)
+	{
+		// 인벤토리 열기
+		InventoryWidget->SetVisibility(ESlateVisibility::Visible);
+		bShowMouseCursor = true;
+
+		FInputModeGameAndUI InputMode;
+		// SetWidgetToFocus()는 키보드 입력이 필요한 UI(텍스트 입력 등)에서만 필요합니다
+		//InputMode.SetWidgetToFocus(InventoryWidget->TakeWidget());
+		InputMode.SetHideCursorDuringCapture(false);
+		InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+		SetInputMode(InputMode);
+
+		// 마우스 이벤트가 UI를 먼저 거치도록 설정
+		bShowMouseCursor = true;
+		FlushPressedKeys(); // 이전 입력 초기화
+
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리 열림"));
+	}
+	else
+	{
+		// 인벤토리 닫기
+		InventoryWidget->SetVisibility(ESlateVisibility::Hidden);
+		bShowMouseCursor = false;
+
+		FInputModeGameOnly InputMode;
+		SetInputMode(InputMode);
+
+		FlushPressedKeys(); // 입력 초기화
+
+		UE_LOG(LogTemp, Warning, TEXT("인벤토리 닫힘"));
+	}
+}
+
+// 인벤토리 위젯에 옮길 예정
+//// -작성자: 노현기 -일시: 2025.11.12
+//bool AP4PlayerController::IsMouseOverUI() const
+//{
+//	if (!InventoryWidget)
+//	{
+//		return false;
+//	}
+//
+//	// 인벤토리가 보이지 않으면 false
+//	if (InventoryWidget->GetVisibility() != ESlateVisibility::Visible)
+//	{
+//		return false;
+//	}
+//
+//	// 마우스 위치 가져오기
+//	FVector2D MousePosition;
+//	if (GetMousePosition(MousePosition.X, MousePosition.Y))
+//	{
+//		// InventoryPanel 영역 가져오기
+//		// 주의: InventoryPanel을 public으로 만들거나 getter 필요
+//		// 또는 InventoryWidget에 IsMouseOver 함수 추가
+//
+//		// 간단한 방법: 위젯이 마우스 아래 있는지 체크
+//		if (InventoryWidget->IsHovered())
+//		{
+//			return true;
+//		}
+//	}
+//
+//	return false;
+//}

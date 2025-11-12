@@ -31,6 +31,14 @@ protected:
     // GAS 입력 바인딩
     void SetupGASInputBindings(UAbilitySystemComponent* ASC);
 
+    // -작성: 노현기 -일시: 2025.11.10
+    // 인벤토리 토글 함수
+    void ToggleInventory();
+   
+    // 인벤토리 위젯에 옮길 예정
+    //// 마우스가 UI 위에 있는지 체크하는 함수
+    //bool IsMouseOverUI() const;
+
 private:
     // 입력 매핑
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
@@ -48,6 +56,11 @@ private:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> AttackAction;
 
+
+    //작성- 한승헌 일ㄹ시 2025.11.12
+    //NPC와 상호작용을 위한 키 추가.
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UInputAction> InteractionAction;
 
     //작성 - 한승헌 2025-11-10
     //디버그용 데미지 주기.
@@ -72,4 +85,17 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
     TObjectPtr<class UP4HUDWidget> P4HUDWidget;
 
+    // -작성: 노현기 -일시: 2025.11.10
+    // 인벤토리 위젯 클래스
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
+    TSubclassOf<class UP4InventoryWidget> InventoryWidgetClass;
+
+// -작성: 노현기 -일시: 2025.11.10 
+private:
+    // 인벤토리 위젯 참조
+    UPROPERTY()
+    TObjectPtr<class UP4InventoryWidget> InventoryWidget;
+
+    // 인벤토리 창 띄우기 = false
+    bool bIsInventoryVisible = false;
 };

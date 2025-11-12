@@ -10,6 +10,12 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Animation/AnimMontage.h"
 
+// -작성: 노현기 -일시: 2025.11.10
+// Todo: 인벤토리 컴포넌트 클래스 폴더 위치를 컴포넌트로 옮길 것
+#include "Inventory/P4InventoryComponent.h"
+#include "Item/ItemDataBase.h"
+#include "UI/P4InventoryWidget.h"
+
 // Sets default values
 AP4CharacterBase::AP4CharacterBase()
 {
@@ -18,6 +24,11 @@ AP4CharacterBase::AP4CharacterBase()
 	// GAS 초기화
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	AttributeSet = CreateDefaultSubobject<UP4PlayerAttributeSet>(TEXT("AttributeSet"));
+
+	// -작성: 노현기 -일시: 2025.11.10
+	// 인벤토리 컴포넌트 생성
+	InventoryComp = CreateDefaultSubobject<UP4InventoryComponent>(TEXT("InventoryComponent"));
+
 	// Pawn
 	bUseControllerRotationPitch = false;
 	bUseControllerRotationYaw = false;
@@ -74,7 +85,7 @@ AP4CharacterBase::AP4CharacterBase()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ComboActionMontageRef(TEXT("/Game/Character/Animation/Katana/ForUse/AM_KatanaDefaultAttack.AM_KatanaDefaultAttack"));
 	if (ComboActionMontageRef.Object)
 	{
-		ComboActionMontage = ComboActionMontageRef.Object;
+		DefaultAttackMontage = ComboActionMontageRef.Object;
 	}
 
 	//static ConstructorHelpers::FObjectFinder<UABComboActionData> ComboActionDataRef(TEXT("/Script/ArenaBattle.ABComboActionData'/Game/ArenaBattle/CharacterAction/ABA_ComboAttack.ABA_ComboAttack'"));
@@ -91,7 +102,16 @@ AP4CharacterBase::AP4CharacterBase()
 
 	// Weapon Component
 	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("hand_rSocket"));
+	Weapon->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+
+	//todo: Load Weapon through Inventory
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshRef(
+		TEXT("/Game/Weapon/Katana.Katana"));
+	if (WeaponMeshRef.Succeeded())
+	{
+		Weapon->SetSkeletalMesh(WeaponMeshRef.Object);
+	}
+	
 }
 
 void AP4CharacterBase::PostInitializeComponents()
@@ -103,6 +123,84 @@ void AP4CharacterBase::PostInitializeComponents()
         ASC->InitAbilityActorInfo(this, this);
         //AttributeSet = NewObject<UP4PlayerAttributeSet>(this, UP4PlayerAttributeSet::StaticClass());
     }
+	UP4PlayerAttributeSet* PlayerAttributeSet = Cast<UP4PlayerAttributeSet>(AttributeSet);
+	PlayerAttributeSet->OnHpZero.AddUObject(this, &AP4CharacterBase::SetDead);
+}
+
+void AP4CharacterBase::SetDead()
+{
+	// 이동 못하게 막기
+	GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 사망 몽타주 재생
+	PlayDeadAnimation();
+
+	// 콜리전 끄기
+	SetActorEnableCollision(false);
+
+	// DeadEventDelayTime 후 액터 삭제
+	//FTimerHandle DeadTimerHandle;
+	//float DeadEventDelayTime = 5.f;
+	//GetWorld()->GetTimerManager().SetTimer(
+	//	DeadTimerHandle,
+	//	[&]()
+	//	{
+	//		Destroy();
+	//	},
+	//	DeadEventDelayTime,
+	//	false
+	//);
+}
+
+void AP4CharacterBase::PlayDeadAnimation()
+{
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		AnimInstance->StopAllMontages(0.f);
+
+		const float PlayRate = 3.0f;
+		AnimInstance->Montage_Play(DeadMontage, PlayRate);
+	}
+}
+
+// -작성: 노현기 -일시: 2025.11.10
+void AP4CharacterBase::BeginPlay()
+{
+	Super::BeginPlay();
+
+	// 테스트용 아이템 추가 (UI는 컨트롤러가 담당)
+	if (InventoryComp)
+	{
+		UItemDataBase* TestSword = LoadObject<UItemDataBase>(nullptr,
+			TEXT("/Game/Item/Equipment/DA_Sword.DA_Sword"));
+		UItemDataBase* TestShield = LoadObject<UItemDataBase>(nullptr,
+			TEXT("/Game/Item/Equipment/DA_Shield.DA_Shield"));
+		UItemDataBase* TestPotion = LoadObject<UItemDataBase>(nullptr,
+			TEXT("/Game/Item/Consumable/DA_HealthPotion.DA_HealthPotion"));
+		UItemDataBase* TestPotion2 = LoadObject<UItemDataBase>(nullptr,
+			TEXT("/Game/Item/Consumable/DA_IncreaseMaxHealthPotion.DA_IncreaseMaxHealthPotion"));
+
+		if (TestSword)
+		{
+			InventoryComp->AddItem(TestSword, 1);
+			UE_LOG(LogTemp, Warning, TEXT("검 추가됨!"));
+			InventoryComp->AddItem(TestSword, 1);
+			UE_LOG(LogTemp, Warning, TEXT("검 1개 더 추가됨!"));
+			InventoryComp->AddItem(TestShield, 1);
+		}
+
+		if (TestPotion)
+		{
+			InventoryComp->AddItem(TestPotion, 10);
+			UE_LOG(LogTemp, Warning, TEXT("포션 10개 추가됨!"));
+			InventoryComp->AddItem(TestPotion, 5);
+			UE_LOG(LogTemp, Warning, TEXT("포션 5개 더 추가됨!"));
+			InventoryComp->AddItem(TestPotion, 99);
+			InventoryComp->AddItem(TestPotion, 90);
+			InventoryComp->AddItem(TestPotion2, 50);
+		}
+	}
 }
 
 UAbilitySystemComponent* AP4CharacterBase::GetAbilitySystemComponent() const

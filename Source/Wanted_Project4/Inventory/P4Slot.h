@@ -21,14 +21,33 @@ public:
 
 	virtual void NativeConstruct() override;
 
-	virtual FReply NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
+	// 마우스 클릭 감지
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent) override;
 
-	virtual void NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)override;
-	virtual bool NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)override;
+	// 마우스 드래그 감지
+	virtual void NativeOnDragDetected(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent,
+		UDragDropOperation*& OutOperation) override;
+	
+	// 마우스 드랍 감지
+	virtual bool NativeOnDrop(
+		const FGeometry& InGeometry,
+		const FDragDropEvent& InDragDropEvent,
+		UDragDropOperation* InOperation) override;
 
+	// 아이템 인벤토리에 세팅
 	void SetItem(const FInventoryItem& InItemData);
 
+	// UI만 업데이트 (CurrentItem은 그대로)
+	void UpdateSlotUI();
+
 	void ClearSlot();
+
+	// 현재 아이템 정보 가져오기
+	FORCEINLINE const FInventoryItem& GetCurrentItem() const { return CurrentItem; }
 public:
 	/*UPROPERTY(EditAnywhere, Category = "Slot")
 	TObjectPtr<class UItemDataBase> ItemData;*/
@@ -46,6 +65,10 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Slot")
 	int32 SlotIndex;
 
+	// 슬롯 타입 (에디터에서 설정)
+	UPROPERTY(EditAnywhere, Category = "Slot")
+	EInventorySlotType SlotType = EInventorySlotType::Equipment;
+
 protected:
 	// 슬롯이 현재 가진 아이템 정보
 	FInventoryItem CurrentItem;
@@ -53,7 +76,7 @@ protected:
 	UPROPERTY()
 	TObjectPtr<class UP4ItemIconLoader> IconLoader;
 
-	// 드래그 할때 사용될 슬롯 위젯
+	// 드래그 할때 사용될 아이템 이미지 위젯
 	UPROPERTY(EditAnywhere, Category = "Slot")
 	TSubclassOf<UP4Slot> DragWidgetClass;
 };

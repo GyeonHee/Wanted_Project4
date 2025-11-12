@@ -6,6 +6,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Interface/MonsterAIInterface.h"
+#include "Interface/P4MonsterDamageInterface.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
 #include "P4MonsterBase.generated.h"
@@ -18,7 +19,8 @@ class WANTED_PROJECT4_API AP4MonsterBase
 	: public ACharacter,
 	  public IAbilitySystemInterface,
 	  public IAnimationAttackInterface,
-	  public IMonsterAIInterface
+	  public IMonsterAIInterface,
+	  public IP4MonsterDamageInterface
 {
 	GENERATED_BODY()
 
@@ -44,7 +46,11 @@ public:
 public:
 	// 공격 받았을 경우 처리 함수
 	UFUNCTION(BlueprintCallable, Category = Monster)
-	void MonsterApplyDamage(const float DamageAmount);
+	virtual void MonsterApplyDamage(const float DamageAmount) override;
+
+	// 공격할 시 데미지 주는 처리 함수
+	UFUNCTION(BlueprintCallable, Category = Monster)
+	virtual void MonsterGiveDamage(AActor* TargetActor, const float DamageAmount) override;
 
 	// Monster AI Interface 구현
 public:
@@ -55,8 +61,8 @@ public:
 
 	// @Todo: AttributeSet 에 없는 애들을 일단 어떻게 할 것인가
 	// AttributeSet 에 없음
-	FORCEINLINE virtual float GetAIAttackRange() override { return 150.f; }
-	FORCEINLINE virtual float GetAIPatrolRadius() override { return 500.f; }
+	FORCEINLINE virtual float GetAIAttackRange() override { return 250.f; }
+	FORCEINLINE virtual float GetAIPatrolRadius() override { return 900.f; }
 
 	// 공격 요청 함수
 	virtual void AttackByAI() override;
@@ -66,7 +72,7 @@ public:
 
 	// 공격 몽타주가 끝나면 알려주는 함수
 	virtual void NotifyActionEnd();
-	
+
 	//SetAIAttackDelegate 에서 전달된 델리게이트를 저장할 변수
 	FAIMonsterAttackFinished OnAttackFinished;
 
@@ -75,13 +81,19 @@ public:
 	void AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
 
 	// Hit 몽타주 실행 및 종료 시 호출될 함수
-	void HitActionBegin();
+	virtual void HitActionBegin();
 	void HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+
+	// 공격, 피격 애니메이션 진행 여부를 확인하기 위한 변수
+	virtual bool GetIsHitting() override { return IsHitting; }
+	virtual bool GetIsAttacking() override { return IsAttacking; }
+	bool IsAttacking = false;
+	bool IsHitting = false;
 
 protected:
 	// 몬스터가 죽었을 시 실행 될 함수
 	virtual void SetDead();
-	
+
 	// ASC
 	// 몬스터의 경우 일시적이므로 Character 에 붙임
 protected:
@@ -114,7 +126,7 @@ protected:
 	// 몬스터 피격 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> HitMontage;
-	
+
 	// 몬스터 사망 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
