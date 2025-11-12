@@ -68,10 +68,6 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
     TSoftObjectPtr<UTexture2D> Icon;
 
-    // HP 회복량
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
-    int32 HealHealth;
-
     // 태그 (여기에 Item.Equipment.Weapon.Sword 같은걸 넣음)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Tags")
     FGameplayTagContainer ItemTags;
