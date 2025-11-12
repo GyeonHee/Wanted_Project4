@@ -68,13 +68,11 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 
 	//작성: 한승헌 -일시 : 2025.11.11
 
-	MiniMapTexture = MapViewrCapture->TextureTarget;
-
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> MiniMapRef(TEXT("/Game/UI/MiniMap/MiniMapRenderTarget.MiniMapRenderTarget"));
 
 	if (MiniMapRef.Succeeded() == true)
 	{
-		MiniMapTexture = MiniMapRef.Object;
+		MapViewrCapture->TextureTarget = MiniMapRef.Object;
 	}
 	//여기까지가 미니맵 코드입니다. - 작성: 한승헌.
 }
