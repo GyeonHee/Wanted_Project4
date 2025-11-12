@@ -198,11 +198,11 @@ void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupt
 {
 	IsAttacking = false;
 	
-	// 무브먼트 모드 복구
-	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	// 피격 모션이 진행중이 아니라면
 	if (IsHitting == false)
 	{
+	    // 무브먼트 모드 복구
+	    GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 	}
 
 	// 공격이 끝났음을 알림
