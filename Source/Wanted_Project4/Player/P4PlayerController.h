@@ -53,6 +53,11 @@ private:
     TObjectPtr<UInputAction> AttackAction;
 
 
+    //작성- 한승헌 일ㄹ시 2025.11.12
+    //NPC와 상호작용을 위한 키 추가.
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UInputAction> InteractionAction;
+
     //작성 - 한승헌 2025-11-10
     //디버그용 데미지 주기.
     UFUNCTION(Exec)

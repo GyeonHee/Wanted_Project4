@@ -88,8 +88,8 @@ public:
 	UPROPERTY(EditAnywhere, Category = Grid)
 	FVector TileOffsetCoordC = FVector(11962.0f, -5474.0f, 100.0f); //타일 C 좌표
 
-	UPROPERTY(EditAnywhere, Category = Grid)
-	FVector TileOffsetCoordD = FVector(15167.0f, 4921.0f, 0.0f); //타일 D 좌표
+	UPROPERTY(VisibleAnywhere, Category = Grid)
+	FVector TileOffsetCoordD = FVector::ZeroVector; //타일 D좌표 => 자동으로 계산.
 
 	//UPROPERTY(EditAnywhere, Category = Grid)
 	//FVector TileOffsetCoordD; //타일 D 좌표

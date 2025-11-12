@@ -17,6 +17,12 @@ void AP4StageGimmck::BeginPlay()
 	BaseAB = TileOffsetCoordB - TileOffsetCoordA;
 	BaseAC = TileOffsetCoordC - TileOffsetCoordA;
 
+	//BaseAB.Z = 0.0f;
+	//BaseAC.Z = 0.0f;
+
+	FVector ComputeD = (TileOffsetCoordB + TileOffsetCoordC - TileOffsetCoordA);
+	TileOffsetCoordD = ComputeD;
+
 	// 2) 시작 셀 계산
 	if (APawn* P = UGameplayStatics::GetPlayerPawn(this, 0))
 	{
@@ -26,14 +32,17 @@ void AP4StageGimmck::BeginPlay()
 	// 3) 초기 로드
 	RefreshTiles();
 
-	// (선택) 검증 로그
+	// 디버그(경계 aliasing 확인)
 	const FVector P00 = CellToWorld({ 0,0 });
 	const FVector P10 = CellToWorld({ 1,0 });
 	const FVector P01 = CellToWorld({ 0,1 });
-	UE_LOG(LogTemp, Warning, TEXT("A(0,0)=%s  B(1,0)=%s  C(0,1)=%s"),
-		*P00.ToString(), *P10.ToString(), *P01.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("|AB|=%f  |AC|=%f"),
-		(P10 - P00).Size(), (P01 - P00).Size());
+	const FVector P11 = CellToWorld({ 1,1 });
+	const FVector P20 = CellToWorld({ 2,0 });
+	const FVector P02 = CellToWorld({ 0,2 });
+	UE_LOG(LogTemp, Warning, TEXT("P00=%s P10=%s P01=%s P11=%s P20=%s P02=%s"),
+		*P00.ToString(), *P10.ToString(), *P01.ToString(), *P11.ToString(), *P20.ToString(), *P02.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("|AB|=%f |AC|=%f |2AB|=%f |2AC|=%f"),
+		(P10 - P00).Size(), (P01 - P00).Size(), (P20 - P00).Size(), (P02 - P00).Size());
 }
 
 void AP4StageGimmck::Tick(float DeltaTime)
