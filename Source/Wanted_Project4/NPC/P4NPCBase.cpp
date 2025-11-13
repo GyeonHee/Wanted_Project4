@@ -5,6 +5,10 @@
 #include "AbilitySystemComponent.h"
 #include "Components/SphereComponent.h"
 #include "Character/P4CharacterPlayer.h"
+#include "Quest/P4QuestInfo.h"
+#include "Quest/P4StageDetails.h"
+#include "Quest/P4ObjectiveDetails.h"
+
 // Sets default values
 AP4NPCBase::AP4NPCBase()
 {
