@@ -3,6 +3,7 @@
 
 #include "UI/P4HUDWidget.h"
 #include "P4HpBarWidget.h"
+#include "P4QuestInformationWidget.h"
 #include "P4MiniMapWidget.h"
 #include "Interface/P4CharacterHUDInterface.h"
 
@@ -31,8 +32,12 @@ void UP4HUDWidget::NativeConstruct()
 	HpBar =  Cast<UP4HpBarWidget>(
 		GetWidgetFromName(TEXT("WidgetHpBar"))
 	);
-
 	ensureAlways(HpBar != nullptr);
+
+	QuestTextBlock = Cast<UP4QuestInformationWidget>(
+		GetWidgetFromName(TEXT("WidgetQuestLog"))
+	);
+	ensureAlways(QuestTextBlock != nullptr);
 
 	//ÀÛ¼º ÇÑ½ÂÇå - 2025 -11 - 10
 

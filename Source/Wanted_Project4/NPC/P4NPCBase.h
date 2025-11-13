@@ -36,6 +36,11 @@ public:
 
 	virtual void Interaction(ACharacter* Character);
 
+	FORCEINLINE int32 GetNPCQuestCode() const
+	{
+		return NPCQuestCode;
+	}
+
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -61,9 +66,7 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	TObjectPtr<class USphereComponent> InteractionSphere; //인터렉션 범위
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Quest")
-	TObjectPtr<class UAnimMontage> RequsetMontage; //퀘스트 수주시 모션 몽타주
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Quest") 
-	TObjectPtr<class UAnimMontage> QusetClearMomtage; //퀘스트 완료시 모션 몽타주
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Quest)
+	int32 NPCQuestCode;
 
 };

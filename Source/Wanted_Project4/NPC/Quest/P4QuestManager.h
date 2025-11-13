@@ -36,6 +36,9 @@ public:
 	UFUNCTION(BlueprintPure, Category = Quest)
 	int32 GetObjectiveProgress(const FString& ObjectiveID) const; //현재 Object(퀘스트목표) 진행도 조회.
 
+	const FP4QuestInfo* GetCurrentQuest() const;
+	const FP4StageDetails* GetCurrentStage() const;
+
 	//Getter 섹션.
 public:
 	UFUNCTION(BlueprintPure, Category = Quest)

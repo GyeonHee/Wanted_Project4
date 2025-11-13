@@ -8,20 +8,13 @@
 #include "Quest/P4QuestInfo.h"
 #include "Quest/P4StageDetails.h"
 #include "Quest/P4ObjectiveDetails.h"
+#include "Animation/AnimMontage.h"
 
 // Sets default values
 AP4NPCBase::AP4NPCBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletaMeshRef(TEXT("/Game/NPC/ImsiNPC.ImsiNPC"));
-
-	if (SkeletaMeshRef.Succeeded() == true)
-	{
-		GetMesh()->SetSkeletalMesh(SkeletaMeshRef.Object);
-	}
 
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
@@ -38,7 +31,8 @@ AP4NPCBase::AP4NPCBase()
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AP4NPCBase::OnOverlapBegin);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AP4NPCBase::OnOverlapEnd);
 
-	Tag_InRange = FGameplayTag::RequestGameplayTag(FName("Character.Interaction"));
+	//Tag_InRange = FGameplayTag::RequestGameplayTag(FName("Character.Interaction"));
+	
 }
 
 // Called when the game starts or when spawned

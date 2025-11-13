@@ -69,7 +69,6 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 	MapViewrCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorHDR;
 
 	//작성: 한승헌 -일시 : 2025.11.11
-
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> MiniMapRef(TEXT("/Game/UI/MiniMap/MiniMapRenderTarget.MiniMapRenderTarget"));
 
 	if (MiniMapRef.Succeeded() == true)

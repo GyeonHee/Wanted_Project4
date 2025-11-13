@@ -12,6 +12,7 @@
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "Inventory/P4InventoryComponent.h"
 #include "UI/P4InventoryWidget.h"
+#include "UI/P4QuestWidget.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -352,6 +353,14 @@ void AP4PlayerController::ToggleInventory()
 		FlushPressedKeys(); // 입력 초기화
 
 		UE_LOG(LogTemp, Warning, TEXT("인벤토리 닫힘"));
+	}
+}
+
+void AP4PlayerController::OpenQuestUI(int32 QuestCode)
+{
+	if (QuestWidgetClass == nullptr)
+	{
+		return;
 	}
 }
 

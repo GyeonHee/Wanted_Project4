@@ -39,6 +39,9 @@ protected:
     //// 마우스가 UI 위에 있는지 체크하는 함수
     //bool IsMouseOverUI() const;
 
+public:
+    //작성 한승헌 일시 2025.11.13
+    void OpenQuestUI(int32 QuestCode);
 private:
     // 입력 매핑
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
@@ -89,6 +92,14 @@ protected:
     // 인벤토리 위젯 클래스
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = HUD)
     TSubclassOf<class UP4InventoryWidget> InventoryWidgetClass;
+    
+//- 작성: 한승헌 일시: 2025.11.13
+//퀘스트 UI
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Quest)
+    TSubclassOf<class UP4QuestWidget> QuestWidgetClass;
+
+    UPROPERTY()
+    TObjectPtr<UP4QuestWidget> QuestWidget;
 
 // -작성: 노현기 -일시: 2025.11.10 
 private:
