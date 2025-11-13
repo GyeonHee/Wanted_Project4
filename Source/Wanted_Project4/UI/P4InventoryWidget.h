@@ -35,27 +35,11 @@ public:
 		const FGeometry& InGeometry,
 		const FPointerEvent& InMouseEvent) override;
 
-	//// 마우스 드래그 감지
-	//virtual void NativeOnDragDetected(
-	//	const FGeometry& InGeometry,
-	//	const FPointerEvent& InMouseEvent,
-	//	UDragDropOperation*& OutOperation) override;
+	// 마우스 움직임 감지
+	virtual FReply NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 
-	//// 마우스 드랍 감지
-	//virtual bool NativeOnDrop(
-	//	const FGeometry& InGeometry,
-	//	const FDragDropEvent& InDragDropEvent,
-	//	UDragDropOperation* InOperation) override;
-
-	//// 인벤토리 창 움직이기 위한 함수들 -----
-	//virtual void NativeTick(const FGeometry& InGeometry, float InDeltaTime) override;
-
-	//UFUNCTION()
-	//void MoveStart();
-
-	//UFUNCTION()
-	//void MoveEnd();
-	// -----------------------------------
+	// 마우스 버튼 뗌 감지
+	virtual FReply NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent) override;
 	
 	// 마우스가 인벤토리 영역 위에 있는지 체크
 	bool IsMouseOverInventory() const;
@@ -79,16 +63,17 @@ protected:
 	TObjectPtr<class UUniformGridPanel> ConsumableTypeSlot;
 
 private:
-	// 드래그 중인지 판별하기 위한 변수
-	uint8 bIsDragging;
-
-	// 초기 위치 및 오프셋
-	FVector2D InitialPos;
-	FVector2D InitialOffset;
+	bool bIsDragging;
+	
+	// 오프셋
+	FVector2D DragOffset;
 
 	// 인벤토리 영역 Canvas Panel (모든 인벤토리 UI를 담고 있는 패널)
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UCanvasPanel> InventoryPanel;
 
+	// 인벤토리 드래그 하기 위한 헤더보드
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UBorder> DragHeader;
 };
 
