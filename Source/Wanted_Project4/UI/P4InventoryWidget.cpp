@@ -12,6 +12,7 @@
 #include "Components/CanvasPanelSlot.h"
 #include "BluePrint/WidgetLayoutLibrary.h"
 #include "Player/P4PlayerController.h"
+#include "Components/Border.h"
 
 UP4InventoryWidget::UP4InventoryWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -84,7 +85,6 @@ void UP4InventoryWidget::NativeConstruct()
             }
         }
     }
-
 }
 
 void UP4InventoryWidget::BindInventory(UP4InventoryComponent* InInventoryComp)
@@ -196,30 +196,135 @@ void UP4InventoryWidget::RefreshSlot(EInventorySlotType SlotType, int32 SlotInde
 }
 
 FReply UP4InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-    // InventoryPanel 영역 내부 클릭인지 체크
-    if (InventoryPanel)
-    {
-        FGeometry PanelGeometry = InventoryPanel->GetCachedGeometry();
-        FVector2D LocalMousePos = PanelGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-        FVector2D PanelSize = PanelGeometry.GetLocalSize();
+{  
+    UE_LOG(LogTemp, Warning, TEXT("=== NativeOnMouseButtonDown 호출됨 ==="));
 
-        // InventoryPanel 영역 내부인지 확인
-        if (LocalMousePos.X >= 0 && LocalMousePos.X <= PanelSize.X &&
-            LocalMousePos.Y >= 0 && LocalMousePos.Y <= PanelSize.Y)
+    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    {
+        UE_LOG(LogTemp, Warning, TEXT("좌클릭 감지됨"));
+
+        // DragHeader를 클릭했는지 체크
+        if (DragHeader && DragHeader->IsHovered())
+        {
+            bIsDragging = true;
+
+            // 뷰포트 로컬 좌표로 계산
+            if (UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(InventoryPanel->Slot))
+            {
+                // 현재 패널의 위치 (뷰포트 로컬 좌표)
+                FVector2D CurrentPanelPosition = CanvasSlot->GetPosition();
+
+                // 마우스 위치를 뷰포트 로컬 좌표로 변환
+                FVector2D MousePosViewport = InMouseEvent.GetScreenSpacePosition();
+                if (GEngine && GEngine->GameViewport)
+                {
+                    FVector2D ViewportSize;
+                    GEngine->GameViewport->GetViewportSize(ViewportSize);
+
+                    // DPI 스케일을 고려한 마우스 위치
+                    float Scale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+                    MousePosViewport = MousePosViewport / Scale;
+                }
+
+                // 오프셋 = 마우스 위치 - 패널 위치
+                DragOffset = MousePosViewport - CurrentPanelPosition;
+
+                UE_LOG(LogTemp, Warning, TEXT("DragHeader 클릭! MousePos: %s, PanelPos: %s, DragOffset: %s"),
+                    *MousePosViewport.ToString(), *CurrentPanelPosition.ToString(), *DragOffset.ToString());
+            }
+
+            return FReply::Handled().CaptureMouse(TakeWidget());
+        }
+
+        // DragHeader가 아닌 인벤토리 내부를 클릭한 경우
+        if (InventoryPanel && InventoryPanel->IsHovered())
         {
             UE_LOG(LogTemp, Warning, TEXT("인벤토리 내부 클릭 - 게임 입력 차단"));
-
-            Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-            return FReply::Handled();
+            return FReply::Handled();  // 게임 입력 차단만
         }
     }
 
     // 인벤토리 외부 클릭 - 게임 입력 허용
-    UE_LOG(LogTemp, Log, TEXT("인벤토리 외부 클릭 - 게임 입력 허용"));
+    UE_LOG(LogTemp, Warning, TEXT("인벤토리 외부 클릭 - Unhandled"));
     return FReply::Unhandled();
-   
 }
+
+FReply UP4InventoryWidget::NativeOnMouseMove(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    if (bIsDragging)
+    {
+        UCanvasPanelSlot* CanvasSlot = Cast<UCanvasPanelSlot>(InventoryPanel->Slot);
+
+        if (!CanvasSlot)
+        {
+            UE_LOG(LogTemp, Error, TEXT("CanvasSlot이 nullptr!"));
+            return FReply::Unhandled();
+        }
+
+        // 뷰포트 로컬 좌표로 변환
+        FVector2D MousePosViewport = InMouseEvent.GetScreenSpacePosition();
+        if (GEngine && GEngine->GameViewport)
+        {
+            float Scale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+            MousePosViewport = MousePosViewport / Scale;
+        }
+
+        // 새 위치 = 마우스 위치 - 오프셋
+        FVector2D NewPosition = MousePosViewport - DragOffset;
+
+        // ⭐ 화면 경계 제한 추가
+        FVector2D PanelSize = InventoryPanel->GetCachedGeometry().GetLocalSize();
+        FVector2D ViewportSize = FVector2D::ZeroVector;
+
+        if (GEngine && GEngine->GameViewport)
+        {
+            GEngine->GameViewport->GetViewportSize(ViewportSize);
+            float Scale = UWidgetLayoutLibrary::GetViewportScale(GetWorld());
+            ViewportSize = ViewportSize / Scale;
+        }
+
+        // 경계 제한 (0 ~ 뷰포트 크기 - 패널 크기)
+        // 패널 기준이 인벤토리 패널 기준이라 그 밖에 있는 DragHead는 위로 드래그 하다보면 잘림
+        // 그래서 Y값은 Min값을 DragHeader크기만큼 늘려줌
+        NewPosition.X = FMath::Clamp(NewPosition.X, 0.0f, FMath::Max(0.0f, ViewportSize.X - PanelSize.X));
+        NewPosition.Y = FMath::Clamp(NewPosition.Y, 30.0f, FMath::Max(0.0f, ViewportSize.Y - PanelSize.Y)); 
+
+        CanvasSlot->SetPosition(NewPosition);
+
+
+        return FReply::Handled();
+    }
+
+    return FReply::Unhandled();
+}
+
+FReply UP4InventoryWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
+{
+    UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonUp 호출됨! Button: %s, bIsDragging: %d"),
+        *InMouseEvent.GetEffectingButton().ToString(), bIsDragging);
+
+    if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
+    {
+        if (bIsDragging)
+        {
+            bIsDragging = false;
+            UE_LOG(LogTemp, Warning, TEXT("드래그 종료 - ReleaseMouseCapture 호출"));
+            return FReply::Handled().ReleaseMouseCapture();  // ⭐ 중요!
+        }
+
+        // 드래그 중이 아니었지만 인벤토리 내부 클릭이었다면
+        if (InventoryPanel && InventoryPanel->IsHovered())
+        {
+            UE_LOG(LogTemp, Warning, TEXT("인벤토리 내부 클릭 종료"));
+            return FReply::Handled();
+        }
+    }
+
+    UE_LOG(LogTemp, Warning, TEXT("Unhandled MouseButtonUp"));
+    return FReply::Unhandled();
+}
+
+
 
 bool UP4InventoryWidget::IsMouseOverInventory() const
 {
@@ -241,72 +346,3 @@ bool UP4InventoryWidget::IsMouseOverInventory() const
     UE_LOG(LogTemp, Log, TEXT("InventoryWidget IsHovered: %s"), bIsHovered ? TEXT("true") : TEXT("false"));
     return bIsHovered;
 }
-
-
-//void UP4InventoryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
-//{
-//    Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-//}
-//
-//bool UP4InventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-//{
-//    Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-//
-//    MoveEnd();
-//    return true;
-//}
-//
-//void UP4InventoryWidget::NativeTick(const FGeometry& InGeometry, float InDeltaTime)
-//{
-//    Super::NativeTick(InGeometry, InDeltaTime);
-//
-//    // 드래그 중이라면
-//    if (bIsDragging)
-//    {
-//        FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
-//
-//        // 초기 마우스 위치와의 차이 계산
-//        float DeltaX = InitialOffset.X - MousePos.X;
-//        float DeltaY = InitialOffset.Y - MousePos.Y;
-//
-//        // 초기 마우스 위치와의 차이를 초기 위젯 위치에 반영
-//        InitialPos.X += -DeltaX;
-//        InitialPos.Y += -DeltaY;
-//
-//        // 오프셋 재설정 (이전 마우스 위치 -> 현재 마우스 위치)
-//        InitialOffset = MousePos;
-//
-//        // 오버레이 위치 재설정
-//        UCanvasPanelSlot* CanvasPanelSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Overlay);
-//        if (CanvasPanelSlot)
-//        {
-//            CanvasPanelSlot->SetPosition(InitialPos);
-//        }
-//    }
-//}
-//
-//void UP4InventoryWidget::MoveStart()
-//{
-//    bIsDragging = true;
-//    UE_LOG(LogTemp, Log, TEXT("MoveStart() bIsDragging = true"));
-//
-//    // 오버레이 현재 위치 구해 저장
-//    FVector2D WidgetPos;
-//    UCanvasPanelSlot* CanvasPanelSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Overlay);
-//    
-//    if (CanvasPanelSlot)
-//    {
-//        WidgetPos = CanvasPanelSlot->GetPosition();
-//    }
-//    InitialPos = WidgetPos;
-//
-//    // 마우스 현재 위치 구해 저장
-//    InitialOffset = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
-//}
-//
-//void UP4InventoryWidget::MoveEnd()
-//{
-//    bIsDragging = false;
-//
-//    UE_LOG(LogTemp, Log, TEXT("MoveEnd() bIsDragging = false"));
-//}
