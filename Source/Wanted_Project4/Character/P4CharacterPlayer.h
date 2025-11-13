@@ -42,8 +42,13 @@ protected:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USpringArmComponent> MapSpringArm;
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = MiniMap, meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MiniMap, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USceneCaptureComponent2D> MapViewrCapture;
+
+	//TObjectPtr<class UTextureRenderTarget2D> MiniMapTexture;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MiniMap, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UPaperSprite> CompassSprite;
 protected:
 	///Script/Engine.AnimMontage'/Game/Character/Animation/AM_Rolling.AM_Rolling'
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))

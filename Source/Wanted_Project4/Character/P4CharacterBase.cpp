@@ -179,7 +179,7 @@ void AP4CharacterBase::BeginPlay()
 		UItemDataBase* TestPotion = LoadObject<UItemDataBase>(nullptr,
 			TEXT("/Game/Item/Consumable/DA_HealthPotion.DA_HealthPotion"));
 		UItemDataBase* TestPotion2 = LoadObject<UItemDataBase>(nullptr,
-			TEXT("/Game/Item/Consumable/DA_ManaPotion.DA_ManaPotion"));
+			TEXT("/Game/Item/Consumable/DA_IncreaseMaxHealthPotion.DA_IncreaseMaxHealthPotion"));
 
 		if (TestSword)
 		{
