@@ -12,8 +12,9 @@
 #include "Physics/P4Collision.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Stat/P4MonsterStatComponent.h"
-#include "GameplayTagContainer.h"
-#include "GameplayEffectTypes.h"
+//#include "GameplayTagContainer.h"	HandleGameplayCue()
+//#include "GameplayEffectTypes.h"	HandleGameplayCue()
+#include "P4GameInstance.h"
 
 class UP4PlayerAttributeSet;
 // Sets default values
@@ -293,6 +294,17 @@ void AP4MonsterBase::SetDead()
 		DeadEventDelayTime,
 		false
 	);
+
+
+	//-작성: 한승헌
+	//-일시: 2025.11.13
+	//-내용: 퀘스트 시스템을 제작하여 테스트용으로 작성합니다.
+	auto* GI = GetWorld()->GetGameInstance<UP4GameInstance>();
+
+	if ((GI != nullptr) && (GI->QuestManager != nullptr))
+	{
+		GI->QuestManager->UpdateObjective(TEXT("Jagras_Kill"));
+	}
 }
 
 void AP4MonsterBase::SetupAttackDelegate()
