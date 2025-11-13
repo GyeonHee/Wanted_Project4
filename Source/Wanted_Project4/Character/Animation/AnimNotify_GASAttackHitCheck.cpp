@@ -25,7 +25,7 @@ void UAnimNotify_GASAttackHitCheck::Notify(USkeletalMeshComponent* MeshComp, UAn
 			FGameplayEventData PayloadData;
 			//PayloadData.EventMagnitude = ComboAttackLevel;
 
-			// ASC가진 액터에 태그 부착해서 이벤트 실행
+			// ASC가진 액터에 태그 부착(Character.Action.AttackHitCheck) 해서 이 태그가 트리거 태그로 지정된 BPGA_AttackHitCheck 실행.
 			UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(OwnerActor, TriggerGameplayTag, PayloadData);
 		}
 	}

@@ -12,6 +12,8 @@
 #include "Physics/P4Collision.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Stat/P4MonsterStatComponent.h"
+#include "GameplayTagContainer.h"
+#include "GameplayEffectTypes.h"
 
 class UP4PlayerAttributeSet;
 // Sets default values
@@ -89,6 +91,17 @@ void AP4MonsterBase::AttackHitCheck()
 {
 	// @Todo: 공격 판정 구현 필요(델리게이트로 바꾸면서 미사용)
 }
+
+//void AP4MonsterBase::HandleGameplayCue(AActor* MyTarget, FGameplayTag EventTag, EGameplayCueEvent::Type EventType, const FGameplayCueParameters& Parameters)
+//{
+//	Super::HandleGameplayCue(MyTarget, EventTag, EventType, Parameters);
+//	
+//	if (AttributeSet->GetCurHP()>0 && EventTag.MatchesTagExact(FGameplayTag::RequestGameplayTag(FName("GameplayCue.Monster.Hit"))))
+//	{
+//		HitActionBegin(); // 넉백 / 피격 몽타주 실행
+//		UE_LOG(LogTemp, Log, TEXT("HitActionBegin"));
+//	}
+//}
 
 void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
 {

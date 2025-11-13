@@ -5,9 +5,9 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Character/GA/AT/P4AT_Trace.h"
 #include "Character/GA/TA/P4TA_Trace.h"
+
 #include "Attribute/P4PlayerAttributeSet.h"
-#include "Monster/P4MonsterBase.h"
-#include "Monster/Stat/P4MonsterAttributeSet.h"
+#include "Interface/P4MonsterDamageInterface.h"
 
 UP4GA_AttackHitCheck::UP4GA_AttackHitCheck()
 {
@@ -18,6 +18,7 @@ void UP4GA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 {
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
+	// AbilityTask_Trace 생성 (UP4AT_Trace)
 	UP4AT_Trace* AttackTraceTask = UP4AT_Trace::CreateTask(this, AP4TA_Trace::StaticClass());
 	AttackTraceTask->OnComplete.AddDynamic(this, &UP4GA_AttackHitCheck::OnTraceResultCallback);
 	AttackTraceTask->ReadyForActivation();
@@ -25,45 +26,44 @@ void UP4GA_AttackHitCheck::ActivateAbility(const FGameplayAbilitySpecHandle Hand
 	UE_LOG(LogTemp, Log, TEXT("Begin"));
 }
 
+// 태스크 마무리 콜백
 void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDataHandle& TargetDataHandle)
 {
-	//if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
-	//{
-	//	FHitResult HitResult = UAbilitySystemBlueprintLibrary::GetHitResultFromTargetData(TargetDataHandle, 0);
-	//	UE_LOG(LogTemp, Log, TEXT("Target %s Detected"), *(HitResult.GetActor()->GetName()));
+	/*
+	
+	if (UAbilitySystemBlueprintLibrary::TargetDataHasHitResult(TargetDataHandle, 0))
+	{
+		FGameplayEffectSpecHandle EffectSpecHandle = MakeOutgoingGameplayEffectSpec(AttackDamageEffect);
+		if (EffectSpecHandle.IsValid())
+		{
+			// todo: 선우 documentation 정리( // 주석은 정리용임. 적용시킬 코드가 아님)
+			//struct FGameplayAbilityTargetDataHandle
+			//{
+			//	TArray<TSharedPtr<FGameplayAbilityTargetData>> Data;
+			//};
+			//이라서 SweepMultiByChannel 결과가 여러 개 나올 경우 Data 배열 안에 각 HitResult가 TargetData 형태로 여러 개 들어가서 GAS가 자동으로 모든 타겟의 ASC를 순회하여 GE 각각 적용.
 
-	//	UAbilitySystemComponent* SourceASC = GetAbilitySystemComponentFromActorInfo_Checked();
-	//	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(HitResult.GetActor());
-	//	if (!SourceASC || !TargetASC)
-	//	{
-	//		UE_LOG(LogTemp, Error, TEXT("ASC not found!"));
-	//		return;
-	//	}
+			//for (const TSharedPtr<FGameplayAbilityTargetData>& Data : TargetDataHandle.Data)
+			//{
+			//	for (TWeakObjectPtr<AActor> TargetActor : Data->GetActors())
+			//	{
+			//		TargetASC = UAbilitySystemGlobals::GetAbilitySystemComponentFromActor(TargetActor);
+			//		TargetASC->ApplyGameplayEffectSpecToSelf(EffectSpec);
+			//	}
+			//}
+			
+			ApplyGameplayEffectSpecToTarget(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, EffectSpecHandle, TargetDataHandle);
+		}
 
-	//	const UP4PlayerAttributeSet* SourceAttribute = SourceASC->GetSet<UP4PlayerAttributeSet>();
-	//	UP4MonsterAttributeSet* TargetAttribute = const_cast<UP4MonsterAttributeSet*>(TargetASC->GetSet<UP4MonsterAttributeSet>());
-	//	if (!SourceAttribute || !TargetAttribute)
-	//	{
-	//		UE_LOG(LogTemp, Error, TEXT("AttributeSet not found!"));
-	//		return;
-	//	}
+	bool bReplicatedEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 
-	//	const float AttackDamage = SourceAttribute->GetAttackRate();
-	//	// 수정 전: 몬스터 Attribute 에서 체력에 접근해서 HP 감소
-	//	//TargetAttribute->SetCurHP(TargetAttribute->GetCurHP() - AttackDamage);
-
-	//	// 수정 후: 인터페이스로 접근, 체력 감소 함수에 데미지를 인자로 넣어서 호출
-	//	IP4MonsterDamageInterface* Monster = Cast<IP4MonsterDamageInterface>(TargetASC->GetOwner());
-	//	Monster->MonsterApplyDamage(AttackDamage);
-	//}
-
-
-	//bool bReplicatedEndAbility = true;
-	//bool bWasCancelled = false;
-	//EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
+	*/
 
 
-	// todo: 알아먹게 고치기
+	// todo: 알아먹게 고치기 (여러마리 동시타격 지원)
+
 	int32 NumData = TargetDataHandle.Data.Num();
 	if (NumData == 0)
 	{
@@ -124,5 +124,7 @@ void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	}
 
 	// Ability 종료 처리
-	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	bool bReplicatedEndAbility = true;
+	bool bWasCancelled = false;
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicatedEndAbility, bWasCancelled);
 }
