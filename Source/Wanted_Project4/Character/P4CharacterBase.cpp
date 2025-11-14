@@ -97,14 +97,12 @@ AP4CharacterBase::AP4CharacterBase()
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DamagedMontageRef(TEXT("/Game/Character/Animation/Katana/ForUse/AM_KatanaDamaged.AM_KatanaDamaged"));
 	if (DamagedMontageRef.Object)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("모션 추가!"));
 		DamagedMontage = DamagedMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/Character/Animation/AM_Dead.AM_Dead"));
 	if (DeadMontageRef.Object)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("모션 추가!"));
 		DeadMontage = DeadMontageRef.Object;
 	}
 
@@ -146,8 +144,7 @@ void AP4CharacterBase::ApplyDamage(const float DamageAmount)
 
 		if (TSubclassOf<UGameplayEffect> DamagedEffectClass = DamagedEffectSoftClass.Get())
 		{
-			// todo: 임시 피격 애니메이션 속도 *3
-			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamagedEffectClass, 3.f, Context);
+			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamagedEffectClass, 1.f, Context);
 			if (SpecHandle.IsValid())
 			{
 				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
@@ -173,7 +170,8 @@ void AP4CharacterBase::DamagedActionBegin()
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
 
 		// Damaged 몽타주 재생
-		AnimInstance->Montage_Play(DamagedMontage, 1.f);
+		// todo: 임시 피격 애니메이션 속도 *3
+		AnimInstance->Montage_Play(DamagedMontage, 2.5f);
 
 		FOnMontageEnded OnMontageEnded;
 		OnMontageEnded.BindUObject(this, &AP4CharacterBase::DamagedActionEnd);
@@ -234,7 +232,7 @@ void AP4CharacterBase::PlayDeadAnimation()
 	{
 		AnimInstance->StopAllMontages(0.f);
 
-		const float PlayRate = 3.0f;
+		const float PlayRate = 2.0f;
 		AnimInstance->Montage_Play(DeadMontage, PlayRate);
 	}
 }
