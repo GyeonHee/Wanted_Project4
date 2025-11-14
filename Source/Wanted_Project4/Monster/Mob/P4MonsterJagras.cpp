@@ -119,7 +119,7 @@ void AP4MonsterJagras::MeleeAttack()
 		Start,
 		End,
 		FQuat::Identity,
-		ECC_GameTraceChannel1,
+		ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params
 	);
@@ -153,5 +153,10 @@ void AP4MonsterJagras::MeleeAttack()
 		
 		// 다른 액터가 공격 당했을 시 처리
 		GiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
+	}
+	else
+	{
+		// @MobTODO: 몬스터 충돌 판정 확인용
+		UE_LOG(LogTemp, Log, TEXT("몬스터 공격 시 충돌된 오브젝트가 없습니다."));
 	}
 }
