@@ -22,13 +22,22 @@ void UP4QuestInformationWidget::NativeConstruct()
 	}
 
 	RefreshQuestUI();
+
+	if (QuestManager != nullptr)
+	{
+		QuestManager->OnQuestStarted.AddUObject(this, &UP4QuestInformationWidget::HandleQuestStarted);
+		QuestManager->OnQuestCleared.AddUObject(this, &UP4QuestInformationWidget::HandleQuestCleared);
+	}
+
+	//시작할땐 숨기기.
+	SetVisibility(ESlateVisibility::Hidden);
 }
 
 void UP4QuestInformationWidget::NativeTick(const FGeometry& MyGeometry, float InDeltaTime)
 {
 	Super::NativeTick(MyGeometry, InDeltaTime);
 
-	RefreshQuestUI();
+	//RefreshQuestUI();
 }
 
 void UP4QuestInformationWidget::RefreshQuestUI()
@@ -39,19 +48,25 @@ void UP4QuestInformationWidget::RefreshQuestUI()
 		return;
 	}
 
-	if (QuestManager == nullptr || QuestManager->IsQuestActive() == false) //퀘스트 매니저가 없거나, 퀘스트가 액티브된 상태가 아니면.
-	{
-		//QuestName->SetText(FText::FromString(TEXT("진행중인 퀘스트 없음")));
-		//Stage->SetText(FText::GetEmpty());
-		//CurrentProgress->SetText(FText::FromString(TEXT("0")));
-		//ObjectiveProgress->SetText(FText::FromString(TEXT("0")));
-		if (GetVisibility() != ESlateVisibility::Collapsed)
-		{
-			SetVisibility(ESlateVisibility::Collapsed);
-		}
+	//if (QuestManager == nullptr || QuestManager->IsQuestActive() == false) //퀘스트 매니저가 없거나, 퀘스트가 액티브된 상태가 아니면.
+	//{
+	//	QuestName->SetText(FText::FromString(TEXT("진행중인 퀘스트 없음")));
+	//	Stage->SetText(FText::GetEmpty());
+	//	CurrentProgress->SetText(FText::FromString(TEXT("0")));
+	//	ObjectiveProgress->SetText(FText::FromString(TEXT("0")));
 
-		return;
-	}
+	//	if (GetVisibility() != ESlateVisibility::Collapsed)
+	//	{
+	//		SetVisibility(ESlateVisibility::Collapsed);
+	//	}
+
+	//	//if (GetVisibility() != ESlateVisibility::Hidden)
+	//	//{
+	//	//	SetVisibility(ESlateVisibility::Hidden);
+	//	//}
+
+	//	return;
+	//}
 
 	if (GetVisibility() != ESlateVisibility::Visible)
 	{
@@ -86,4 +101,20 @@ void UP4QuestInformationWidget::RefreshQuestUI()
 		CurrentProgress->SetText(FText::FromString(TEXT("0")));
 		ObjectiveProgress->SetText(FText::FromString(TEXT("0")));
 	}
+}
+
+void UP4QuestInformationWidget::HandleQuestStarted()
+{
+	// 퀘스트 시작되면 보이게
+	SetVisibility(ESlateVisibility::Visible);
+
+	RefreshQuestUI();
+}
+
+void UP4QuestInformationWidget::HandleQuestCleared()
+{
+	// 퀘스트 끝나면 숨기기
+	SetVisibility(ESlateVisibility::Hidden);
+
+	//RefreshQuestUI();
 }

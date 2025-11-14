@@ -18,6 +18,10 @@
 /**
  * 
  */
+
+DECLARE_MULTICAST_DELEGATE(FOnQuestStarted);
+DECLARE_MULTICAST_DELEGATE(FOnQuestCleared);
+
 UCLASS()
 class WANTED_PROJECT4_API UP4QuestManager : public UObject
 {
@@ -73,7 +77,9 @@ public:
 
 	TMap<FString, int32> ObjectiveProgress; //ObjectiveId를 키로 사용해서 현재 카운트에 접근.
 
-
+	//델리게이트
+	FOnQuestStarted OnQuestStarted;
+	FOnQuestCleared OnQuestCleared;
 
 
 protected:

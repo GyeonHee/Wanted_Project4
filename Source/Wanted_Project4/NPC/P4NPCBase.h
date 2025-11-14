@@ -36,6 +36,8 @@ public:
 
 	virtual void Interaction(ACharacter* Character);
 
+	void ShowQuestUI(int32 QuestCode);
+
 	FORCEINLINE int32 GetNPCQuestCode() const
 	{
 		return NPCQuestCode;
@@ -68,5 +70,12 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Quest)
 	int32 NPCQuestCode;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = UI)
+	TSubclassOf<class UP4QuestWidget> QuestWidgetClass;
+
+	UPROPERTY()
+	TObjectPtr<UP4QuestWidget> QuestWidgetInstance;
+
 
 };

@@ -29,7 +29,7 @@ public:
 	virtual void Interaction(ACharacter* Character) override;
 
 protected:
-	void ShowQuestUI();
+
 
 	//GAS섹션.
 public:
@@ -49,6 +49,7 @@ protected:
 	TObjectPtr<class UAnimMontage> RequsetMontage; //퀘스트 수주시 모션 몽타주
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Quest)
 	TObjectPtr<class UAnimMontage> QusetClearMomtage; //퀘스트 완료시 모션 몽타주
+
 
 
 

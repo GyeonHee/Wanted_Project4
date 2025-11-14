@@ -29,6 +29,12 @@ public:
 	// 입력 처리 함수
 	void HandleMove(const FInputActionValue& Value);
 	void HandleLook(const FInputActionValue& Value);
+
+
+	//작성- 한승헌 
+	//일시- 2025.11.14 
+	// 캐릭터가 인터렉트하고있는 액터.
+	TObjectPtr<AActor> CurrentInteractActor;
 	
 protected:
 	// components.

@@ -21,6 +21,11 @@ public:
 protected:
 	void RefreshQuestUI();
 
+
+	//델리게이트용 함수.
+	void HandleQuestStarted();
+	void HandleQuestCleared();
+
 	//변수 섹션
 public:
 

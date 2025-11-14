@@ -88,6 +88,12 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 		//CompassSprite->GetSourceTexture() = CompassTextureRef.Object;
 	}
 	//여기까지가 미니맵 코드입니다. - 작성: 한승헌.
+
+
+	//작성-한승헌
+	//일시- 2025.11.14
+	//현재 인터렉스하고 있는 액터 포인터 초기화.
+	CurrentInteractActor = nullptr;
 }
 
 void AP4CharacterPlayer::GASInputPressed(int32 InputId)

@@ -51,10 +51,6 @@ void AP4NPCDollCat::Interaction(ACharacter* Character)
 	Super::Interaction(Character);
 }
 
-void AP4NPCDollCat::ShowQuestUI()
-{
-
-}
 
 UAbilitySystemComponent* AP4NPCDollCat::GetAbilitySystemComponent() const
 {

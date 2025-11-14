@@ -71,6 +71,8 @@ void UP4QuestManager::StartQuest(int32 QuestCode)
 	UE_LOG(LogTemp, Display, TEXT("Quest %d Started: %s"),
 		QuestCode,
 		*Quest->QuestName.ToString());
+
+	OnQuestStarted.Broadcast();
 }
 
 void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
@@ -168,6 +170,8 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 		CurrentQuestCode = -1;
 		CurrentStageIndex = 0;
 		ObjectiveProgress.Empty();
+
+		OnQuestCleared.Broadcast();
 	}
 }
 
