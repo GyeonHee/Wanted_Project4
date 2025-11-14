@@ -6,31 +6,18 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
+#include "Interface/MonsterAIInterface.h"
 
 AP4MonsterAIController::AP4MonsterAIController()
 {
-	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(
-		TEXT("/Game/Monster/AI/BB_Monster.BB_Monster")
-	);
-	if (BBAssetRef.Succeeded())
-	{
-		BBAsset = BBAssetRef.Object;
-	}
-
-	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(
-		TEXT("/Game/Monster/AI/BT_Monster.BT_Monster")
-	);
-	if (BTAssetRef.Succeeded())
-	{
-		BTAsset = BTAssetRef.Object;
-	}
+	
 }
 
 void AP4MonsterAIController::RunAI()
 {	
 	// 블랙보드 컴포넌트 받기
 	UBlackboardComponent* BBComp = Blackboard.Get();
-
+	
 	// 블랙보드 사용 설정
 	if (UseBlackboard(BBAsset, BBComp))
 	{
@@ -59,7 +46,14 @@ void AP4MonsterAIController::StopAI()
 void AP4MonsterAIController::OnPossess(APawn* InPawn)
 {
 	Super::OnPossess(InPawn);
-
+	
+	IMonsterAIInterface* Monster = Cast<IMonsterAIInterface>(InPawn);
+	if (Monster)
+	{
+		BBAsset = Monster->GetBBAsset();
+		BTAsset = Monster->GetBTAsset();
+	}
+	
 	// 컨트롤러가 Pawn 에 빙의하면 AI 실행
 	RunAI();
 }

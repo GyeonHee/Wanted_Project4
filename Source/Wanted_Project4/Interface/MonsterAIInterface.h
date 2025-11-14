@@ -28,8 +28,8 @@ class WANTED_PROJECT4_API IMonsterAIInterface
 public:	
 	// AI 관련해서 구현 필요한 함수
 	// BB, BT 불러오기
-	//virtual UBlackboardData GetBBAsset() const = 0;
-	//virtual U
+	virtual UBlackboardData* GetBBAsset() const = 0;
+	virtual UBehaviorTree* GetBTAsset() const = 0;
 	
 	// AttributeSet 에 있음
 	virtual float GetAIDetectRange() = 0;

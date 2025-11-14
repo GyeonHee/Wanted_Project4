@@ -36,14 +36,27 @@ AP4MonsterBase::AP4MonsterBase()
 		MonsterStatData = DataTableRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(
+		TEXT("/Game/Monster/AI/BB_Monster.BB_Monster")
+	);
+	if (BBAssetRef.Succeeded())
+	{
+		BBAsset = BBAssetRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(
+		TEXT("/Game/Monster/AI/BT_Monster.BT_Monster")
+	);
+	if (BTAssetRef.Succeeded())
+	{
+		BTAsset = BTAssetRef.Object;
+	}
+	
 	// AI 설정===========================================
 	AIControllerClass = AP4MonsterAIController::StaticClass();
 
 	// 맵에 배치 또는 생성 시 MonsterAIController 에 빙의되도록
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-	// @Todo: 테스트용 임시
-	//MonsterID = FName("Jagras");
 }
 
 void AP4MonsterBase::BeginPlay()

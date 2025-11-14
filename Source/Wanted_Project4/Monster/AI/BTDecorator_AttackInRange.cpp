@@ -46,7 +46,6 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	
 	// 타겟과의 거리
 	float TargetDistance = ControllingPawn->GetDistanceTo(Target);
-	UE_LOG(LogTemp, Log, TEXT("TargetDistance: %f"), TargetDistance);
 
 	// 사거리 안에 있으면 공격
 	return (TargetDistance <= AttackRange);

@@ -4,6 +4,7 @@
 #include "Monster/Mob/P4BossMonsterNemielle.h"
 
 #include "Monster/P4MonsterBase.h"
+#include "Monster/AI/P4MonsterAIController.h"
 
 AP4BossMonsterNemielle::AP4BossMonsterNemielle()
 {
@@ -31,12 +32,6 @@ AP4BossMonsterNemielle::AP4BossMonsterNemielle()
 	}
 
 	// @Todo: 보스 몬스터 몽타주 생성자 초기화
-
-
-	// AI 설정 ===============================================
-	//AIControllerClass = AP4BossMonsterAIController::StaticClass();
-
-	//AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
 }
 
 void AP4BossMonsterNemielle::BeginPlay()
