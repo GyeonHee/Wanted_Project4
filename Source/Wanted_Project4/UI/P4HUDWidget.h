@@ -33,6 +33,6 @@ protected:
 
 	//UPROPERTY()
 	//TObjectPtr<class UP4MiniMapWidget> MiniMap;
-
+	TObjectPtr<class UP4QuestInformationWidget> QuestTextBlock;
 
 };

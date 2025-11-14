@@ -8,20 +8,13 @@
 #include "Quest/P4QuestInfo.h"
 #include "Quest/P4StageDetails.h"
 #include "Quest/P4ObjectiveDetails.h"
-
+#include "Animation/AnimMontage.h"
+#include "UI/P4QuestWidget.h"
 // Sets default values
 AP4NPCBase::AP4NPCBase()
 {
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-
-
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletaMeshRef(TEXT("/Game/NPC/ImsiNPC.ImsiNPC"));
-
-	if (SkeletaMeshRef.Succeeded() == true)
-	{
-		GetMesh()->SetSkeletalMesh(SkeletaMeshRef.Object);
-	}
 
 	InteractionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("InteractionSphere"));
 	InteractionSphere->SetupAttachment(RootComponent);
@@ -38,7 +31,14 @@ AP4NPCBase::AP4NPCBase()
 	InteractionSphere->OnComponentBeginOverlap.AddDynamic(this, &AP4NPCBase::OnOverlapBegin);
 	InteractionSphere->OnComponentEndOverlap.AddDynamic(this, &AP4NPCBase::OnOverlapEnd);
 
-	Tag_InRange = FGameplayTag::RequestGameplayTag(FName("Character.Interaction"));
+	//Tag_InRange = FGameplayTag::RequestGameplayTag(FName("Character.Interaction"));
+
+	static ConstructorHelpers::FClassFinder<UP4QuestWidget> QuestWidgetClassRef(TEXT("/Game/UI/WBP_QuestWidget.WBP_QuestWidget_C"));
+
+	if (QuestWidgetClassRef.Succeeded() == true)
+	{
+		QuestWidgetClass = QuestWidgetClassRef.Class;
+	}
 }
 
 // Called when the game starts or when spawned
@@ -71,6 +71,34 @@ void AP4NPCBase::Interaction(ACharacter* Character)
 	}
 }
 
+void AP4NPCBase::ShowQuestUI(int32 QuestCode)
+{
+	APlayerController* PlayerController =
+		Cast<APlayerController>(GetWorld()->GetFirstPlayerController());
+	if (QuestWidgetClass == nullptr || PlayerController == nullptr)
+	{
+		return;
+	}
+
+	if (QuestWidgetInstance == nullptr)
+	{
+		QuestWidgetInstance = CreateWidget<UP4QuestWidget>(PlayerController, QuestWidgetClass);
+	}
+
+	if (QuestWidgetInstance != nullptr)
+	{
+		QuestWidgetInstance->AddToViewport(10);
+		QuestWidgetInstance->InitWithQuestCode(QuestCode);
+
+		PlayerController->bShowMouseCursor = true;
+
+		FInputModeUIOnly InputMode;
+		InputMode.SetWidgetToFocus(QuestWidgetInstance->TakeWidget());
+		PlayerController->SetInputMode(InputMode);
+	}
+}
+
+
 void AP4NPCBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HasAuthority() == false)
@@ -95,6 +123,8 @@ void AP4NPCBase::OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor
 
 		PlayerASC->AddLooseGameplayTag(Tag_InRange); //소통범위 안에있으면 NPC와 소통가능하게 태그 부착.
 	}
+
+	PlayerCharacter->CurrentInteractActor = this;
 }
 
 void AP4NPCBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
@@ -122,6 +152,8 @@ void AP4NPCBase::OnOverlapEnd(UPrimitiveComponent* OverlappedComponent, AActor* 
 
 		PlayerASC->RemoveLooseGameplayTag(Tag_InRange); //소통범위 밖에 있으면 NPC와 소통 불가능하게 태그 탈착.
 	}
+
+	PlayerCharacter->CurrentInteractActor = nullptr;
 }
 
 UAbilitySystemComponent* AP4NPCBase::GetAbilitySystemComponent() const

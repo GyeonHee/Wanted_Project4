@@ -71,6 +71,8 @@ void UP4QuestManager::StartQuest(int32 QuestCode)
 	UE_LOG(LogTemp, Display, TEXT("Quest %d Started: %s"),
 		QuestCode,
 		*Quest->QuestName.ToString());
+
+	OnQuestStarted.Broadcast();
 }
 
 void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
@@ -168,6 +170,8 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 		CurrentQuestCode = -1;
 		CurrentStageIndex = 0;
 		ObjectiveProgress.Empty();
+
+		OnQuestCleared.Broadcast();
 	}
 }
 
@@ -179,4 +183,32 @@ int32 UP4QuestManager::GetObjectiveProgress(const FString& ObjectiveID) const
 	}
 
 	return 0;
+}
+
+const FP4QuestInfo* UP4QuestManager::GetCurrentQuest() const
+{
+	if (bQuestActive == false || CurrentQuestCode == -1)
+	{
+		UE_LOG(LogTemp, Display, TEXT("현재 퀘스트중이 아닙니다."));
+		return nullptr;
+	}
+
+	return GetQuest(CurrentQuestCode);
+}
+
+const FP4StageDetails* UP4QuestManager::GetCurrentStage() const
+{
+	const FP4QuestInfo* Quest = GetCurrentQuest();
+
+	if (Quest == nullptr)
+	{
+		return nullptr;
+	}
+
+	if (Quest->Stages.IsValidIndex(CurrentStageIndex) == false)
+	{
+		return nullptr;
+	}
+
+	return &Quest->Stages[CurrentStageIndex];
 }

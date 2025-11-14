@@ -12,6 +12,8 @@
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "Inventory/P4InventoryComponent.h"
 #include "UI/P4InventoryWidget.h"
+#include "UI/P4QuestWidget.h"
+#include "NPC/P4NPCBase.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -242,7 +244,7 @@ void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
 		//작성: 한승헌
 		//일시: 2025.11.12
 		//NPC와 상호작용을 위한 입력 키.
-		EIC->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
+		EIC->BindAction(InteractionAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleAbilityPressed, 2);
 	}
 }
 
@@ -354,6 +356,24 @@ void AP4PlayerController::ToggleInventory()
 		UE_LOG(LogTemp, Warning, TEXT("인벤토리 닫힘"));
 	}
 }
+
+//void AP4PlayerController::OpenQuestUI(int32 QuestCode)
+//{
+//	AP4CharacterPlayer* PlayerCharacter = Cast<AP4CharacterPlayer>(GetPawn());
+//
+//	if (PlayerCharacter == nullptr)
+//	{
+//		return;
+//	}
+//
+//	if (PlayerCharacter->CurrentInteractActor != nullptr)
+//	{
+//		AP4NPCBase* NPC_Charcter
+//			= Cast<AP4NPCBase>(PlayerCharacter->CurrentInteractActor);
+//
+//		NPC_Charcter->ShowQuestUI(QuestCode);
+//	}
+//}
 
 // 인벤토리 위젯에 옮길 예정
 //// -작성자: 노현기 -일시: 2025.11.12
