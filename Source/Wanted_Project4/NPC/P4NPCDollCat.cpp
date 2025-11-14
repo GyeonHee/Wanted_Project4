@@ -6,7 +6,7 @@
 AP4NPCDollCat::AP4NPCDollCat()
 {
 
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletaMeshRef(TEXT("/Game/NPC/ImsiNPC.ImsiNPC"));
+	static ConstructorHelpers::FObjectFinder<USkeletalMesh> SkeletaMeshRef(TEXT("/Game/NPC/DollCat/DollCat.DollCat"));
 
 	if (SkeletaMeshRef.Succeeded() == true)
 	{
@@ -20,7 +20,7 @@ AP4NPCDollCat::AP4NPCDollCat()
 	);
 
 	//임시 테스트 ABP
-	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRef(TEXT("/Game/NPC/Animations/ABP_NPCTest.ABP_NPCTest_C"));
+	static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRef(TEXT("/Game/NPC/Dollcat/Animations/ABP_NPCTest.ABP_NPCTest_C"));
 
 	if (AnimInstanceRef.Succeeded())
 	{

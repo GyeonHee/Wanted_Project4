@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+ï»¿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "P4QuestWidget.h"
@@ -23,7 +23,7 @@ void UP4QuestWidget::NativeConstruct()
 		}
 	}
 
-	//¹öÆ° µ¨¸®°ÔÀÌÆ® »ý¼º.
+	//ë²„íŠ¼ ë¸ë¦¬ê²Œì´íŠ¸ ìƒì„±.
 	if (AcceptButtton != nullptr)
 	{
 		AcceptButtton->OnClicked.RemoveDynamic(this, &UP4QuestWidget::OnAcceptClicked);
@@ -60,7 +60,11 @@ void UP4QuestWidget::InitWithQuestCode(int32 InQuestCode)
 
 	if (QuestDescText != nullptr)
 	{
-		QuestDescText->SetText(Quest->LogDescription);
+		FString DescString = Quest->LogDescription.ToString();
+
+		DescString.ReplaceInline(TEXT("\\n"), TEXT("\n"));
+
+		QuestDescText->SetText(FText::FromString(DescString));
 	}
 
 	if (StageInfoText != nullptr)
@@ -70,7 +74,7 @@ void UP4QuestWidget::InitWithQuestCode(int32 InQuestCode)
 			const FP4StageDetails& FirstStage = Quest->Stages[0];
 
 			FString StageStr = FString::Printf(
-				TEXT("ÇÙ½É ¸ñÇ¥ : %s"), 
+				TEXT("%s"), 
 				*FirstStage.Description.ToString()
 			);
 
@@ -85,7 +89,7 @@ void UP4QuestWidget::InitWithQuestCode(int32 InQuestCode)
 
 void UP4QuestWidget::OnAcceptClicked()
 {
-	//Äù½ºÆ® ½ÇÇàÇÏ±â.
+	//í€˜ìŠ¤íŠ¸ ì‹¤í–‰í•˜ê¸°.
 	if (QuestManager != nullptr && PendingQuestCode != -1)
 	{
 		QuestManager->StartQuest(PendingQuestCode);
@@ -101,7 +105,7 @@ void UP4QuestWidget::OnAcceptClicked()
 		PlayerController->SetInputMode(GameOnly);
 		PlayerController->bShowMouseCursor = false;
 	}
-	//´Ý±â.
+	//ë‹«ê¸°.
 	RemoveFromParent();
 }
 
