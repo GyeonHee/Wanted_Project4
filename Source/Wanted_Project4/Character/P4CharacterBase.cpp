@@ -94,9 +94,17 @@ AP4CharacterBase::AP4CharacterBase()
 	//	ComboActionData = ComboActionDataRef.Object;
 	//}
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DamagedMontageRef(TEXT("/Game/Character/Animation/Katana/ForUse/AM_KatanaDamaged.AM_KatanaDamaged"));
+	if (DamagedMontageRef.Object)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("모션 추가!"));
+		DamagedMontage = DamagedMontageRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(TEXT("/Game/Character/Animation/AM_Dead.AM_Dead"));
 	if (DeadMontageRef.Object)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("모션 추가!"));
 		DeadMontage = DeadMontageRef.Object;
 	}
 
@@ -112,6 +120,73 @@ AP4CharacterBase::AP4CharacterBase()
 		Weapon->SetSkeletalMesh(WeaponMeshRef.Object);
 	}
 	
+}
+
+void AP4CharacterBase::ApplyDamage(const float DamageAmount)
+{
+	// todo: 알아먹게 수정
+	if (ASC)
+	{
+		// Hit 몽타주, 넉백 같은 즉각 반응
+		DamagedActionBegin();
+
+		// 받을 데미지 설정
+		AttributeSet->SetDamageAmount(DamageAmount);
+
+		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+		Context.AddSourceObject(this);
+
+		// BPGE_PlayerDamaged 블루프린트 GameplayEffect (서버)
+		FSoftClassPath GEPath(TEXT("/Game/Character/GE/BPGE_PlayerDamaged.BPGE_PlayerDamaged_C"));
+		TSoftClassPtr<UGameplayEffect> DamagedEffectSoftClass(GEPath);
+		if (DamagedEffectSoftClass.IsPending())
+		{
+			DamagedEffectSoftClass.LoadSynchronous();
+		}
+
+		if (TSubclassOf<UGameplayEffect> DamagedEffectClass = DamagedEffectSoftClass.Get())
+		{
+			// todo: 임시 피격 애니메이션 속도 *3
+			FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DamagedEffectClass, 3.f, Context);
+			if (SpecHandle.IsValid())
+			{
+				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			}
+		}
+	}
+}
+
+void AP4CharacterBase::GiveDamage(AActor* TargetActor, const float DamageAmount)
+{
+	// GA로 처리함.
+}
+
+void AP4CharacterBase::DamagedActionBegin()
+{
+	// Damaged 몽타주 실행
+	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
+	if (AnimInstance)
+	{
+		IsDamaged = true;
+
+		// Damaged 모션동안 이동 막기
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+		// Damaged 몽타주 재생
+		AnimInstance->Montage_Play(DamagedMontage, 1.f);
+
+		FOnMontageEnded OnMontageEnded;
+		OnMontageEnded.BindUObject(this, &AP4CharacterBase::DamagedActionEnd);
+
+		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, DamagedMontage);
+	}
+}
+
+void AP4CharacterBase::DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
+{
+	IsDamaged = false;
+
+	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
 
 void AP4CharacterBase::PostInitializeComponents()

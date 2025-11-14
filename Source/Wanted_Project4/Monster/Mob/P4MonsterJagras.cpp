@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "P4MonsterJagras.h"
@@ -149,6 +149,6 @@ void AP4MonsterJagras::MeleeAttack()
 	if (HitDetected)
 	{
 		// 다른 액터가 공격 당했을 시 처리
-		MonsterGiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
+		GiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
 	}
 }

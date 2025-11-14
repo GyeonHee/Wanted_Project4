@@ -21,15 +21,24 @@ class WANTED_PROJECT4_API UP4PlayerAttributeSet : public UAttributeSet
 public:
 	UP4PlayerAttributeSet();
 
+	// 공격 사거리
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, AttackRange);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, MaxAttackRange);
+
+	// 공격범위
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, AttackRadius);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, MaxAttackRadius);
+
+	// 공격력
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, AttackRate);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, MaxAttackRate);
+
+	// 체력
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, Health);
 	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, MaxHealth);
-	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, Damage);
+
+	// 받아야할 데미지(받는 데미지 처리용)
+	ATTRIBUTE_ACCESSORS_BASIC(UP4PlayerAttributeSet, DamageAmount);
 
 	virtual void PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue) override;
 	//virtual void PostAttributeChange(const FGameplayAttribute& Attribute, float OldValue, float NewValue) override;
@@ -65,7 +74,7 @@ public:
 	FGameplayAttributeData MaxHealth;
 
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
-	FGameplayAttributeData Damage;
+	FGameplayAttributeData DamageAmount;
 
 	bool bOutOfHealth = false;
 

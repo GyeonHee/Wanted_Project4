@@ -13,14 +13,14 @@ UP4PlayerAttributeSet::UP4PlayerAttributeSet() :
 	AttackRate(30.0f),
 	MaxAttackRate(100.0f),
 	MaxHealth(100.0f),
-	Damage(0.0f)
+	DamageAmount(0.0f)
 {
 	InitHealth(GetMaxHealth());
 }
 
 void UP4PlayerAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
 {
-	if (Attribute == GetDamageAttribute())
+	if (Attribute == GetDamageAmountAttribute())
 	{
 		NewValue = NewValue < 0.0f ? 0.0f : NewValue;
 	}
@@ -69,19 +69,20 @@ void UP4PlayerAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCa
 
 
 	//작성 한승헌 - 2025-11-10
+	//작성 이선우 - 2025-11-14 DamageAmount로 수정
 	const float MinHealth = 0.0f;
 
 	if (Data.EvaluatedData.Attribute == GetHealthAttribute())
 	{
 		SetHealth(FMath::Clamp(GetHealth(), MinHealth, GetMaxHealth()));
 	}
-	else if (Data.EvaluatedData.Attribute == GetDamageAttribute())
+	else if (Data.EvaluatedData.Attribute == GetDamageAmountAttribute())
 	{
-		const float NewHealth = FMath::Clamp(GetHealth() - GetDamage(), MinHealth, GetMaxHealth());
+		const float NewHealth = FMath::Clamp(GetHealth() - GetDamageAmount(), MinHealth, GetMaxHealth());
 
 		SetHealth(NewHealth);
 
-		SetDamage(0.0f);
+		SetDamageAmount(0.0f);
 	}
 	//==================================================
 
