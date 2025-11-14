@@ -1,58 +1,83 @@
-ï»¿// P4StageGimmck.cpp
+// Fill out your copyright notice in the Description page of Project Settings.
+
 
 #include "Map/P4StageGimmck.h"
 #include "Kismet/GameplayStatics.h"
-#include "GameFramework/Pawn.h"
-
+#include "Character/P4CharacterBase.h"
+#include "Math/Vector.h"
+#include "Math/UnrealMathUtility.h"
+// Sets default values
 AP4StageGimmck::AP4StageGimmck()
 {
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+
 }
 
+// Called when the game starts or when spawned
 void AP4StageGimmck::BeginPlay()
 {
 	Super::BeginPlay();
+	
 
-	// 1) ê²©ì ê¸°ë³¸ ë²¡í„° ì„¤ì • (Z=0ìœ¼ë¡œ í‰ë©´í™”)
-	BaseAB = TileOffsetCoordB - TileOffsetCoordA;
-	BaseAC = TileOffsetCoordC - TileOffsetCoordA;
+	Vx = (TileOffsetCoordB - TileOffsetCoordA);
+	Vy = (TileOffsetCoordC - TileOffsetCoordA);
 
-	//BaseAB.Z = 0.0f;
-	//BaseAC.Z = 0.0f;
+	Vx.Z = 0.0f;
+	Vy.Z = 0.0f;
 
-	FVector ComputeD = (TileOffsetCoordB + TileOffsetCoordC - TileOffsetCoordA);
-	TileOffsetCoordD = ComputeD;
 
-	// 2) ì‹œì‘ ì…€ ê³„ì‚°
-	if (APawn* P = UGameplayStatics::GetPlayerPawn(this, 0))
+	BaseAB = Vx;        // Çì´õ¿¡ FVector BaseAB, BaseAC Ãß°¡
+	BaseAC = Vy;
+
+	//ÇÃ·¹ÀÌ¾î °¡Á®¿À±â.
+	//AP4CharacterBase* PlayerCharacter 
+	//	= Cast<AP4CharacterBase>(UGameplayStatics::GetPlayerPawn(this,0));
+	// ÀÏ´Ü ÀÓ½Ã·Î Å×½ºÆ®¸¦ À§ÇØ ÀÌ°É·Î ¼³Á¤.
+	APawn* PlayerCharacter 
+		= Cast<APawn>(UGameplayStatics::GetPlayerPawn(this,0));
+
+	if (PlayerCharacter != nullptr)
 	{
-		CurrentCenter = WorldToCell(P->GetActorLocation());
+		CurrentCenter = WorldToCell(PlayerCharacter->GetActorLocation());
 	}
 
-	// 3) ì´ˆê¸° ë¡œë“œ
 	RefreshTiles();
 
-	// ë””ë²„ê·¸(ê²½ê³„ aliasing í™•ì¸)
+	//DCorrection = TileOffsetCoordD - (TileOffsetCoordB + TileOffsetCoordC - TileOffsetCoordA);
+
+	const FVector AB = TileOffsetCoordB - TileOffsetCoordA;
+	const FVector AC = TileOffsetCoordC - TileOffsetCoordA;
+	UE_LOG(LogTemp, Warning, TEXT("AB=%s | |AB|=%f"), *AB.ToString(), AB.Size());
+	UE_LOG(LogTemp, Warning, TEXT("AC=%s | |AC|=%f"), *AC.ToString(), AC.Size());
+
 	const FVector P00 = CellToWorld({ 0,0 });
 	const FVector P10 = CellToWorld({ 1,0 });
 	const FVector P01 = CellToWorld({ 0,1 });
-	const FVector P11 = CellToWorld({ 1,1 });
-	const FVector P20 = CellToWorld({ 2,0 });
-	const FVector P02 = CellToWorld({ 0,2 });
-	UE_LOG(LogTemp, Warning, TEXT("P00=%s P10=%s P01=%s P11=%s P20=%s P02=%s"),
-		*P00.ToString(), *P10.ToString(), *P01.ToString(), *P11.ToString(), *P20.ToString(), *P02.ToString());
-	UE_LOG(LogTemp, Warning, TEXT("|AB|=%f |AC|=%f |2AB|=%f |2AC|=%f"),
-		(P10 - P00).Size(), (P01 - P00).Size(), (P20 - P00).Size(), (P02 - P00).Size());
+	UE_LOG(LogTemp, Warning, TEXT("A(0,0)=%s  B(1,0)=%s  C(0,1)=%s"),
+		*P00.ToString(), *P10.ToString(), *P01.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Actual A->B dist=%f  A->C dist=%f"),
+		(P10 - P00).Size(), (P01 - P00).Size());
+	UE_LOG(LogTemp, Warning, TEXT("Check Vx=%s  Vy=%s | |Vx|=%f |Vy|=%f"), *Vx.ToString(), *Vy.ToString(), Vx.Size(), Vy.Size());
+	UE_LOG(LogTemp, Warning, TEXT("TileC=%s  TileD=%s"), *TileOffsetCoordC.ToString(), *TileOffsetCoordD.ToString());
+	UE_LOG(LogTemp, Warning, TEXT("Vx=%s Vy=%s"), *Vx.ToString(), *Vy.ToString());
 }
 
+// Called every frame
 void AP4StageGimmck::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	APawn* P = UGameplayStatics::GetPlayerPawn(this, 0);
-	if (!P) return;
+	APawn* PlayerCharacter
+		= Cast<APawn>(UGameplayStatics::GetPlayerPawn(this, 0));
 
-	const FIntPoint NewCenter = WorldToCell(P->GetActorLocation());
+	if (PlayerCharacter == nullptr)
+	{
+		return;
+	}
+
+	const FIntPoint NewCenter = WorldToCell(PlayerCharacter->GetActorLocation());
+
 	if (NewCenter != CurrentCenter)
 	{
 		CurrentCenter = NewCenter;
@@ -60,66 +85,65 @@ void AP4StageGimmck::Tick(float DeltaTime)
 	}
 }
 
-// ì›”ë“œ â†’ ì…€ì¸ë±ìŠ¤ : ë°˜ë“œì‹œ ì›”ë“œâ†’ë¡œì»¬ë¡œ ë°”ê¾¼ ë’¤, ë¡œì»¬ XY í‰ë©´ì—ì„œ ê³„ì‚°
-FIntPoint AP4StageGimmck::WorldToCell(const FVector& World) const
+FIntPoint AP4StageGimmck::WorldToCell(const FVector& world) const
 {
-	// ì›”ë“œ â†’ ë¡œì»¬
-	const FVector Local = GetActorTransform().InverseTransformPosition(World);
+	const FVector Relative = world - GetActorLocation();
 
-	// ë¡œì»¬ XYì—ì„œ ì„ í˜•ê²°í•© í’€ê¸°
-	const FVector2D vx(BaseAB.X, BaseAB.Y);
-	const FVector2D vy(BaseAC.X, BaseAC.Y);
-	const FVector2D p(Local.X, Local.Y);
+	const FVector2D vx = FVector2D(Vx.X, Vx.Y);
+	const FVector2D vy = FVector2D(Vy.X, Vy.Y);
+	const FVector2D PlayerXY = FVector2D(Relative.X, Relative.Y);
+
 
 	const float det = vx.X * vy.Y - vx.Y * vy.X;
-	if (FMath::IsNearlyZero(det))
+
+	if (FMath::IsNearlyZero(det) == true)
 	{
-		// ê±°ì˜ í‰í–‰í•  ì¼ì€ ì—†ê² ì§€ë§Œ ì•ˆì „ì¥ì¹˜
-		const float SafeVx = FMath::IsNearlyZero(BaseAB.X) ? 1.f : BaseAB.X;
-		const float SafeVy = FMath::IsNearlyZero(BaseAC.Y) ? 1.f : BaseAC.Y;
+		const float SafeVx = FMath::IsNearlyZero(Vx.X) ? 1.0f : Vx.X;
+		const float SafeVy = FMath::IsNearlyZero(Vy.Y) ? 1.0f : Vy.Y;
 
-		int32 i = FMath::FloorToInt(Local.X / SafeVx);
-		int32 j = FMath::FloorToInt(Local.Y / SafeVy);
-		return { i, j };
+		int32 i = FMath::FloorToInt(Relative.X / SafeVx);
+		int32 j = FMath::FloorToInt(Relative.Y / SafeVy);
+		return { i,j };
 	}
-
+	
 	const float invDet = 1.0f / det;
-	const float iFloat = (p.X * vy.Y - p.Y * vy.X) * invDet;         // p Â· vYâŸ‚ / det
-	const float jFloat = (-p.X * vx.Y + p.Y * vx.X) * invDet;        // p Â· vXâŸ‚ / det
+
+	const float iFloat = (PlayerXY.X * vy.Y - PlayerXY.Y * vy.X) * invDet;
+	const float jFloat = (-PlayerXY.X * vx.Y + PlayerXY.Y * vx.X) * invDet;
+
 
 	return FIntPoint(FMath::FloorToInt(iFloat), FMath::FloorToInt(jFloat));
+
 }
 
-// ì…€ì¸ë±ìŠ¤ â†’ ì›”ë“œ : ë¡œì»¬ì—ì„œ ì¢Œí‘œ ë§Œë“  ë’¤ ì•¡í„° íŠ¸ëœìŠ¤í¼ìœ¼ë¡œ ì›”ë“œ ë³€í™˜
-FVector AP4StageGimmck::CellToWorld(const FIntPoint& Cell) const
+FVector AP4StageGimmck::CellToWorld(const FIntPoint& cell) const
 {
-	// 2x2 ìŠˆí¼ì…€ ë‹¨ìœ„ ì´ë™ ë²¡í„°
-	const FVector Ux = BaseAB * 2.f;   // ë‘ ì¹¸
-	const FVector Uy = BaseAC * 2.f;
+	// 2x2 ½´ÆÛ¼¿ °£ ÀÌµ¿ º¤ÅÍ
+	const FVector Ux = BaseAB * 2.0f; // A->B µÎ Ä­
+	const FVector Uy = BaseAC * 2.0f; // A->C µÎ Ä­
 
-	// ìŒìˆ˜ ì¸ë±ìŠ¤ ì•ˆì •í™”ìš© parity
+	// À½¼ö ¼¿µµ ¾ÈÁ¤ÀûÀ¸·Î µ¿ÀÛÇÏ°Ô ¸ğµâ·¯ Á¤±ÔÈ­
 	auto Parity = [](int32 v) { return (v % 2 + 2) % 2; };
-	const int32 px = Parity(Cell.X);
-	const int32 py = Parity(Cell.Y);
+	const int32 px = Parity(cell.X); // 0 ¶Ç´Â 1
+	const int32 py = Parity(cell.Y); // 0 ¶Ç´Â 1
 
-	// ìŠˆí¼ì…€ ì¢Œí‘œ(ì •ìˆ˜)
-	const int32 sx = (Cell.X - px) / 2;
-	const int32 sy = (Cell.Y - py) / 2;
+	// ÀÌ ¼¿ÀÇ ½´ÆÛ¼¿ ÁÂÇ¥ (Â¦¼ö/È¦¼ö ¼ººĞ Á¦°Å ÈÄ 2·Î ³ª´®)
+	const int32 sx = FMath::FloorToInt((cell.X - px) / 2.0f);
+	const int32 sy = FMath::FloorToInt((cell.Y - py) / 2.0f);
 
-	// ìŠˆí¼ì…€ ê¸°ì¤€ ë¡œì»¬ ìœ„ì¹˜
-	FVector Local = Ux * sx + Uy * sy;
+	// ½´ÆÛ¼¿ ±âÁØÁ¡
+	FVector Pos = GetActorLocation() + Ux * sx + Uy * sy;
 
-	// ìŠˆí¼ì…€ ë‚´ë¶€ì˜ A/B/C/D ì˜¤í”„ì…‹ì„ í•œ ë²ˆë§Œ ì ìš©
-	switch (GetCellType(Cell))
+	// ½´ÆÛ¼¿ ³»ºÎ¿¡¼­ A/B/C/D ¿ÀÇÁ¼ÂÀ» ÇÑ ¹ø¸¸ Àû¿ë
+	switch (GetCellType(cell))
 	{
-	case ETileType::A: Local += (TileOffsetCoordA - TileOffsetCoordA); break;
-	case ETileType::B: Local += (TileOffsetCoordB - TileOffsetCoordA); break;
-	case ETileType::C: Local += (TileOffsetCoordC - TileOffsetCoordA); break;
-	case ETileType::D: Local += (TileOffsetCoordD - TileOffsetCoordA); break;
+	case ETileType::A: Pos += (TileOffsetCoordA - TileOffsetCoordA); break; // 0
+	case ETileType::B: Pos += (TileOffsetCoordB - TileOffsetCoordA); break;
+	case ETileType::C: Pos += (TileOffsetCoordC - TileOffsetCoordA); break;
+	case ETileType::D: Pos += (TileOffsetCoordD - TileOffsetCoordA); break;
 	}
 
-	// ë¡œì»¬ â†’ ì›”ë“œ
-	return GetActorTransform().TransformPosition(Local);
+	return Pos;
 }
 
 void AP4StageGimmck::RefreshTiles()
@@ -138,51 +162,71 @@ void AP4StageGimmck::RefreshTiles()
 
 	TArray<FIntPoint> Keys;
 	ActiveTilesMap.GenerateKeyArray(Keys);
+
 	for (const FIntPoint& K : Keys)
 	{
-		if (!Wanted.Contains(K))
+		if (Wanted.Contains(K) == false)
 		{
-			if (AActor* A = ActiveTilesMap[K].Get())
+			if (AActor* MapActor = ActiveTilesMap[K].Get())
 			{
-				A->Destroy();
+				MapActor->Destroy();
 			}
+
 			ActiveTilesMap.Remove(K);
 		}
 	}
 }
 
-AActor* AP4StageGimmck::SpawnTileAt(const FIntPoint& Cell)
+AActor* AP4StageGimmck::SpawnTileAt(const FIntPoint& cell)
 {
-	if (TWeakObjectPtr<AActor>* Found = ActiveTilesMap.Find(Cell))
+	if (TWeakObjectPtr<AActor>* Found = ActiveTilesMap.Find(cell))
 	{
-		if (Found->IsValid()) return Found->Get();
+		if (Found->IsValid() == true)
+		{
+			return Found->Get();
+		}
 	}
 
-	TSubclassOf<AActor> Cls = PickTileClass(Cell);
-	if (!Cls) return nullptr;
+	TSubclassOf<AActor> Cls = PickTileClass(cell);
 
-	const FVector  Loc = CellToWorld(Cell);
-	const FRotator Rot = FRotator::ZeroRotator;
+	if (Cls == nullptr)
+	{
+		return nullptr;
+	}
+	
+	const FVector NewLocation = CellToWorld(cell);
+	const FRotator NewRotation = FRotator::ZeroRotator;
 
 	FActorSpawnParameters Params;
 	Params.Owner = this;
 
-	AActor* Spawned = GetWorld()->SpawnActor<AActor>(Cls, Loc, Rot, Params);
-	if (Spawned)
+	AActor* SpawnedMapActor = GetWorld()->SpawnActor<AActor>(Cls, NewLocation, NewRotation, Params);
+
+	if (SpawnedMapActor != nullptr)
 	{
-		ActiveTilesMap.Add(Cell, Spawned);
+		ActiveTilesMap.Add(cell, SpawnedMapActor);
 	}
-	return Spawned;
+	return SpawnedMapActor;	
 }
 
-TSubclassOf<AActor> AP4StageGimmck::PickTileClass(const FIntPoint& Cell) const
+TSubclassOf<AActor> AP4StageGimmck::PickTileClass(const FIntPoint& cell) const
 {
-	switch (GetCellType(Cell))
+	switch (GetCellType(cell))
 	{
-	case ETileType::A: return TileA;
-	case ETileType::B: return TileB;
-	case ETileType::C: return TileC;
-	case ETileType::D: return TileD;
-	default:           return TileD;
+	case ETileType::A:
+		return TileA;
+
+	case ETileType::B:
+		return TileB;
+
+	case ETileType::C:
+		return TileC;
+
+	case ETileType::D:
+		return TileD;
+
+	default:
+		return TileD;
 	}
 }
+

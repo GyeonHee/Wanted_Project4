@@ -7,11 +7,7 @@
 #include "Components/UniformGridPanel.h"
 #include "Components/Widget.h"
 #include "Inventory/P4InventoryTags.h"
-#include "Components/CanvasPanel.h"
-#include "BluePrint/WidgetTree.h"
-#include "Components/CanvasPanelSlot.h"
-#include "BluePrint/WidgetLayoutLibrary.h"
-#include "Player/P4PlayerController.h"
+
 
 UP4InventoryWidget::UP4InventoryWidget(const FObjectInitializer& ObjectInitializer) : Super(ObjectInitializer)
 {
@@ -53,37 +49,6 @@ void UP4InventoryWidget::NativeConstruct()
 	}
 	UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 개수: %d, 소비 슬롯 개수: %d"), EquipmentSlots.Num(), ConsumableSlots.Num());
 
-
-    bIsDragging = false;
-
-    // InventoryPanel 찾기 및 디버깅 (BindWidget 사용 시)
-    if (InventoryPanel)
-    {
-        FVector2D PanelSize = InventoryPanel->GetCachedGeometry().GetLocalSize();
-        UE_LOG(LogTemp, Warning, TEXT("InventoryPanel 크기: %s"), *PanelSize.ToString());
-    }
-    else
-    {
-        // BindWidget이 안 되었으면 수동으로 찾기
-        UE_LOG(LogTemp, Warning, TEXT("InventoryPanel이 바인딩되지 않음, 수동 검색 중..."));
-
-        TArray<UWidget*> AllWidgets;
-        WidgetTree->GetAllWidgets(AllWidgets);
-
-        for (UWidget* Widget : AllWidgets)
-        {
-            if (UCanvasPanel* Panel = Cast<UCanvasPanel>(Widget))
-            {
-                // 루트가 아닌 Canvas Panel 찾기
-                if (Panel != GetRootWidget())
-                {
-                    InventoryPanel = Panel;
-                    UE_LOG(LogTemp, Warning, TEXT("InventoryPanel 수동 검색 성공: %s"), *Panel->GetName());
-                    break;
-                }
-            }
-        }
-    }
 
 }
 
@@ -194,119 +159,3 @@ void UP4InventoryWidget::RefreshSlot(EInventorySlotType SlotType, int32 SlotInde
 
     UE_LOG(LogTemp, Log, TEXT("RefreshSlot: 타입[%d] 인덱스[%d] 갱신 완료"), (int32)SlotType, SlotIndex);
 }
-
-FReply UP4InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
-{
-    // InventoryPanel 영역 내부 클릭인지 체크
-    if (InventoryPanel)
-    {
-        FGeometry PanelGeometry = InventoryPanel->GetCachedGeometry();
-        FVector2D LocalMousePos = PanelGeometry.AbsoluteToLocal(InMouseEvent.GetScreenSpacePosition());
-        FVector2D PanelSize = PanelGeometry.GetLocalSize();
-
-        // InventoryPanel 영역 내부인지 확인
-        if (LocalMousePos.X >= 0 && LocalMousePos.X <= PanelSize.X &&
-            LocalMousePos.Y >= 0 && LocalMousePos.Y <= PanelSize.Y)
-        {
-            UE_LOG(LogTemp, Warning, TEXT("인벤토리 내부 클릭 - 게임 입력 차단"));
-
-            Super::NativeOnMouseButtonDown(InGeometry, InMouseEvent);
-            return FReply::Handled();
-        }
-    }
-
-    // 인벤토리 외부 클릭 - 게임 입력 허용
-    UE_LOG(LogTemp, Log, TEXT("인벤토리 외부 클릭 - 게임 입력 허용"));
-    return FReply::Unhandled();
-   
-}
-
-bool UP4InventoryWidget::IsMouseOverInventory() const
-{
-    // 위젯이 보이지 않으면 false
-    if (GetVisibility() != ESlateVisibility::Visible)
-    {
-        return false;
-    }
-
-    // InventoryPanel이 있으면 그것을 체크, 없으면 전체 위젯 체크
-    if (InventoryPanel)
-    {
-        bool bIsHovered = InventoryPanel->IsHovered();
-        UE_LOG(LogTemp, Log, TEXT("InventoryPanel IsHovered: %s"), bIsHovered ? TEXT("true") : TEXT("false"));
-        return bIsHovered;
-    }
-
-    bool bIsHovered = this->IsHovered();
-    UE_LOG(LogTemp, Log, TEXT("InventoryWidget IsHovered: %s"), bIsHovered ? TEXT("true") : TEXT("false"));
-    return bIsHovered;
-}
-
-
-//void UP4InventoryWidget::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
-//{
-//    Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-//}
-//
-//bool UP4InventoryWidget::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
-//{
-//    Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-//
-//    MoveEnd();
-//    return true;
-//}
-//
-//void UP4InventoryWidget::NativeTick(const FGeometry& InGeometry, float InDeltaTime)
-//{
-//    Super::NativeTick(InGeometry, InDeltaTime);
-//
-//    // 드래그 중이라면
-//    if (bIsDragging)
-//    {
-//        FVector2D MousePos = UWidgetLayoutLibrary::GetMousePositionOnViewport(GetWorld());
-//
-//        // 초기 마우스 위치와의 차이 계산
-//        float DeltaX = InitialOffset.X - MousePos.X;
-//        float DeltaY = InitialOffset.Y - MousePos.Y;
-//
-//        // 초기 마우스 위치와의 차이를 초기 위젯 위치에 반영
-//        InitialPos.X += -DeltaX;
-//        InitialPos.Y += -DeltaY;
-//
-//        // 오프셋 재설정 (이전 마우스 위치 -> 현재 마우스 위치)
-//        InitialOffset = MousePos;
-//
-//        // 오버레이 위치 재설정
-//        UCanvasPanelSlot* CanvasPanelSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Overlay);
-//        if (CanvasPanelSlot)
-//        {
-//            CanvasPanelSlot->SetPosition(InitialPos);
-//        }
-//    }
-//}
-//
-//void UP4InventoryWidget::MoveStart()
-//{
-//    bIsDragging = true;
-//    UE_LOG(LogTemp, Log, TEXT("MoveStart() bIsDragging = true"));
-//
-//    // 오버레이 현재 위치 구해 저장
-//    FVector2D WidgetPos;
-//    UCanvasPanelSlot* CanvasPanelSlot = UWidgetLayoutLibrary::SlotAsCanvasSlot(Overlay);
-//    
-//    if (CanvasPanelSlot)
-//    {
-//        WidgetPos = CanvasPanelSlot->GetPosition();
-//    }
-//    InitialPos = WidgetPos;
-//
-//    // 마우스 현재 위치 구해 저장
-//    InitialOffset = UWidgetLayoutLibrary::GetMousePositionOnViewport(this);
-//}
-//
-//void UP4InventoryWidget::MoveEnd()
-//{
-//    bIsDragging = false;
-//
-//    UE_LOG(LogTemp, Log, TEXT("MoveEnd() bIsDragging = false"));
-//}

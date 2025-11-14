@@ -8,9 +8,6 @@
 #include "AbilitySystemComponent.h"
 #include "Components/SceneCaptureComponent2D.h"
 #include "Components/SceneComponent.h"
-#include "Engine/TextureRenderTarget2D.h"
-#include "PaperSprite.h"
-#include "Engine/Texture2D.h"
 
 AP4CharacterPlayer::AP4CharacterPlayer()
 {
@@ -67,27 +64,6 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 	MapViewrCapture->ProjectionType = ECameraProjectionMode::Orthographic;
 	MapViewrCapture->OrthoWidth = 32768.0f;
 	MapViewrCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorHDR;
-
-	//작성: 한승헌 -일시 : 2025.11.11
-
-	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> MiniMapRef(TEXT("/Game/UI/MiniMap/MiniMapRenderTarget.MiniMapRenderTarget"));
-
-	if (MiniMapRef.Succeeded() == true)
-	{
-		MapViewrCapture->TextureTarget = MiniMapRef.Object;
-	}
-
-
-	CompassSprite = CreateDefaultSubobject<UPaperSprite>(TEXT("CompassSprite"));
-	//CompassSprite->SetupAttachment(RootComponent);
-
-	//작성: 한승헌 - 일시: 2025.11.12
-	static ConstructorHelpers::FObjectFinder<UTexture2D> CompassTextureRef(TEXT("/Game/UI/MiniMap/Compass.Compass"));
-	
-	if (CompassTextureRef.Succeeded())
-	{
-		//CompassSprite->GetSourceTexture() = CompassTextureRef.Object;
-	}
 	//여기까지가 미니맵 코드입니다. - 작성: 한승헌.
 }
 

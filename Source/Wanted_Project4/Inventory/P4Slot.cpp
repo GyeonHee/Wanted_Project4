@@ -98,9 +98,6 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 		{
 			UE_LOG(LogTemp, Log, TEXT("아이템 없음"));
 		}
-
-		// 우클릭은 항상 Handled 반환 (게임 입력 차단)
-		return FReply::Handled();
 	}
 
 	// 좌클릭 입력
@@ -112,18 +109,9 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 		{
 			// 유효한 아이템이 존재하면 드래그 이벤트를 감지하도록 UWidgetBlueprintLibrary::DetectDragIfPressed 함수를 호출합니다.
 			Reply = UWidgetBlueprintLibrary::DetectDragIfPressed(InMouseEvent, this, EKeys::LeftMouseButton);
-			return Reply.NativeReply;
-		}
-		else
-		{
-			// 아이템이 없어도 슬롯 클릭은 Handled (공격 차단)
-			UE_LOG(LogTemp, Log, TEXT("빈 슬롯 클릭 - 공격 차단"));
-			return FReply::Handled();
 		}
 	}
-
-	// 다른 버튼이면 Handled 반환 (안전장치)
-	return FReply::Handled();
+	return Reply.NativeReply;
 }
 
 void UP4Slot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
