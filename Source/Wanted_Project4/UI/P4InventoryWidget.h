@@ -30,6 +30,36 @@ public:
 	// 특정 슬롯만 업데이트
 	void RefreshSlot(EInventorySlotType SlotType, int32 SlotIndex);
 
+	// 마우스 클릭 감지(인벤토리 클릭 시 공격모션 방지하기 위해)
+	virtual FReply NativeOnMouseButtonDown(
+		const FGeometry& InGeometry,
+		const FPointerEvent& InMouseEvent) override;
+
+	//// 마우스 드래그 감지
+	//virtual void NativeOnDragDetected(
+	//	const FGeometry& InGeometry,
+	//	const FPointerEvent& InMouseEvent,
+	//	UDragDropOperation*& OutOperation) override;
+
+	//// 마우스 드랍 감지
+	//virtual bool NativeOnDrop(
+	//	const FGeometry& InGeometry,
+	//	const FDragDropEvent& InDragDropEvent,
+	//	UDragDropOperation* InOperation) override;
+
+	//// 인벤토리 창 움직이기 위한 함수들 -----
+	//virtual void NativeTick(const FGeometry& InGeometry, float InDeltaTime) override;
+
+	//UFUNCTION()
+	//void MoveStart();
+
+	//UFUNCTION()
+	//void MoveEnd();
+	// -----------------------------------
+	
+	// 마우스가 인벤토리 영역 위에 있는지 체크
+	bool IsMouseOverInventory() const;
+
 public:
 	// 인벤토리 컴포넌트로 인벤토리 데이터 참조
 	UPROPERTY()
@@ -48,6 +78,17 @@ protected:
 	UPROPERTY(meta = (BindWidget))
 	TObjectPtr<class UUniformGridPanel> ConsumableTypeSlot;
 
-	
+private:
+	// 드래그 중인지 판별하기 위한 변수
+	uint8 bIsDragging;
+
+	// 초기 위치 및 오프셋
+	FVector2D InitialPos;
+	FVector2D InitialOffset;
+
+	// 인벤토리 영역 Canvas Panel (모든 인벤토리 UI를 담고 있는 패널)
+	UPROPERTY(meta = (BindWidget))
+	TObjectPtr<class UCanvasPanel> InventoryPanel;
+
 };
 

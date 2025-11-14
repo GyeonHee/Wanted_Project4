@@ -79,24 +79,23 @@ private:
 	}
 public:
 	//맵 타일의 상대좌표(타일 A가 기준점).
-	UPROPERTY(VisibleAnywhere, Category = Grid)
+	UPROPERTY(EditAnywhere, Category = Grid)
 	FVector TileOffsetCoordA = FVector::ZeroVector; //타일 A 좌표
 
-	UPROPERTY(VisibleAnywhere, Category = Grid)
-	FVector TileOffsetCoordB = FVector(3750.0f, -9950.0, -1000.0f); //타일 B 좌표
+	UPROPERTY(EditAnywhere, Category = Grid)
+	FVector TileOffsetCoordB = FVector(3750.0f, 9950.0f, 1000.0f); //타일 B 좌표
+
+	UPROPERTY(EditAnywhere, Category = Grid)
+	FVector TileOffsetCoordC = FVector(11962.0f, -5474.0f, 100.0f); //타일 C 좌표
 
 	UPROPERTY(VisibleAnywhere, Category = Grid)
-	FVector TileOffsetCoordC = FVector(12060.0f, 5410.8f, 100.0f); //타일 C 좌표
-
-	UPROPERTY(VisibleAnywhere, Category = Grid)
-	//FVector TileOffsetCoordD = FVector(5025.9f, -15159.0f, 0.0f); //타일 D 좌표
-	FVector TileOffsetCoordD = FVector(7799.0f, -5025.9f, 0.0f); //타일 D 좌표
+	FVector TileOffsetCoordD = FVector::ZeroVector; //타일 D좌표 => 자동으로 계산.
 
 	//UPROPERTY(EditAnywhere, Category = Grid)
 	//FVector TileOffsetCoordD; //타일 D 좌표
 
 	UPROPERTY(EditAnywhere, Category = Grid)
-	int32 GridRadiusX = 2;
+	int32 GridRadiusX = 1;
 
 	UPROPERTY(EditAnywhere, Category = Grid)
 	int32 GridRadiusY = 1;
