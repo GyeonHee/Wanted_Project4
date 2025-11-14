@@ -11,6 +11,7 @@ UP4AT_Trace::UP4AT_Trace()
 
 UP4AT_Trace* UP4AT_Trace::CreateTask(UGameplayAbility* OwningAbility, TSubclassOf<AP4TA_Trace> TargetActorClass)
 {
+	//AbilityTask_Trace 생성 (UP4AT_Trace)
 	UP4AT_Trace* NewTask = NewAbilityTask<UP4AT_Trace>(OwningAbility);
 	NewTask->TargetActorClass = TargetActorClass;
 	return NewTask;
@@ -38,6 +39,7 @@ void UP4AT_Trace::OnDestroy(bool AbilityEnded)
 
 void UP4AT_Trace::SpawnAndInitializeTargetActor()
 {
+	// TargetActor_Trace 스폰(AP4TA_Trace)
 	SpawnedTargetActor = Cast<AP4TA_Trace>(Ability->GetWorld()->SpawnActorDeferred<AGameplayAbilityTargetActor>(TargetActorClass, FTransform::Identity, nullptr, nullptr, ESpawnActorCollisionHandlingMethod::AlwaysSpawn));
 	if (SpawnedTargetActor)
 	{
@@ -57,7 +59,7 @@ void UP4AT_Trace::FinalizeTargetActor()
 		ASC->SpawnedTargetActors.Push(SpawnedTargetActor);
 		SpawnedTargetActor->StartTargeting(Ability);
 
-		// 바로 TA의 ConfirmTargetingAndContinue()가 실행됨.
+		// 바로 Target Actor의 ConfirmTargetingAndContinue()가 실행됨.
 		SpawnedTargetActor->ConfirmTargeting();
 	}
 }

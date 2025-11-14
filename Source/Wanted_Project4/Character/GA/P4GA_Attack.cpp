@@ -40,6 +40,8 @@ void UP4GA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, cons
 		UAbilityTask_PlayMontageAndWait* PlayAttackTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, TEXT("PlayAttack"), DefaultAttackMontage,1.f, GetNextSection());
 		PlayAttackTask->OnCompleted.AddDynamic(this, &UP4GA_Attack::OnCompleteCallback);
 		PlayAttackTask->OnInterrupted.AddDynamic(this, &UP4GA_Attack::OnInterruptedCallback);
+
+		// AT의 함수 호출
 		PlayAttackTask->ReadyForActivation();
 	}
 		

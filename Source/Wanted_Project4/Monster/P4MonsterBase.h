@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 #pragma once
 
@@ -9,6 +9,7 @@
 #include "Interface/P4MonsterDamageInterface.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
+//#include "GameplayCueInterface.h"  // Cue 인터페이스 정의 포함
 #include "P4MonsterBase.generated.h"
 
 // 몬스터 공격 시 각 공격을 실행할 델리게이트
@@ -20,7 +21,7 @@ class WANTED_PROJECT4_API AP4MonsterBase
 	  public IAbilitySystemInterface,
 	  public IAnimationAttackInterface,
 	  public IMonsterAIInterface,
-	  public IP4MonsterDamageInterface
+	  public IP4MonsterDamageInterface//, public IGameplayCueInterface
 {
 	GENERATED_BODY()
 
@@ -51,6 +52,13 @@ public:
 	// 공격할 시 데미지 주는 처리 함수
 	UFUNCTION(BlueprintCallable, Category = Monster)
 	virtual void MonsterGiveDamage(AActor* TargetActor, const float DamageAmount) override;
+
+	//virtual void HandleGameplayCue(
+	//	AActor* MyTarget,
+	//	FGameplayTag EventTag,
+	//	EGameplayCueEvent::Type EventType,
+	//	const FGameplayCueParameters& Parameters
+	//) override;
 
 	// Monster AI Interface 구현
 public:

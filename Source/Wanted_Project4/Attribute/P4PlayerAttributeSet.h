@@ -39,7 +39,7 @@ public:
 	// const를 무시해주기 위함. 죽음 델리게이트
 	mutable FOnHpZeroDelegate OnHpZero;
 
-protected:
+public:
 	UPROPERTY(BlueprintReadOnly, Category = "Attack", Meta = (AllowPrivateAccess = true))
 	FGameplayAttributeData AttackRange;
 
