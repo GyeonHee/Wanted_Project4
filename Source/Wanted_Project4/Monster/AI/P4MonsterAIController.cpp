@@ -27,7 +27,7 @@ AP4MonsterAIController::AP4MonsterAIController()
 }
 
 void AP4MonsterAIController::RunAI()
-{
+{	
 	// 블랙보드 컴포넌트 받기
 	UBlackboardComponent* BBComp = Blackboard.Get();
 

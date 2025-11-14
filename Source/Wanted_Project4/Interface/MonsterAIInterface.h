@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "BehaviorTree/BlackboardData.h"
 #include "UObject/Interface.h"
 #include "MonsterAIInterface.generated.h"
 
@@ -24,8 +25,12 @@ class WANTED_PROJECT4_API IMonsterAIInterface
 	GENERATED_BODY()
 
 	// Add interface functions to this class. This is the class that will be inherited to implement this interface.
-public:
+public:	
 	// AI 관련해서 구현 필요한 함수
+	// BB, BT 불러오기
+	//virtual UBlackboardData GetBBAsset() const = 0;
+	//virtual U
+	
 	// AttributeSet 에 있음
 	virtual float GetAIDetectRange() = 0;
 	virtual float GetAIChaseRange() = 0;

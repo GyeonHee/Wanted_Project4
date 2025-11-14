@@ -9,15 +9,13 @@ AP4BossMonsterBase::AP4BossMonsterBase()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 	
-
-	
+	PAtternComponent = CreateDefaultSubobject<UP4MonsterPatternComponent>(TEXT("PatternComponent"));	
 }
 
 // Called when the game starts or when spawned
 void AP4BossMonsterBase::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame

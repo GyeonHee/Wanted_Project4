@@ -13,10 +13,16 @@ UCLASS()
 class WANTED_PROJECT4_API AP4BossMonsterNemielle : public AP4BossMonsterBase
 {
 	GENERATED_BODY()
-
+	
 public:
 	AP4BossMonsterNemielle();
+
+	virtual void BeginPlay() override;
 	
 	virtual void SetupAttackDelegate() override;
-	
+
+protected:
+	void LeftWingStomp();
+	void Howling();
+	void EnergyBomb();
 };

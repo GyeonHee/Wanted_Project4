@@ -148,6 +148,9 @@ void AP4MonsterJagras::MeleeAttack()
 
 	if (HitDetected)
 	{
+		// @MobTODO: 몬스터 충돌 판정 확인용
+		UE_LOG(LogTemp, Log, TEXT("몬스터 공격 시 충돌된 오브젝트: %s"), *OutHitResult.GetActor()->GetName());
+		
 		// 다른 액터가 공격 당했을 시 처리
 		MonsterGiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
 	}

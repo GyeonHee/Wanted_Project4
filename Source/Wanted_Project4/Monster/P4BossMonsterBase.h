@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "AbilitySystemInterface.h"
+#include "AI/P4MonsterPatternComponent.h"
 #include "GameFramework/Character.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "P4BossMonsterBase.generated.h"
@@ -83,6 +84,10 @@ protected:
 
 	// 몬스터 공격 관리 섹션
 protected:
+	// 패턴 관리 컴포넌트
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UP4MonsterPatternComponent> PAtternComponent;
+	
 	// 공격 델리게이트를 배열로 저장
 	TArray<FBossMonsterAttackDelegate> AttackDelegates;
 
