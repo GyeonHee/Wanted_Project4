@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "P4MonsterJagras.h"
@@ -152,6 +152,6 @@ void AP4MonsterJagras::MeleeAttack()
 		UE_LOG(LogTemp, Log, TEXT("몬스터 공격 시 충돌된 오브젝트: %s"), *OutHitResult.GetActor()->GetName());
 		
 		// 다른 액터가 공격 당했을 시 처리
-		MonsterGiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
+		GiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
 	}
 }

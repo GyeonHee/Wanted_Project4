@@ -6,7 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AI/P4MonsterAIController.h"
-#include "Attribute/P4PlayerAttributeSet.h"
+//#include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Physics/P4Collision.h"
@@ -104,7 +104,7 @@ void AP4MonsterBase::AttackHitCheck()
 //	}
 //}
 
-void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
+void AP4MonsterBase::ApplyDamage(const float DamageAmount)
 {
 	if (ASC)
 	{
@@ -145,22 +145,28 @@ void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
 	}
 }
 
-void AP4MonsterBase::MonsterGiveDamage(AActor* TargetActor, const float DamageAmount)
+void AP4MonsterBase::GiveDamage(AActor* TargetActor, const float DamageAmount)
 {
-	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	if (!TargetASC)
+	// todo: Player만 데미지 전달하는걸로 바꾸기
+	if (IP4DamageableInterface* Character = Cast<IP4DamageableInterface>(TargetActor))
 	{
-		return;
+		Character->ApplyDamage(DamageAmount); // 공격자 정보도 전달
 	}
 
-	UP4PlayerAttributeSet* TargetAttribute = const_cast<UP4PlayerAttributeSet*>(TargetASC->GetSet<UP4PlayerAttributeSet>());
-	if (!TargetAttribute)
-	{
-		return;
-	}
-	
-	// todo: 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
-	TargetAttribute->SetHealth(TargetAttribute->GetHealth() - DamageAmount);
+	//UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	//if (!TargetASC)
+	//{
+	//	return;
+	//}
+
+	//UP4PlayerAttributeSet* TargetAttribute = const_cast<UP4PlayerAttributeSet*>(TargetASC->GetSet<UP4PlayerAttributeSet>());
+	//if (!TargetAttribute)
+	//{
+	//	return;
+	//}
+	//
+	//// 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
+	//TargetAttribute->SetHealth(TargetAttribute->GetHealth() - DamageAmount);
 }
 
 void AP4MonsterBase::AttackByAI()

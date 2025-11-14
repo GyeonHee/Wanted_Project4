@@ -6,7 +6,7 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Interface/MonsterAIInterface.h"
-#include "Interface/P4MonsterDamageInterface.h"
+#include "Interface/P4DamageableInterface.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
 //#include "GameplayCueInterface.h"  // Cue 인터페이스 정의 포함
@@ -21,7 +21,7 @@ class WANTED_PROJECT4_API AP4MonsterBase
 	  public IAbilitySystemInterface,
 	  public IAnimationAttackInterface,
 	  public IMonsterAIInterface,
-	  public IP4MonsterDamageInterface//, public IGameplayCueInterface
+	  public IP4DamageableInterface//, public IGameplayCueInterface
 {
 	GENERATED_BODY()
 
@@ -47,11 +47,11 @@ public:
 public:
 	// 공격 받았을 경우 처리 함수
 	UFUNCTION(BlueprintCallable, Category = Monster)
-	virtual void MonsterApplyDamage(const float DamageAmount) override;
+	virtual void ApplyDamage(const float DamageAmount) override;
 
 	// 공격할 시 데미지 주는 처리 함수
 	UFUNCTION(BlueprintCallable, Category = Monster)
-	virtual void MonsterGiveDamage(AActor* TargetActor, const float DamageAmount) override;
+	virtual void GiveDamage(AActor* TargetActor, const float DamageAmount) override;
 
 	//virtual void HandleGameplayCue(
 	//	AActor* MyTarget,

@@ -7,7 +7,7 @@
 #include "Character/GA/TA/P4TA_Trace.h"
 
 #include "Attribute/P4PlayerAttributeSet.h"
-#include "Interface/P4MonsterDamageInterface.h"
+#include "Interface/P4DamageableInterface.h"
 
 UP4GA_AttackHitCheck::UP4GA_AttackHitCheck()
 {
@@ -67,7 +67,7 @@ void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 	int32 NumData = TargetDataHandle.Data.Num();
 	if (NumData == 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("No target data found."));
+		//UE_LOG(LogTemp, Warning, TEXT("No target data found."));
 		EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 		return;
 	}
@@ -113,13 +113,13 @@ void UP4GA_AttackHitCheck::OnTraceResultCallback(const FGameplayAbilityTargetDat
 		//}
 
 		// 인터페이스 기반 데미지 처리
-		if (IP4MonsterDamageInterface* Monster = Cast<IP4MonsterDamageInterface>(HitActor))
+		if (IP4DamageableInterface* Monster = Cast<IP4DamageableInterface>(HitActor))
 		{
-			Monster->MonsterApplyDamage(AttackDamage);
+			Monster->ApplyDamage(AttackDamage);
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("%s does not implement MonsterDamageInterface"), *HitActor->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("%s does not implement DamageableInterface"), *HitActor->GetName());
 		}
 	}
 
