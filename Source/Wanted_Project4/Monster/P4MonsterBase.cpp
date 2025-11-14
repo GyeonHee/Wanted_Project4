@@ -108,8 +108,8 @@ void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
 {
 	if (ASC)
 	{
-		// Hit 몽타주 실행
-		HitActionBegin();
+		// Damaged 몽타주 실행
+		DamagedActionBegin();
 
 		// 체력 감소 적용 부분
 		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
@@ -213,7 +213,7 @@ void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupt
 	IsAttacking = false;
 	
 	// 피격 모션이 진행중이 아니라면
-	if (IsHitting == false)
+	if (IsDamaged == false)
 	{
 	    // 무브먼트 모드 복구
 	    GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -223,38 +223,38 @@ void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupt
 	NotifyActionEnd();
 }
 
-void AP4MonsterBase::HitActionBegin()
+void AP4MonsterBase::DamagedActionBegin()
 {
-	// Hit 몽타주 실행
+	// Damaged 몽타주 실행
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
-		IsHitting = true;
+		IsDamaged = true;
 				
-		// @Todo: 임시 Hit 모션 시작 로그
-		UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Hit Action Begin"));
+		// @Todo: 임시 Damaged 모션 시작 로그
+		UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Damaged Action Begin"));
 		
-		// Hit 모션동안 이동 막기
+		// Damaged 모션동안 이동 막기
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
 
-		// Hit 몽타주 재생
-		AnimInstance->Montage_Play(HitMontage, 1.f);
+		// Damaged 몽타주 재생
+		AnimInstance->Montage_Play(DamagedMontage, 1.f);
 
 		FOnMontageEnded OnMontageEnded;
 		OnMontageEnded.BindUObject(
-			this, &AP4MonsterBase::HitActionEnd
+			this, &AP4MonsterBase::DamagedActionEnd
 		);
 
-		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, HitMontage);
+		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, DamagedMontage);
 	}
 }
 
-void AP4MonsterBase::HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
+void AP4MonsterBase::DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
 {	
-	// @Todo: 임시 Hit 모션 끝 로그
-	UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Hit Action End"));
+	// @Todo: 임시 Damaged 모션 끝 로그
+	UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Damaged Action End"));
 
-	IsHitting = false;
+	IsDamaged = false;
 	
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }

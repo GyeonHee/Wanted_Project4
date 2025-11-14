@@ -47,12 +47,12 @@ AP4MonsterJagras::AP4MonsterJagras()
 		AttackActionMontage = AttackActionMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitMontageRef(
-		TEXT("/Game/Monster/Model/Jagras/AM_Jagras_Hit.AM_Jagras_Hit")
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DamagedMontageRef(
+		TEXT("/Game/Monster/Model/Jagras/AM_Jagras_Damaged.AM_Jagras_Damaged")
 	);
-	if (HitMontageRef.Succeeded())
+	if (DamagedMontageRef.Succeeded())
 	{
-		HitMontage = HitMontageRef.Object;
+		DamagedMontage = DamagedMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(

@@ -38,10 +38,8 @@ EBTNodeResult::Type UBTTask_MonsterAttack::ExecuteTask(UBehaviorTreeComponent& O
 	);
 
 	// 현재 몬스터가 피격 애니메이션 재생중이면
-	if (AIPawn->GetIsHitting())
+	if (AIPawn->GetIsDamaged())
 	{
-		// @Todo: 확인용
-		UE_LOG(LogTemp, Log, TEXT("IsHitting 확인"));
 		return EBTNodeResult::Failed;
 	}
 	
