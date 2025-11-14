@@ -14,7 +14,7 @@
 #include "Stat/P4MonsterStatComponent.h"
 //#include "GameplayTagContainer.h"	HandleGameplayCue()
 //#include "GameplayEffectTypes.h"	HandleGameplayCue()
-#include "P4GameInstance.h"
+#include "Game/P4GameInstance.h"
 
 class UP4PlayerAttributeSet;
 // Sets default values

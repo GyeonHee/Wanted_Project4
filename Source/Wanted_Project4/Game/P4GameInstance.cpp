@@ -1,7 +1,7 @@
 ﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "P4GameInstance.h"
+#include "Game/P4GameInstance.h"
 
 
 UP4GameInstance::UP4GameInstance()

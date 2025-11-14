@@ -2,7 +2,7 @@
 
 
 #include "UI/P4QuestInformationWidget.h"
-#include "P4GameInstance.h"
+#include "Game/P4GameInstance.h"
 #include "NPC/Quest/P4QuestManager.h"
 #include "Components/TextBlock.h"
 

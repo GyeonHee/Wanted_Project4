@@ -5,7 +5,7 @@
 #include "Components/TextBlock.h"
 #include "Components/Button.h"
 #include "Components/Image.h"
-#include "P4GameInstance.h"
+#include "Game/P4GameInstance.h"
 #include "NPC/Quest/P4QuestManager.h"
 void UP4QuestWidget::NativeConstruct()
 {
