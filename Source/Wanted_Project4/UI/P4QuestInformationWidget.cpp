@@ -9,7 +9,7 @@
 void UP4QuestInformationWidget::NativeConstruct()
 {
 	Super::NativeConstruct();
-	
+
 	UWorld* world = GetWorld();
 	if (world != nullptr)
 	{
@@ -25,7 +25,11 @@ void UP4QuestInformationWidget::NativeConstruct()
 
 	if (QuestManager != nullptr)
 	{
+		//퀘스트가 시작되면 보이게 하는 함수를 델리게이트로 연결.
 		QuestManager->OnQuestStarted.AddUObject(this, &UP4QuestInformationWidget::HandleQuestStarted);
+		//퀘스트 진행사항이 업데이트하면 갱신되게 하는 함수를 델리게이트로 연결.
+		QuestManager->OnQuestUpdated.AddUObject(this, &UP4QuestInformationWidget::HandleQuestUpdated);
+		//퀘스트가 종료되면 UI를 숨기게 하는 함수를 델리게이트로 연결.
 		QuestManager->OnQuestCleared.AddUObject(this, &UP4QuestInformationWidget::HandleQuestCleared);
 	}
 
@@ -46,31 +50,6 @@ void UP4QuestInformationWidget::RefreshQuestUI()
 		CurrentProgress == nullptr || ObjectiveProgress == nullptr)
 	{
 		return;
-	}
-
-	//if (QuestManager == nullptr || QuestManager->IsQuestActive() == false) //퀘스트 매니저가 없거나, 퀘스트가 액티브된 상태가 아니면.
-	//{
-	//	QuestName->SetText(FText::FromString(TEXT("진행중인 퀘스트 없음")));
-	//	Stage->SetText(FText::GetEmpty());
-	//	CurrentProgress->SetText(FText::FromString(TEXT("0")));
-	//	ObjectiveProgress->SetText(FText::FromString(TEXT("0")));
-
-	//	if (GetVisibility() != ESlateVisibility::Collapsed)
-	//	{
-	//		SetVisibility(ESlateVisibility::Collapsed);
-	//	}
-
-	//	//if (GetVisibility() != ESlateVisibility::Hidden)
-	//	//{
-	//	//	SetVisibility(ESlateVisibility::Hidden);
-	//	//}
-
-	//	return;
-	//}
-
-	if (GetVisibility() != ESlateVisibility::Visible)
-	{
-		SetVisibility(ESlateVisibility::Visible);
 	}
 
 	//현재 퀘스트하고 현재 퀘스트의 스테이지 가져오기.
@@ -111,10 +90,13 @@ void UP4QuestInformationWidget::HandleQuestStarted()
 	RefreshQuestUI();
 }
 
+void UP4QuestInformationWidget::HandleQuestUpdated()
+{
+	RefreshQuestUI();
+}
+
 void UP4QuestInformationWidget::HandleQuestCleared()
 {
 	// 퀘스트 끝나면 숨기기
 	SetVisibility(ESlateVisibility::Hidden);
-
-	//RefreshQuestUI();
 }

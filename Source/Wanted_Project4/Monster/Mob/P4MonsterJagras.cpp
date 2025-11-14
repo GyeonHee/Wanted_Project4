@@ -7,6 +7,7 @@
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/BoxComponent.h"
 #include "Physics/P4Collision.h"
+#include "Game/P4GameInstance.h"
 
 AP4MonsterJagras::AP4MonsterJagras()
 {
@@ -94,6 +95,26 @@ void AP4MonsterJagras::SetupAttackDelegate()
 
 	// 바인딩한 델리게이트로 AttackDelegates 배열 설정
 	AttackDelegates = {Patern1};
+}
+
+void AP4MonsterJagras::SetDead()
+{
+	Super::SetDead();
+
+	//-작성: 한승헌
+	//-일시: 2025.11.13
+	//-내용: 퀘스트 시스템을 제작하여 테스트용으로 작성합니다.
+	auto* GI = GetWorld()->GetGameInstance<UP4GameInstance>();
+
+	if ((GI != nullptr) && (GI->QuestManager != nullptr))
+	{
+		if (GI->QuestManager->IsQuestActive() == false)
+		{
+			return;
+		}
+
+		GI->QuestManager->UpdateObjective(TEXT("Jagras_Kill"));
+	}
 }
 
 void AP4MonsterJagras::MeleeAttack()

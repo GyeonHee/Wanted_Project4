@@ -26,11 +26,13 @@ void UP4QuestWidget::NativeConstruct()
 	//버튼 델리게이트 생성.
 	if (AcceptButtton != nullptr)
 	{
+		AcceptButtton->OnClicked.RemoveDynamic(this, &UP4QuestWidget::OnAcceptClicked);
 		AcceptButtton->OnClicked.AddDynamic(this, &UP4QuestWidget::OnAcceptClicked);
 	}
 
 	if (DeclineButton != nullptr)
 	{
+		DeclineButton->OnClicked.RemoveDynamic(this, &UP4QuestWidget::OnDeclinClicked);
 		DeclineButton->OnClicked.AddDynamic(this, &UP4QuestWidget::OnDeclinClicked);
 	}
 }

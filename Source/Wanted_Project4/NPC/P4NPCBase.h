@@ -43,6 +43,11 @@ public:
 		return NPCQuestCode;
 	}
 
+	FORCEINLINE FString GetReportObjectiveID() const
+	{
+		return ReportObjectiveID;
+	}
+
 protected:
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp,
@@ -77,5 +82,6 @@ protected:
 	UPROPERTY()
 	TObjectPtr<UP4QuestWidget> QuestWidgetInstance;
 
-
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Quest)
+	FString ReportObjectiveID;
 };

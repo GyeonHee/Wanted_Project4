@@ -97,6 +97,10 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 
 	const FP4StageDetails& CurrentStage = Quest->Stages[CurrentStageIndex];
 
+
+	//이번 호출에서 실제로 진행도가 변화하였는지?
+	bool bProgressChanged = false;
+
 	// 1) 일단 일치하는 Objective에 대해 Progress 증가
 	for (const FP4ObjectiveDetails& Obj : CurrentStage.Objectives)
 	{
@@ -109,10 +113,17 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 			{
 				CurrentValue++;
 
+				bProgressChanged = true;
+
 				UE_LOG(LogTemp, Log, TEXT("Objective %s progress: %d / %d"),
 					*ObjectiveID, CurrentValue, Obj.Quantity);
 			}
 		}
+	}
+
+	if (bProgressChanged == true)
+	{
+		OnQuestUpdated.Broadcast();
 	}
 
 	//2) 스테이지 전체 완료 여부 체크.
@@ -160,6 +171,8 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 
 		UE_LOG(LogTemp, Log, TEXT("Move to Stage %d of Quest %d"),
 			CurrentStageIndex, CurrentQuestCode);
+
+		OnQuestUpdated.Broadcast();
 	}
 	else
 	{

@@ -28,6 +28,7 @@ AP4NPCDollCat::AP4NPCDollCat()
 	}
 
 	Tag_InRange = FGameplayTag::RequestGameplayTag(FName("Character.Interaction.Quest"));
+	ReportObjectiveID = "Report_Jagras";
 }
 
 void AP4NPCDollCat::BeginPlay()

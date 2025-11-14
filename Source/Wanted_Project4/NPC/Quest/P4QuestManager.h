@@ -20,6 +20,7 @@
  */
 
 DECLARE_MULTICAST_DELEGATE(FOnQuestStarted);
+DECLARE_MULTICAST_DELEGATE(FOnQuestUpdated);
 DECLARE_MULTICAST_DELEGATE(FOnQuestCleared);
 
 UCLASS()
@@ -79,6 +80,7 @@ public:
 
 	//델리게이트
 	FOnQuestStarted OnQuestStarted;
+	FOnQuestUpdated OnQuestUpdated;
 	FOnQuestCleared OnQuestCleared;
 
 
