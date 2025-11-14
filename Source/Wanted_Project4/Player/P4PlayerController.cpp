@@ -12,6 +12,7 @@
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "Inventory/P4InventoryComponent.h"
 #include "UI/P4InventoryWidget.h"
+#include "Character/Animation/P4PlayerAnimInstance.h"
 
 AP4PlayerController::AP4PlayerController()
 {
@@ -57,6 +58,20 @@ AP4PlayerController::AP4PlayerController()
 	if (InteractionActionRef.Succeeded())
 	{
 		InteractionAction = InteractionActionRef.Object;
+	}
+
+	//작성- 노현기 일시- 2025.11.14
+	static ConstructorHelpers::FObjectFinder<UInputAction> InventoryActionRef(TEXT("/Game/Character/Input/Action/IA_Inventory.IA_Inventory"));
+	if (InventoryActionRef.Succeeded())
+	{
+		InventoryAction = InventoryActionRef.Object;
+	}
+
+	//작성- 노현기 일시- 2025.11.14
+	static ConstructorHelpers::FObjectFinder<UInputAction> DrawKatanaActionRef(TEXT("/Game/Character/Input/Action/IA_DrawKatana.IA_DrawKatana"));
+	if (DrawKatanaActionRef.Succeeded())
+	{
+		DrawKatanaAction = DrawKatanaActionRef.Object;
 	}
 
 	//HUD 생성 -작성: 한승헌 -일시: 2025.11.07
@@ -218,12 +233,18 @@ void AP4PlayerController::SetupInputComponent()
 
 		//EIC->BindAction(AttackAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleAttack);
 		//SetupPlayerGAS();
+
+		// -작성: 노현기 -일시: 2025.11.14
+		EIC->BindAction(InventoryAction, ETriggerEvent::Started, this, &AP4PlayerController::ToggleInventory);
+		EIC->BindAction(DrawKatanaAction, ETriggerEvent::Started, this, &AP4PlayerController::ToggleHandOnWeapon);
 	}
 
-	// 입력 바인딩 ('I' 키눌러서 인벤토리 토글) 
-	// @Todo: 이거 프로젝트 세팅에서 입력 바인딩에서 키 설정해야하는거로 알고있어요 메인 레벨에서 해야함(되어있음)
-	// -작성: 노현기 -일시: 2025.11.10
-	InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AP4PlayerController::ToggleInventory);
+	//// 입력 바인딩 ('I' 키눌러서 인벤토리 토글) 
+	//// @Todo: 이거 프로젝트 세팅에서 입력 바인딩에서 키 설정해야하는거로 알고있어요 메인 레벨에서 해야함(되어있음)
+	//// -작성: 노현기 -일시: 2025.11.10
+	//InputComponent->BindAction("ToggleInventory", IE_Pressed, this, &AP4PlayerController::ToggleInventory);
+	////-작성: 노현기 - 일시 : 2025.11.14
+	//InputComponent->BindAction("ToggleHandOnWeapon", IE_Pressed, this, &AP4PlayerController::ToggleHandOnWeapon);
 }
 
 void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
@@ -336,7 +357,7 @@ void AP4PlayerController::ToggleInventory()
 
 		// 마우스 이벤트가 UI를 먼저 거치도록 설정
 		bShowMouseCursor = true;
-		FlushPressedKeys(); // 이전 입력 초기화
+		//FlushPressedKeys(); // 이전 입력 초기화
 
 		UE_LOG(LogTemp, Warning, TEXT("인벤토리 열림"));
 	}
@@ -355,35 +376,83 @@ void AP4PlayerController::ToggleInventory()
 	}
 }
 
-// 인벤토리 위젯에 옮길 예정
-//// -작성자: 노현기 -일시: 2025.11.12
-//bool AP4PlayerController::IsMouseOverUI() const
-//{
-//	if (!InventoryWidget)
-//	{
-//		return false;
-//	}
-//
-//	// 인벤토리가 보이지 않으면 false
-//	if (InventoryWidget->GetVisibility() != ESlateVisibility::Visible)
-//	{
-//		return false;
-//	}
-//
-//	// 마우스 위치 가져오기
-//	FVector2D MousePosition;
-//	if (GetMousePosition(MousePosition.X, MousePosition.Y))
-//	{
-//		// InventoryPanel 영역 가져오기
-//		// 주의: InventoryPanel을 public으로 만들거나 getter 필요
-//		// 또는 InventoryWidget에 IsMouseOver 함수 추가
-//
-//		// 간단한 방법: 위젯이 마우스 아래 있는지 체크
-//		if (InventoryWidget->IsHovered())
-//		{
-//			return true;
-//		}
-//	}
-//
-//	return false;
-//}
+// -작성: 노현기 -일시: 2025.11.14
+void AP4PlayerController::ToggleHandOnWeapon()
+{
+	UE_LOG(LogTemp, Warning, TEXT("ToggleHandOnWeapon 입력 감지"));
+
+	AP4CharacterPlayer* P4Character = Cast<AP4CharacterPlayer>(GetPawn());
+	if (!P4Character)
+	{
+		UE_LOG(LogTemp, Error, TEXT("P4Character를 찾을 수 없습니다!"));
+		return;
+	}
+
+	USkeletalMeshComponent* MeshComp = P4Character->GetMesh();
+	UP4PlayerAnimInstance* AnimInst = MeshComp ? Cast<UP4PlayerAnimInstance>(MeshComp->GetAnimInstance()) : nullptr;
+
+	if (!AnimInst)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AnimInstance를 찾을 수 없습니다!"));
+		return;
+	}
+
+	// ⭐ bIsEquipped 상태 로그 출력
+	UE_LOG(LogTemp, Warning, TEXT("현재 bIsEquipped: %s"), AnimInst->bIsEquipped ? TEXT("true") : TEXT("false"));
+
+	// ⭐ 먼저 장착되어 있는지 확인
+	if (!AnimInst->bIsEquipped)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("무기가 장착되지 않았습니다! 발도/납도 불가능"));
+		return;
+	}
+
+	// ⭐ 상태 토글 (손에 쥐고 있는지)
+	bIsEquip = !bIsEquip;
+
+	UAnimInstance* AnimInstance = MeshComp->GetAnimInstance();
+	if (!AnimInstance) return;
+
+	if (bIsEquip)
+	{
+		// 발도 (등 → 손)
+		UAnimMontage* DrawMontage = P4Character->GetDrawKatanaMontage();
+
+		UE_LOG(LogTemp, Warning, TEXT("DrawMontage 포인터: %s"), DrawMontage ? TEXT("Valid") : TEXT("nullptr"));
+
+		if (DrawMontage)
+		{
+			float PlayLength = AnimInstance->Montage_Play(DrawMontage);
+			UE_LOG(LogTemp, Warning, TEXT("DrawKatana 몽타주 재생! 길이: %f"), PlayLength);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("DrawKatana 몽타주가 설정되지 않았습니다!"));
+		}
+
+		// ⭐ 임시로 여기서도 설정
+		AnimInst->bIsKatanaOnHand = true;
+		UE_LOG(LogTemp, Warning, TEXT("bIsKatanaOnHand = true"));
+	}
+	else
+	{
+		// 납도 (손 → 등)
+		UAnimMontage* SheathMontage = P4Character->GetSheathKatanaMontage();
+
+		UE_LOG(LogTemp, Warning, TEXT("SheathMontage 포인터: %s"), SheathMontage ? TEXT("Valid") : TEXT("nullptr"));
+
+		if (SheathMontage)
+		{
+			float PlayLength = AnimInstance->Montage_Play(SheathMontage);
+			UE_LOG(LogTemp, Warning, TEXT("SheathKatana 몽타주 재생! 길이: %f"), PlayLength);
+		}
+		else
+		{
+			UE_LOG(LogTemp, Error, TEXT("SheathKatana 몽타주가 설정되지 않았습니다!"));
+		}
+
+		// ⭐ 임시로 여기서도 설정
+		AnimInst->bIsKatanaOnHand = false;
+		UE_LOG(LogTemp, Warning, TEXT("bIsKatanaOnHand = false"));
+	}
+}

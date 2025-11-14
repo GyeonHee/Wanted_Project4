@@ -11,6 +11,7 @@
 #include "Engine/TextureRenderTarget2D.h"
 #include "PaperSprite.h"
 #include "Engine/Texture2D.h"
+#include "Animation/AnimMontage.h"
 
 AP4CharacterPlayer::AP4CharacterPlayer()
 {

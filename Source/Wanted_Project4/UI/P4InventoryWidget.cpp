@@ -34,8 +34,6 @@ void UP4InventoryWidget::NativeConstruct()
 			{
                 SlotWidget->SlotType = EInventorySlotType::Equipment;
 				EquipmentSlots.Add(SlotWidget);
-
-				UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 추가됨: %s, 인덱스: %d"), *SlotWidget->GetName(), SlotWidget->SlotIndex);
 			}
 		}
 	}
@@ -48,12 +46,9 @@ void UP4InventoryWidget::NativeConstruct()
 			{
                 SlotWidget->SlotType = EInventorySlotType::Consumable;
 				ConsumableSlots.Add(SlotWidget);
-				UE_LOG(LogTemp, Warning, TEXT("소비 슬롯 추가됨: %s, 인덱스: %d"), *SlotWidget->GetName(), SlotWidget->SlotIndex);
 			}
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("장비 슬롯 개수: %d, 소비 슬롯 개수: %d"), EquipmentSlots.Num(), ConsumableSlots.Num());
-
 
     bIsDragging = false;
 
@@ -61,13 +56,10 @@ void UP4InventoryWidget::NativeConstruct()
     if (InventoryPanel)
     {
         FVector2D PanelSize = InventoryPanel->GetCachedGeometry().GetLocalSize();
-        UE_LOG(LogTemp, Warning, TEXT("InventoryPanel 크기: %s"), *PanelSize.ToString());
     }
     else
     {
         // BindWidget이 안 되었으면 수동으로 찾기
-        UE_LOG(LogTemp, Warning, TEXT("InventoryPanel이 바인딩되지 않음, 수동 검색 중..."));
-
         TArray<UWidget*> AllWidgets;
         WidgetTree->GetAllWidgets(AllWidgets);
 
@@ -79,7 +71,6 @@ void UP4InventoryWidget::NativeConstruct()
                 if (Panel != GetRootWidget())
                 {
                     InventoryPanel = Panel;
-                    UE_LOG(LogTemp, Warning, TEXT("InventoryPanel 수동 검색 성공: %s"), *Panel->GetName());
                     break;
                 }
             }
@@ -89,39 +80,30 @@ void UP4InventoryWidget::NativeConstruct()
 
 void UP4InventoryWidget::BindInventory(UP4InventoryComponent* InInventoryComp)
 {
-    UE_LOG(LogTemp, Warning, TEXT("=== BindInventory 호출됨 ==="));
-
     if (!InInventoryComp)
     {
         UE_LOG(LogTemp, Error, TEXT("InInventoryComp가 nullptr입니다!"));
         return;
+
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("InventoryComp 바인딩 성공"));
-
     // 1. 인벤토리 컴포넌트 저장
     InventoryComp = InInventoryComp;
 
     // 2. 델리게이트 바인딩 (인벤토리가 변경되면 RefreshUI 자동 호출)
     InventoryComp->OnInventoryUpdated.AddUObject(this, &UP4InventoryWidget::RefreshSlot);
-    UE_LOG(LogTemp, Warning, TEXT("델리게이트 바인딩 완료"));
 
     // 3. 처음 한 번 UI 업데이트
-    UE_LOG(LogTemp, Warning, TEXT("첫 RefreshUI 호출 시작"));
     RefreshUI();
 }
 
 void UP4InventoryWidget::RefreshUI()
 {
-    UE_LOG(LogTemp, Warning, TEXT("=== RefreshUI 호출됨 ==="));
 
     if (!InventoryComp)
     {
         UE_LOG(LogTemp, Error, TEXT("InventoryComp가 nullptr입니다!"));
         return;
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("InventoryComp 존재함"));
 
     // 장비 인벤토리 갱신
     const TArray<FInventoryItem>* EquipItems = InventoryComp->GetInventoryByType(EInventorySlotType::Equipment);
@@ -143,7 +125,6 @@ void UP4InventoryWidget::RefreshUI()
         }
     }
 
-    UE_LOG(LogTemp, Warning, TEXT("=== RefreshUI 완료 ===\n"));
 }
 
 void UP4InventoryWidget::RefreshSlot(EInventorySlotType SlotType, int32 SlotIndex)
@@ -192,16 +173,13 @@ void UP4InventoryWidget::RefreshSlot(EInventorySlotType SlotType, int32 SlotInde
     // 해당 슬롯만 갱신
     (*SlotArray)[SlotIndex]->SetItem((*TargetArray)[SlotIndex]);
 
-    UE_LOG(LogTemp, Log, TEXT("RefreshSlot: 타입[%d] 인덱스[%d] 갱신 완료"), (int32)SlotType, SlotIndex);
 }
 
 FReply UP4InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {  
-    UE_LOG(LogTemp, Warning, TEXT("=== NativeOnMouseButtonDown 호출됨 ==="));
 
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
-        UE_LOG(LogTemp, Warning, TEXT("좌클릭 감지됨"));
 
         // DragHeader를 클릭했는지 체크
         if (DragHeader && DragHeader->IsHovered())
@@ -228,9 +206,6 @@ FReply UP4InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
 
                 // 오프셋 = 마우스 위치 - 패널 위치
                 DragOffset = MousePosViewport - CurrentPanelPosition;
-
-                UE_LOG(LogTemp, Warning, TEXT("DragHeader 클릭! MousePos: %s, PanelPos: %s, DragOffset: %s"),
-                    *MousePosViewport.ToString(), *CurrentPanelPosition.ToString(), *DragOffset.ToString());
             }
 
             return FReply::Handled().CaptureMouse(TakeWidget());
@@ -239,13 +214,11 @@ FReply UP4InventoryWidget::NativeOnMouseButtonDown(const FGeometry& InGeometry, 
         // DragHeader가 아닌 인벤토리 내부를 클릭한 경우
         if (InventoryPanel && InventoryPanel->IsHovered())
         {
-            UE_LOG(LogTemp, Warning, TEXT("인벤토리 내부 클릭 - 게임 입력 차단"));
             return FReply::Handled();  // 게임 입력 차단만
         }
     }
 
     // 인벤토리 외부 클릭 - 게임 입력 허용
-    UE_LOG(LogTemp, Warning, TEXT("인벤토리 외부 클릭 - Unhandled"));
     return FReply::Unhandled();
 }
 
@@ -300,27 +273,21 @@ FReply UP4InventoryWidget::NativeOnMouseMove(const FGeometry& InGeometry, const 
 
 FReply UP4InventoryWidget::NativeOnMouseButtonUp(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent)
 {
-    UE_LOG(LogTemp, Warning, TEXT("NativeOnMouseButtonUp 호출됨! Button: %s, bIsDragging: %d"),
-        *InMouseEvent.GetEffectingButton().ToString(), bIsDragging);
 
     if (InMouseEvent.GetEffectingButton() == EKeys::LeftMouseButton)
     {
         if (bIsDragging)
         {
             bIsDragging = false;
-            UE_LOG(LogTemp, Warning, TEXT("드래그 종료 - ReleaseMouseCapture 호출"));
-            return FReply::Handled().ReleaseMouseCapture();  // ⭐ 중요!
+            return FReply::Handled().ReleaseMouseCapture();
         }
 
         // 드래그 중이 아니었지만 인벤토리 내부 클릭이었다면
         if (InventoryPanel && InventoryPanel->IsHovered())
         {
-            UE_LOG(LogTemp, Warning, TEXT("인벤토리 내부 클릭 종료"));
             return FReply::Handled();
         }
     }
-
-    UE_LOG(LogTemp, Warning, TEXT("Unhandled MouseButtonUp"));
     return FReply::Unhandled();
 }
 
@@ -338,11 +305,9 @@ bool UP4InventoryWidget::IsMouseOverInventory() const
     if (InventoryPanel)
     {
         bool bIsHovered = InventoryPanel->IsHovered();
-        UE_LOG(LogTemp, Log, TEXT("InventoryPanel IsHovered: %s"), bIsHovered ? TEXT("true") : TEXT("false"));
         return bIsHovered;
     }
 
     bool bIsHovered = this->IsHovered();
-    UE_LOG(LogTemp, Log, TEXT("InventoryWidget IsHovered: %s"), bIsHovered ? TEXT("true") : TEXT("false"));
     return bIsHovered;
 }

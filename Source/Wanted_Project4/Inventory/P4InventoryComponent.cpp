@@ -5,6 +5,10 @@
 #include "GameplayAbilities/Public/AbilitySystemInterface.h"
 #include "GameplayAbilities/Public/AbilitySystemComponent.h"
 #include "Inventory/P4InventoryTags.h"
+#include "Character/P4CharacterBase.h"
+#include "Character/Animation/P4PlayerAnimInstance.h"
+#include "Item/Equipment/P4WeaponComponent.h"
+#include "Character/P4CharacterPlayer.h"
 
 // Sets default values for this component's properties
 UP4InventoryComponent::UP4InventoryComponent()
@@ -282,7 +286,46 @@ bool UP4InventoryComponent::EquipItem(UItemDataBase* ItemData)
         }
     }
 
-    UE_LOG(LogTemp, Log, TEXT("EquipItem 함수 리턴"));
+    //// 아이템 태그가 무기라면
+    //FGameplayTag WeaponTag = FGameplayTag::RequestGameplayTag((FName("Item.Equipment.Weapon")));
+    //if (ItemData->HasTag(WeaponTag))
+    //{
+    //    if (AP4CharacterBase* PlayerCharacter = Cast<AP4CharacterBase>(Owner))
+    //    {
+    //        if (UP4WeaponComponent* WeaponComp = PlayerCharacter->GetWeaponComponent())
+    //        {
+    //            WeaponComp->EquipWeapon(ItemData);
+    //        }
+    //    }
+    //}
+
+     // ⭐ 무기라면 WeaponComponent에 전달 + bIsEquipped 설정
+    FGameplayTag WeaponTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment.Weapon"));
+    if (ItemData->HasTag(WeaponTag))
+    {
+        if (AP4CharacterPlayer* PlayerCharacter = Cast<AP4CharacterPlayer>(Owner))
+        {
+            // WeaponComponent로 무기 장착 (등에 부착)
+            if (UP4WeaponComponent* WeaponComp = PlayerCharacter->GetWeaponComponent())
+            {
+                WeaponComp->EquipWeapon(ItemData);
+            }
+
+            // ⭐ AnimInstance의 bIsEquipped를 true로 설정
+            if (USkeletalMeshComponent* MeshComp = PlayerCharacter->GetMesh())
+            {
+                if (UP4PlayerAnimInstance* AnimInst = Cast<UP4PlayerAnimInstance>(MeshComp->GetAnimInstance()))
+                {
+                    AnimInst->bIsEquipped = true;
+                    UE_LOG(LogTemp, Log, TEXT("bIsEquipped = true (등에 무기 장착)"));
+                }
+            }
+        }
+
+        UE_LOG(LogTemp, Log, TEXT("EquipItem 함수 리턴"));
+        return true;
+    }
+
     return true;
 }
 
@@ -308,13 +351,38 @@ bool UP4InventoryComponent::UnequipItem(UItemDataBase* ItemData)
     // 효과 제거
     FActiveGameplayEffectHandle EffectHandle = ActiveEquipmentEffects[ItemData];
     ASC->RemoveActiveGameplayEffect(EffectHandle);
-
     ActiveEquipmentEffects.Remove(ItemData);
 
     UE_LOG(LogTemp, Log, TEXT("장비 해제: %s"), *ItemData->GetItemName().ToString());
 
+    // ⭐ 무기라면 WeaponComponent에서 제거 + bIsEquipped 설정
+    FGameplayTag WeaponTag = FGameplayTag::RequestGameplayTag(FName("Item.Equipment.Weapon"));
+    if (ItemData->HasTag(WeaponTag))
+    {
+        if (AP4CharacterPlayer* PlayerCharacter = Cast<AP4CharacterPlayer>(Owner))
+        {
+            // WeaponComponent로 무기 해제
+            if (UP4WeaponComponent* WeaponComp = PlayerCharacter->GetWeaponComponent())
+            {
+                WeaponComp->UnequipWeapon();
+            }
+
+            // ⭐ AnimInstance의 bIsEquipped, bIsKatanaOnHand를 false로 설정
+            if (USkeletalMeshComponent* MeshComp = PlayerCharacter->GetMesh())
+            {
+                if (UP4PlayerAnimInstance* AnimInst = Cast<UP4PlayerAnimInstance>(MeshComp->GetAnimInstance()))
+                {
+                    AnimInst->bIsEquipped = false;
+                    AnimInst->bIsKatanaOnHand = false;  // 손에도 없어야 함
+                    UE_LOG(LogTemp, Log, TEXT("bIsEquipped = false, bIsKatanaOnHand = false (무기 해제)"));
+                }
+            }
+        }
+    }
+
     return true;
 }
+
 
 void UP4InventoryComponent::SwapSlots(int32 SlotIndexA, int32 SlotIndexB, EInventorySlotType SlotType)
 {

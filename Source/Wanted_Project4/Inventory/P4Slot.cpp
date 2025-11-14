@@ -46,30 +46,19 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 	// 우클릭 입력
 	if (InMouseEvent.IsMouseButtonDown(EKeys::RightMouseButton))
 	{
-		UE_LOG(LogTemp, Log, TEXT("우클릭"));
-
 		// 해당 슬롯에 아이템 정보가 존재하는지 체크
 		if (CurrentItem.ItemData)
 		{
-			UE_LOG(LogTemp, Log, TEXT("아이템 있음: %s, 수량: %d"),
-				*CurrentItem.ItemData->GetItemName().ToString(),
-				CurrentItem.Quantity);
-
 			// 잘못된 접근 방법
 			//UP4InventoryComponent InvComp;
 
 			// 올바른 접근 방법
 			if (APlayerController* PC = GetOwningPlayer())
 			{
-				UE_LOG(LogTemp, Log, TEXT("플레이어 컨트롤러 찾음: %s"), *PC->GetName());
 				if (APawn* Pawn = PC->GetPawn())
 				{
-					UE_LOG(LogTemp, Log, TEXT("폰 찾음: %s"), *Pawn->GetName());
 					if (UP4InventoryComponent* InvComp = Pawn->FindComponentByClass<UP4InventoryComponent>())
 					{
-						UE_LOG(LogTemp, Log, TEXT("인벤토리 컴포넌트 찾음"));
-						UE_LOG(LogTemp, Log, TEXT(" -> Owner: %s"), InvComp->GetOwner() ? *InvComp->GetOwner()->GetName() : TEXT("None"));
-
 						if (CurrentItem.ItemData->HasTag(P4InventoryTags::Item::Equipment))
 						{
 							InvComp->EquipItem(CurrentItem.ItemData);
@@ -106,7 +95,6 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 	// 좌클릭 입력
 	if (InMouseEvent.IsMouseButtonDown(EKeys::LeftMouseButton))
 	{
-		UE_LOG(LogTemp, Log, TEXT("좌클릭"));
 		// 해당 슬롯에 아이템 정보가 존재하는지 체크
 		if (CurrentItem.ItemData)
 		{
@@ -117,7 +105,6 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 		else
 		{
 			// 아이템이 없어도 슬롯 클릭은 Handled (공격 차단)
-			UE_LOG(LogTemp, Log, TEXT("빈 슬롯 클릭 - 공격 차단"));
 			return FReply::Handled();
 		}
 	}
@@ -129,7 +116,6 @@ FReply UP4Slot::NativeOnMouseButtonDown(const FGeometry& InGeometry, const FPoin
 void UP4Slot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEvent& InMouseEvent, UDragDropOperation*& OutOperation)
 {
 	Super::NativeOnDragDetected(InGeometry, InMouseEvent, OutOperation);
-	UE_LOG(LogTemp, Log, TEXT("드래그 시작"));
 
 	// 1️⃣ 아이템 유효성 확인
 	if (!CurrentItem.ItemData)
@@ -187,14 +173,11 @@ void UP4Slot::NativeOnDragDetected(const FGeometry& InGeometry, const FPointerEv
 
 	OutOperation = DragOp;
 
-	UE_LOG(LogTemp, Log, TEXT("DragDropOperation 생성 완료"));
 }
 
 bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& InDragDropEvent, UDragDropOperation* InOperation)
 {
 	Super::NativeOnDrop(InGeometry, InDragDropEvent, InOperation);
-
-	UE_LOG(LogTemp, Log, TEXT("=== 드롭 실행 ==="));
 
 	// 드래그 오퍼레이션 캐스팅
 	UP4ItemDragDropOperation* DropOp = Cast<UP4ItemDragDropOperation>(InOperation);
@@ -213,30 +196,16 @@ bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& In
 	// 같은 슬롯에 드롭한 경우 - 아무것도 하지 않음
 	if (DropOp->FromSlot == this)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("같은 슬롯에 드롭 - 무시"));
 		return true;
 	}
 
 	// 다른 타입의 슬롯으로 드래그 방지
 	if (DropOp->FromSlot->SlotType != this->SlotType)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("다른 타입 슬롯으로 드래그 불가 (출발: %d, 목적: %d)"),
-			(int32)DropOp->FromSlot->SlotType, (int32)this->SlotType);
 		return false;
 	}
 
-	// 아이템 교환 시작
-	UE_LOG(LogTemp, Log, TEXT("아이템 교환 시작"));
-	UE_LOG(LogTemp, Log, TEXT("출발지 슬롯[%d]: %s (수량: %d)"),
-		DropOp->FromSlot->SlotIndex,
-		DropOp->DraggedItem.ItemData ? *DropOp->DraggedItem.ItemData->GetItemName().ToString() : TEXT("없음"),
-		DropOp->DraggedItem.Quantity);
-	UE_LOG(LogTemp, Log, TEXT("목적지 슬롯[%d]: %s (수량: %d)"),
-		SlotIndex,
-		CurrentItem.ItemData ? *CurrentItem.ItemData->GetItemName().ToString() : TEXT("없음"),
-		CurrentItem.Quantity);
-
-	// 🔥 인벤토리 컴포넌트에서만 교환 (UI는 RefreshUI로 자동 갱신)
+	// 인벤토리 컴포넌트에서만 교환 (UI는 RefreshUI로 자동 갱신)
 	if (APlayerController* PC = GetOwningPlayer())
 	{
 		if (APawn* Pawn = PC->GetPawn())
@@ -245,7 +214,6 @@ bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& In
 			{
 				// 인벤토리 컴포넌트에서 교환 → OnInventoryUpdated 브로드캐스트 → RefreshUI 자동 호출
 				InvComp->SwapSlots(DropOp->FromSlot->SlotIndex, SlotIndex, SlotType);
-				UE_LOG(LogTemp, Log, TEXT("인벤토리 컴포넌트 교환 완료 (RefreshUI 자동 호출됨)"));
 				return true;
 			}
 			else
@@ -260,8 +228,6 @@ bool UP4Slot::NativeOnDrop(const FGeometry& InGeometry, const FDragDropEvent& In
 
 void UP4Slot::SetItem(const FInventoryItem& InItemData)
 {
-	UE_LOG(LogTemp, Warning, TEXT("슬롯 SetItem 호출됨"));
-
 	CurrentItem = InItemData;
 
 	UpdateSlotUI();
@@ -319,8 +285,6 @@ void UP4Slot::ClearSlot()
 	{
 		TXT_Quantity->SetVisibility(ESlateVisibility::Hidden);
 	}
-
-	UE_LOG(LogTemp, Log, TEXT("ClearSlot: 슬롯[%d] 비움"), SlotIndex);
 }
 
 

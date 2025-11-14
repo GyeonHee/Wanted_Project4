@@ -1,0 +1,139 @@
+﻿// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "Item/Equipment/P4WeaponComponent.h"
+#include "P4WeaponComponent.h"
+#include "Engine/SkeletalMesh.h"
+#include "Components/SkeletalMeshComponent.h"
+#include "Item/ItemDataBase.h"
+#include "GameFrameWork/Character.h"
+#include "Character/Animation/P4PlayerAnimInstance.h"
+#include "Character/P4CharacterPlayer.h"
+
+// Sets default values for this component's properties
+UP4WeaponComponent::UP4WeaponComponent()
+{
+
+}
+
+void UP4WeaponComponent::EquipWeapon(UItemDataBase* WeaponData)
+{
+	if (!WeaponData) return;
+
+	// 기존에 무기가 있으면 제거
+	if (WeaponMesh)
+	{
+		DestroyWeaponMesh();
+	}
+
+	// 무기 메시 로드
+	USkeletalMesh* Mesh = WeaponData->EquipmentMesh.LoadSynchronous();
+	if (!Mesh)
+	{
+		UE_LOG(LogTemp, Error, TEXT("무기 메시를 로드할 수 없습니다!"));
+		return;
+	}
+
+	CurrentWeaponData = WeaponData;
+	CreateWeaponMesh(Mesh);
+
+	// 기본적으로 등에 부착
+	AttachWeaponToSocket(BackSocketName);
+
+	// 애니메이션 상태 변경
+	if (AP4CharacterPlayer* Player = Cast<AP4CharacterPlayer>(GetOwner()))
+	{
+		if (UP4PlayerAnimInstance* P4PlayerAnimInstance = Cast<UP4PlayerAnimInstance>(Player->GetMesh()->GetAnimInstance()))
+		{
+			P4PlayerAnimInstance->bIsEquipped = true;
+		}
+	}
+
+	UE_LOG(LogTemp, Log, TEXT("무기 장착: %s"), *WeaponData->GetItemName().ToString());
+}
+
+void UP4WeaponComponent::UnequipWeapon()
+{
+	DestroyWeaponMesh();
+	CurrentWeaponData = nullptr;
+
+	UE_LOG(LogTemp, Log, TEXT("무기 해제"));
+}
+
+void UP4WeaponComponent::AttachWeaponToSocket(FName SocketName)
+{
+	if (!WeaponMesh) return;
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (!OwnerCharacter) return;
+
+	USkeletalMeshComponent* CharacterMesh = OwnerCharacter->GetMesh();
+	if (!CharacterMesh) return;
+
+	// 소켓에 부착
+	WeaponMesh->AttachToComponent(
+		CharacterMesh,
+		FAttachmentTransformRules::SnapToTargetIncludingScale,
+		SocketName
+	);
+
+	UE_LOG(LogTemp, Log, TEXT("무기를 소켓 '%s'에 부착"), *SocketName.ToString());
+}
+
+void UP4WeaponComponent::GrabWeapon()
+{
+	UE_LOG(LogTemp, Warning, TEXT("=== GrabWeapon 함수 호출됨! ==="));
+
+	if (!WeaponMesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GrabWeapon: 장착된 무기가 없습니다!"));
+		return;
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("WeaponMesh 존재: %s"), *WeaponMesh->GetName());
+
+	// 등 → 손으로 이동
+	AttachWeaponToSocket(HandSocketName);
+
+	UE_LOG(LogTemp, Log, TEXT("무기를 손에 쥠 (발도)"));
+}
+
+void UP4WeaponComponent::SheathWeapon()
+{
+	if (!WeaponMesh)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("SheathWeapon: 장착된 무기가 없습니다!"));
+		return;
+	}
+
+	// 손 → 등으로 이동
+	AttachWeaponToSocket(BackSocketName);
+
+	UE_LOG(LogTemp, Log, TEXT("무기를 등에 꽂음 (납도)"));
+}
+
+
+void UP4WeaponComponent::CreateWeaponMesh(USkeletalMesh* Mesh)
+{
+	if (!Mesh) return;
+
+	ACharacter* OwnerCharacter = Cast<ACharacter>(GetOwner());
+	if (!OwnerCharacter) return;
+
+	// 무기 메시 컴포넌트 생성
+	WeaponMesh = NewObject<USkeletalMeshComponent>(OwnerCharacter, USkeletalMeshComponent::StaticClass());
+	WeaponMesh->SetSkeletalMesh(Mesh);
+	WeaponMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	WeaponMesh->SetCastShadow(true);
+	WeaponMesh->RegisterComponent();
+}
+
+void UP4WeaponComponent::DestroyWeaponMesh()
+{
+	if (WeaponMesh)
+	{
+		WeaponMesh->DestroyComponent();
+		WeaponMesh = nullptr;
+	}
+}
+
