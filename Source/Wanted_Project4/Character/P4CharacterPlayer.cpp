@@ -173,6 +173,34 @@ void AP4CharacterPlayer::HandleLook(const FInputActionValue& Value)
 	AddControllerPitchInput(LookValue.Y);
 }
 
+void AP4CharacterPlayer::HandleSuicide(const FInputActionValue& Value)
+{
+	if (!ASC) return;
+
+	FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+	// todo: 밑의 코드는 자기 자신만 사용하는거라 필요없다??
+	//Context.AddSourceObject(this);
+
+	// Suicide GE Load
+	FSoftClassPath GEPath(TEXT("/Game/Character/GE/BPGE_PlayerSuicide.BPGE_PlayerSuicide_C"));
+	TSoftClassPtr<UGameplayEffect> SuicideEffect(GEPath);
+
+	if (SuicideEffect.IsPending())
+	{
+		SuicideEffect.LoadSynchronous();
+	}
+
+	if (TSubclassOf<UGameplayEffect> GEClass = SuicideEffect.Get())
+	{
+		FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GEClass, 1.f, Context);
+		if (SpecHandle.IsValid())
+		{
+			ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
+
 //void AP4CharacterPlayer::SetupHUDWidget(UP4HUDWidget* InHudWidtet)
 //{
 //	if (InHudWidtet != nullptr)

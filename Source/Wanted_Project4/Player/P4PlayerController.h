@@ -54,13 +54,17 @@ private:
     TObjectPtr<UInputAction> LookAction;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UInputAction> SuicideAction;
+
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> JumpAction;
 
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> AttackAction;
 
 
-    //작성- 한승헌 일ㄹ시 2025.11.12
+
+    //작성- 한승헌 일시 2025.11.12
     //NPC와 상호작용을 위한 키 추가.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> InteractionAction;
@@ -76,6 +80,7 @@ private:
     // 입력 처리 함수
     void HandleMove(const FInputActionValue& Value);
     void HandleLook(const FInputActionValue& Value);
+    void HandleSuicide(const FInputActionValue& Value);
 
 
 //HUD 생성 -작성: 한승헌 -일시: 2025.11.07
