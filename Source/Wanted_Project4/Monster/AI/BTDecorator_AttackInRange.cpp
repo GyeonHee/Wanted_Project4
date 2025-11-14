@@ -16,9 +16,6 @@ UBTDecorator_AttackInRange::UBTDecorator_AttackInRange()
 bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	bool Result = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
-
-	// @Todo: 확인용
-	UE_LOG(LogTemp, Log, TEXT("여기는 들어오나?"))
 	
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (ControllingPawn == nullptr)

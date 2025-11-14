@@ -74,7 +74,7 @@ protected:
 
 	// 몬스터 피격 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> HitMontage;
+	TObjectPtr<class UAnimMontage> DamagedMontage;
 
 	// 몬스터 사망 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
