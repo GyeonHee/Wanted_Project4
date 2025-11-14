@@ -58,8 +58,6 @@ protected:
 	void DamagedActionBegin();
 	void DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
 	// 공격, 피격 애니메이션 진행 여부를 확인하기 위한 변수
-	bool IsAttacking = false;
-	bool IsDamaged = false;
 
 protected:
 	virtual void PostInitializeComponents() override;

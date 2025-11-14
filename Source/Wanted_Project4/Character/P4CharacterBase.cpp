@@ -15,6 +15,8 @@
 #include "Inventory/P4InventoryComponent.h"
 #include "Item/ItemDataBase.h"
 #include "UI/P4InventoryWidget.h"
+#include "AbilitySystemBlueprintLibrary.h"
+#include "Tag/P4GameplayTag.h"
 
 // Sets default values
 AP4CharacterBase::AP4CharacterBase()
@@ -125,8 +127,12 @@ void AP4CharacterBase::ApplyDamage(const float DamageAmount)
 	// todo: 알아먹게 수정
 	if (ASC)
 	{
-		// Hit 몽타주, 넉백 같은 즉각 반응
-		DamagedActionBegin();
+		// todo: Hit 몽타주, 넉백 같은 즉각 반응 -> ABP에서 처리
+		//DamagedActionBegin();
+
+		ASC->AddLooseGameplayTag(P4TAG_CHARACTER_ISDAMAGED);
+		// Damaged 모션동안 이동 막기
+		GetCharacterMovement()->SetMovementMode(MOVE_None);
 
 		// 받을 데미지 설정
 		AttributeSet->SetDamageAmount(DamageAmount);
@@ -164,7 +170,7 @@ void AP4CharacterBase::DamagedActionBegin()
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
-		IsDamaged = true;
+		ASC->AddLooseGameplayTag(P4TAG_CHARACTER_ISDAMAGED);
 
 		// Damaged 모션동안 이동 막기
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
@@ -182,7 +188,7 @@ void AP4CharacterBase::DamagedActionBegin()
 
 void AP4CharacterBase::DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
 {
-	IsDamaged = false;
+	ASC->RemoveLooseGameplayTag(P4TAG_CHARACTER_ISDAMAGED);
 
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
@@ -202,14 +208,26 @@ void AP4CharacterBase::PostInitializeComponents()
 
 void AP4CharacterBase::SetDead()
 {
-	// 이동 못하게 막기
-	GetCharacterMovement()->SetMovementMode(MOVE_None);
+	if (ASC)
+	{
+		// Dead Tag 부착
+		ASC->AddLooseGameplayTag(P4TAG_CHARACTER_ISDEAD);
 
-	// 사망 몽타주 재생
-	PlayDeadAnimation();
+		FGameplayEventData PayloadData;
+		UE_LOG(LogTemp, Log, TEXT("LETSGOOOOOOOOOOOOO"))
+		 // ASC가진 액터에 태그 부착(Character.State.IsDead) 해서 이 태그가 트리거 태그로 지정된 BPGA_AttackHitCheck 실행.
+		UAbilitySystemBlueprintLibrary::SendGameplayEventToActor(this, P4TAG_CHARACTER_ISDEAD, PayloadData);
+	}	
 
-	// 콜리전 끄기
-	SetActorEnableCollision(false);
+	// 이동 못하게 막기 -> GA_Death에서 처리
+	//GetCharacterMovement()->SetMovementMode(MOVE_None);
+
+	// 사망 몽타주 재생 -> ABP에서 몽타주 말고 시퀀스로 처리
+	// todo: 몽타주 관련 삭제
+	//PlayDeadAnimation();
+
+	// 콜리전 끄기 -> GA_Death에서 처리
+	//SetActorEnableCollision(false);
 
 	// DeadEventDelayTime 후 액터 삭제
 	//FTimerHandle DeadTimerHandle;

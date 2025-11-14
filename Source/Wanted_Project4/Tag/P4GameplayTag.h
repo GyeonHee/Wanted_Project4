@@ -1,9 +1,9 @@
-
+﻿
 #pragma once
 
 #include "GameplayTagContainer.h"
 
-//#define P4TAG_DATA_DAMAGE FGameplayTag::RequestGameplayTag(FName("Data.Damage"))
+#define P4TAG_CHARACTER_ISDAMAGED FGameplayTag::RequestGameplayTag(FName("Character.State.IsDamaged"))
 #define P4TAG_CHARACTER_ISDEAD FGameplayTag::RequestGameplayTag(FName("Character.State.IsDead"))
 // #define P4TAG_CHARACTER_INVINSIBLE FGameplayTag::RequestGameplayTag(FName("Character.State.Invinsible"))
 

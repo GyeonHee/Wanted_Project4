@@ -29,6 +29,7 @@ public:
 	// 입력 처리 함수
 	void HandleMove(const FInputActionValue& Value);
 	void HandleLook(const FInputActionValue& Value);
+	void HandleSuicide(const FInputActionValue& Value);
 
 
 	//작성- 한승헌 
