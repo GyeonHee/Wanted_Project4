@@ -54,4 +54,16 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Character)
 	float JumpingThreshould;
+
+public:
+	// -작성자: 노현기 -일시: 2025.11.13
+	// 카타나가 캐릭터에게 부착 되었는지
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	bool bIsEquipped;
+
+	// -작성자: 노현기 -일시: 2025.11.14
+	// 캐릭터가 발도를 해서 카타나를 손에 쥐고 있는지 ('V'키로 토글)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "State")
+	bool bIsKatanaOnHand;
+
 };

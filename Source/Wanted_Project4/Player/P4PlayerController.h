@@ -35,9 +35,10 @@ protected:
     // 인벤토리 토글 함수
     void ToggleInventory();
    
-    // 인벤토리 위젯에 옮길 예정
-    //// 마우스가 UI 위에 있는지 체크하는 함수
-    //bool IsMouseOverUI() const;
+    // -작성: 노현기 -일시: 2025.11.14
+    // 캐릭터 무기 장착 토글 함수
+    void ToggleHandOnWeapon();
+    
 
 public:
     //작성 한승헌 일시 2025.11.13
@@ -68,6 +69,16 @@ private:
     //NPC와 상호작용을 위한 키 추가.
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UInputAction> InteractionAction;
+
+    // -작성: 노현기 -일시: 2025.11.14
+    // 인벤토리 토글을 위한 키 추가
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UInputAction> InventoryAction;
+
+    // -작성: 노현기 -일시: 2025.11.14
+    // 카타나 발도/납도 하기위한 키 추가
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, Meta = (AllowPrivateAccess = "true"))
+    TObjectPtr<UInputAction> DrawKatanaAction;
 
     //작성 - 한승헌 2025-11-10
     //디버그용 데미지 주기.
@@ -114,4 +125,8 @@ private:
 
     // 인벤토리 창 띄우기 = false
     bool bIsInventoryVisible = false;
+
+    // -작성: 노현기 -일시: 2025.11.14
+    // 캐릭터 무기 들고있는 상태 토글
+    bool bIsEquip = false;
 };

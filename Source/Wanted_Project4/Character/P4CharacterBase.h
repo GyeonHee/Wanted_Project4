@@ -33,6 +33,10 @@ public:
 	// 인벤토리 컴포넌트 접근용
 	FORCEINLINE class UP4InventoryComponent* GetInventoryComponent() const { return InventoryComp; }
 
+	// -작성: 노현기 -일시: 2025.11.14
+	// 무기 컴포넌트 접근용
+	FORCEINLINE class UP4WeaponComponent* GetWeaponComponent() const { return WeaponComponent; }
+
 	// todo: 플레이어에 직접 둘지 아니면 플레이어가 오버라이드해야할지 모르겠음.
 	//void SetupGASInputComponent();
 
@@ -86,6 +90,11 @@ protected:
 	// 인벤토리 컴포넌트 (컨트롤러에서 접근)
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Inventory")
 	TObjectPtr<class UP4InventoryComponent> InventoryComp;
+
+	// -작성: 노현기 -일시: 2025.11.14
+	// 무기 컴포넌트 추가
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Weapon", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UP4WeaponComponent> WeaponComponent;
 
 protected:
 	//virtual void SetCharacterControlData(const class UABCharacterControlData* CharacterControlData);

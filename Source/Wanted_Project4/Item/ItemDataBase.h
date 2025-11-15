@@ -59,6 +59,7 @@ public:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Gameplay")
     TSubclassOf<UGameplayEffect> EquipmentPassiveEffect;
 
+
 protected:
     // 아이템 이름 (표시용)
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item")
@@ -72,9 +73,19 @@ protected:
     UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Tags")
     FGameplayTagContainer ItemTags;
 
+
     // 스택 수량
-    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Stats")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Stack")
     int32 MaxStackCount = 99;
 
+
+public:
+    // 장비 메시
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Visual")
+    TSoftObjectPtr<USkeletalMesh> EquipmentMesh;
+
+    // 장착 소켓 이름 (예: "hand_r_socket")
+    UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Item|Visual")
+    FName AttachSocketName;
 
 };

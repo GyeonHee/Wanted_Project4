@@ -17,6 +17,7 @@
 #include "UI/P4InventoryWidget.h"
 #include "AbilitySystemBlueprintLibrary.h"
 #include "Tag/P4GameplayTag.h"
+#include "Item/Equipment/P4WeaponComponent.h"
 
 // Sets default values
 AP4CharacterBase::AP4CharacterBase()
@@ -30,6 +31,10 @@ AP4CharacterBase::AP4CharacterBase()
 	// -작성: 노현기 -일시: 2025.11.10
 	// 인벤토리 컴포넌트 생성
 	InventoryComp = CreateDefaultSubobject<UP4InventoryComponent>(TEXT("InventoryComponent"));
+
+	// -작성: 노현기 -일시: 2025.11.14
+	// 무기 컴포넌트 생성
+	WeaponComponent = CreateDefaultSubobject<UP4WeaponComponent>(TEXT("WeaponComponent"));
 
 	// Pawn
 	bUseControllerRotationPitch = false;
@@ -108,17 +113,17 @@ AP4CharacterBase::AP4CharacterBase()
 		DeadMontage = DeadMontageRef.Object;
 	}
 
-	// Weapon Component
-	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
-	Weapon->SetupAttachment(GetMesh(), TEXT("hand_lSocket"));
+	//// Weapon Component
+	//Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	////Weapon->SetupAttachment(GetMesh(), TEXT("hand_RSocket"));
 
-	//todo: Load Weapon through Inventory
-	static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshRef(
-		TEXT("/Game/Weapon/Katana.Katana"));
-	if (WeaponMeshRef.Succeeded())
-	{
-		Weapon->SetSkeletalMesh(WeaponMeshRef.Object);
-	}
+	////todo: Load Weapon through Inventory
+	//static ConstructorHelpers::FObjectFinder<USkeletalMesh> WeaponMeshRef(
+	//	TEXT("/Game/Weapon/Katana.Katana"));
+	//if (WeaponMeshRef.Succeeded())
+	//{
+	//	Weapon->SetSkeletalMesh(WeaponMeshRef.Object);
+	//}
 	
 }
 

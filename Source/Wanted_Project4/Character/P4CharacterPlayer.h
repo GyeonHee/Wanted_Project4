@@ -36,6 +36,10 @@ public:
 	//일시- 2025.11.14 
 	// 캐릭터가 인터렉트하고있는 액터.
 	TObjectPtr<AActor> CurrentInteractActor;
+
+	// -작성자: 노현기 -일시: 2025.11.14
+	FORCEINLINE class UAnimMontage* GetDrawKatanaMontage() const { return DrawKatanaMontage; }
+	FORCEINLINE class UAnimMontage* GetSheathKatanaMontage() const { return SheathKatanaMontage; }
 	
 protected:
 	// components.
@@ -64,6 +68,13 @@ protected:
 	///Script/Engine.AnimMontage'/Game/Character/Animation/AM_Rolling.AM_Rolling'
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> RunMontage;
+
+	// -작성자: 노현기 -일시: 2025.11.14
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DrawKatanaMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> SheathKatanaMontage;
 public:
 	// GAS
 	UPROPERTY(EditAnywhere, Category = GAS)
