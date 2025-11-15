@@ -40,6 +40,12 @@ AP4PlayerController::AP4PlayerController()
 		LookAction = LookActionRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UInputAction> SuicideActionRef(TEXT("/Game/Character/Input/Action/IA_Suicide.IA_Suicide"));
+	if (SuicideActionRef.Succeeded())
+	{
+		SuicideAction = SuicideActionRef.Object;
+	}
+
 	static ConstructorHelpers::FObjectFinder<UInputAction> JumpActionRef(TEXT("/Game/Character/Input/Action/IA_Jump.IA_Jump"));
 	if (JumpActionRef.Succeeded())
 	{
@@ -228,6 +234,7 @@ void AP4PlayerController::SetupInputComponent()
 	{
 		EIC->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleMove);
 		EIC->BindAction(LookAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleLook);
+		EIC->BindAction(SuicideAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleSuicide);
 		//EIC->BindAction(JumpAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleJumpStart);
 		//EIC->BindAction(JumpAction, ETriggerEvent::Completed, this, &AP4PlayerController::HandleJumpEnd);
 
@@ -263,7 +270,7 @@ void AP4PlayerController::SetupGASInputBindings(UAbilitySystemComponent* ASC)
 		//작성: 한승헌
 		//일시: 2025.11.12
 		//NPC와 상호작용을 위한 입력 키.
-		EIC->BindAction(InteractionAction, ETriggerEvent::Triggered, this, &AP4PlayerController::HandleAbilityPressed, 2);
+		EIC->BindAction(InteractionAction, ETriggerEvent::Started, this, &AP4PlayerController::HandleAbilityPressed, 2);
 	}
 }
 
@@ -310,6 +317,14 @@ void AP4PlayerController::HandleLook(const FInputActionValue& Value)
 	if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(GetPawn()))
 	{
 		CharacterPlayer->HandleLook(Value);
+	}
+}
+
+void AP4PlayerController::HandleSuicide(const FInputActionValue& Value)
+{
+	if (AP4CharacterPlayer* CharacterPlayer = Cast<AP4CharacterPlayer>(GetPawn()))
+	{
+		CharacterPlayer->HandleSuicide(Value);
 	}
 }
 

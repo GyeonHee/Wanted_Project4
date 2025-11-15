@@ -24,6 +24,12 @@ protected:
 	virtual void SetupAttackDelegate() override;
 
 	// 몬스터 스킬별 공격 판정 함수
+
+
+	//작성 - 한승헌
+	//일시 - 2025.11.14
+	//자그라스 죽으면 메세지 전송하는거를 위한 SetDead 오버라이딩.
+	virtual void SetDead() override;
 protected:
 	void MeleeAttack();
 

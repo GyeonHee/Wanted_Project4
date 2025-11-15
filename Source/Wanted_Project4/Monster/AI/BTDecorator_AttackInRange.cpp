@@ -16,9 +16,6 @@ UBTDecorator_AttackInRange::UBTDecorator_AttackInRange()
 bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) const
 {
 	bool Result = Super::CalculateRawConditionValue(OwnerComp, NodeMemory);
-
-	// @Todo: 확인용
-	UE_LOG(LogTemp, Log, TEXT("여기는 들어오나?"))
 	
 	APawn* ControllingPawn = OwnerComp.GetAIOwner()->GetPawn();
 	if (ControllingPawn == nullptr)
@@ -49,7 +46,6 @@ bool UBTDecorator_AttackInRange::CalculateRawConditionValue(UBehaviorTreeCompone
 	
 	// 타겟과의 거리
 	float TargetDistance = ControllingPawn->GetDistanceTo(Target);
-	UE_LOG(LogTemp, Log, TEXT("TargetDistance: %f"), TargetDistance);
 
 	// 사거리 안에 있으면 공격
 	return (TargetDistance <= AttackRange);

@@ -5,6 +5,11 @@
 #include "GameFramework/Character.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
+
+#include "Character/P4CharacterBase.h"
+#include "AbilitySystemComponent.h"
+#include "Tag/P4GameplayTag.h"
+
 UP4PlayerAnimInstance::UP4PlayerAnimInstance()
 {
 	MovingThreshould = 3.0f;
@@ -34,4 +39,24 @@ void UP4PlayerAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 		bIsFalling = Movement->IsFalling();
 		bIsJumping = bIsFalling & (Velocity.Z > JumpingThreshould);
 	}
+
+	AP4CharacterBase* Character = Cast<AP4CharacterBase>(GetOwningActor());
+	if (Character)
+	{
+		if (Character->GetAbilitySystemComponent()->HasMatchingGameplayTag(P4TAG_CHARACTER_ISDEAD))
+		{
+			bIsDead = true;
+		}
+		//todo: testcode
+		else if (Character->GetAbilitySystemComponent()->HasMatchingGameplayTag(P4TAG_CHARACTER_ISDAMAGED))
+		{
+			bIsDamaged = true;
+		}
+		else
+		{
+			bIsDead = false;
+			bIsDamaged = false;
+		}
+	}
+	
 }

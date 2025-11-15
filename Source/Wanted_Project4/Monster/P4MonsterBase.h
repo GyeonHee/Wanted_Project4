@@ -6,9 +6,11 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 #include "Interface/MonsterAIInterface.h"
-#include "Interface/P4MonsterDamageInterface.h"
+#include "Interface/P4DamageableInterface.h"
 #include "Stat/P4MonsterAttributeSet.h"
 #include "Wanted_Project4/Interface/AnimationAttackInterface.h"
+#include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/BlackboardData.h"
 //#include "GameplayCueInterface.h"  // Cue 인터페이스 정의 포함
 #include "P4MonsterBase.generated.h"
 
@@ -21,7 +23,7 @@ class WANTED_PROJECT4_API AP4MonsterBase
 	  public IAbilitySystemInterface,
 	  public IAnimationAttackInterface,
 	  public IMonsterAIInterface,
-	  public IP4MonsterDamageInterface//, public IGameplayCueInterface
+	  public IP4DamageableInterface //, public IGameplayCueInterface
 {
 	GENERATED_BODY()
 
@@ -47,11 +49,11 @@ public:
 public:
 	// 공격 받았을 경우 처리 함수
 	UFUNCTION(BlueprintCallable, Category = Monster)
-	virtual void MonsterApplyDamage(const float DamageAmount) override;
+	virtual void ApplyDamage(const float DamageAmount) override;
 
 	// 공격할 시 데미지 주는 처리 함수
 	UFUNCTION(BlueprintCallable, Category = Monster)
-	virtual void MonsterGiveDamage(AActor* TargetActor, const float DamageAmount) override;
+	virtual void GiveDamage(AActor* TargetActor, const float DamageAmount) override;
 
 	//virtual void HandleGameplayCue(
 	//	AActor* MyTarget,
@@ -62,6 +64,10 @@ public:
 
 	// Monster AI Interface 구현
 public:
+	// BB, BT 반환
+	FORCEINLINE virtual UBlackboardData* GetBBAsset() const override { return BBAsset; }
+	FORCEINLINE virtual UBehaviorTree* GetBTAsset() const override { return BTAsset; }
+
 	// AttributeSet 에 있음
 	FORCEINLINE virtual float GetAIDetectRange() override { return AttributeSet->GetDetectRange(); }
 	FORCEINLINE virtual float GetAIChaseRange() override { return AttributeSet->GetChaseRange(); }
@@ -88,15 +94,15 @@ public:
 	virtual void AttackActionBegin(FName& InAttackMontageSectionName, const float AttackSpeed);
 	void AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
 
-	// Hit 몽타주 실행 및 종료 시 호출될 함수
-	virtual void HitActionBegin();
-	void HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+	// Damaged 몽타주 실행 및 종료 시 호출될 함수
+	virtual void DamagedActionBegin();
+	void DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
 
 	// 공격, 피격 애니메이션 진행 여부를 확인하기 위한 변수
-	virtual bool GetIsHitting() override { return IsHitting; }
+	virtual bool GetIsDamaged() override { return IsDamaged; }
 	virtual bool GetIsAttacking() override { return IsAttacking; }
 	bool IsAttacking = false;
-	bool IsHitting = false;
+	bool IsDamaged = false;
 
 protected:
 	// 몬스터가 죽었을 시 실행 될 함수
@@ -133,12 +139,18 @@ protected:
 
 	// 몬스터 피격 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<class UAnimMontage> HitMontage;
+	TObjectPtr<class UAnimMontage> DamagedMontage;
 
 	// 몬스터 사망 몽타주
 	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
 
+protected:
+	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UBlackboardData> BBAsset;
+
+	UPROPERTY(EditAnywhere, Category = MonsterControl, meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UBehaviorTree> BTAsset;
 
 	// 몬스터 공격 관리 섹션
 protected:

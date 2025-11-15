@@ -1,4 +1,4 @@
-// Fill out your copyright notice in the Description page of Project Settings.
+﻿// Fill out your copyright notice in the Description page of Project Settings.
 
 
 #include "P4MonsterJagras.h"
@@ -7,6 +7,7 @@
 #include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/BoxComponent.h"
 #include "Physics/P4Collision.h"
+#include "Game/P4GameInstance.h"
 
 AP4MonsterJagras::AP4MonsterJagras()
 {
@@ -47,12 +48,12 @@ AP4MonsterJagras::AP4MonsterJagras()
 		AttackActionMontage = AttackActionMontageRef.Object;
 	}
 
-	static ConstructorHelpers::FObjectFinder<UAnimMontage> HitMontageRef(
-		TEXT("/Game/Monster/Model/Jagras/AM_Jagras_Hit.AM_Jagras_Hit")
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> DamagedMontageRef(
+		TEXT("/Game/Monster/Model/Jagras/AM_Jagras_Damaged.AM_Jagras_Damaged")
 	);
-	if (HitMontageRef.Succeeded())
+	if (DamagedMontageRef.Succeeded())
 	{
-		HitMontage = HitMontageRef.Object;
+		DamagedMontage = DamagedMontageRef.Object;
 	}
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> DeadMontageRef(
@@ -96,6 +97,26 @@ void AP4MonsterJagras::SetupAttackDelegate()
 	AttackDelegates = {Patern1};
 }
 
+void AP4MonsterJagras::SetDead()
+{
+	Super::SetDead();
+
+	//-작성: 한승헌
+	//-일시: 2025.11.13
+	//-내용: 퀘스트 시스템을 제작하여 테스트용으로 작성합니다.
+	auto* GI = GetWorld()->GetGameInstance<UP4GameInstance>();
+
+	if ((GI != nullptr) && (GI->QuestManager != nullptr))
+	{
+		if (GI->QuestManager->IsQuestActive() == false)
+		{
+			return;
+		}
+
+		GI->QuestManager->UpdateObjective(TEXT("Jagras_Kill"));
+	}
+}
+
 void AP4MonsterJagras::MeleeAttack()
 {
 	FVector Start =
@@ -119,7 +140,7 @@ void AP4MonsterJagras::MeleeAttack()
 		Start,
 		End,
 		FQuat::Identity,
-		ECC_GameTraceChannel1,
+		ECC_GameTraceChannel2,
 		FCollisionShape::MakeSphere(AttackRadius),
 		Params
 	);
@@ -148,7 +169,15 @@ void AP4MonsterJagras::MeleeAttack()
 
 	if (HitDetected)
 	{
+		// @MobTODO: 몬스터 충돌 판정 확인용
+		UE_LOG(LogTemp, Log, TEXT("몬스터 공격 시 충돌된 오브젝트: %s"), *OutHitResult.GetActor()->GetName());
+		
 		// 다른 액터가 공격 당했을 시 처리
-		MonsterGiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
+		GiveDamage(OutHitResult.GetActor(), AttributeSet->GetAttack());
+	}
+	else
+	{
+		// @MobTODO: 몬스터 충돌 판정 확인용
+		UE_LOG(LogTemp, Log, TEXT("몬스터 공격 시 충돌된 오브젝트가 없습니다."));
 	}
 }

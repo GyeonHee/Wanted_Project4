@@ -71,6 +71,8 @@ void UP4QuestManager::StartQuest(int32 QuestCode)
 	UE_LOG(LogTemp, Display, TEXT("Quest %d Started: %s"),
 		QuestCode,
 		*Quest->QuestName.ToString());
+
+	OnQuestStarted.Broadcast();
 }
 
 void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
@@ -95,6 +97,10 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 
 	const FP4StageDetails& CurrentStage = Quest->Stages[CurrentStageIndex];
 
+
+	//이번 호출에서 실제로 진행도가 변화하였는지?
+	bool bProgressChanged = false;
+
 	// 1) 일단 일치하는 Objective에 대해 Progress 증가
 	for (const FP4ObjectiveDetails& Obj : CurrentStage.Objectives)
 	{
@@ -107,10 +113,17 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 			{
 				CurrentValue++;
 
+				bProgressChanged = true;
+
 				UE_LOG(LogTemp, Log, TEXT("Objective %s progress: %d / %d"),
 					*ObjectiveID, CurrentValue, Obj.Quantity);
 			}
 		}
+	}
+
+	if (bProgressChanged == true)
+	{
+		OnQuestUpdated.Broadcast();
 	}
 
 	//2) 스테이지 전체 완료 여부 체크.
@@ -158,6 +171,8 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 
 		UE_LOG(LogTemp, Log, TEXT("Move to Stage %d of Quest %d"),
 			CurrentStageIndex, CurrentQuestCode);
+
+		OnQuestUpdated.Broadcast();
 	}
 	else
 	{
@@ -168,6 +183,8 @@ void UP4QuestManager::UpdateObjective(const FString& ObjectiveID)
 		CurrentQuestCode = -1;
 		CurrentStageIndex = 0;
 		ObjectiveProgress.Empty();
+
+		OnQuestCleared.Broadcast();
 	}
 }
 
@@ -179,4 +196,32 @@ int32 UP4QuestManager::GetObjectiveProgress(const FString& ObjectiveID) const
 	}
 
 	return 0;
+}
+
+const FP4QuestInfo* UP4QuestManager::GetCurrentQuest() const
+{
+	if (bQuestActive == false || CurrentQuestCode == -1)
+	{
+		UE_LOG(LogTemp, Display, TEXT("현재 퀘스트중이 아닙니다."));
+		return nullptr;
+	}
+
+	return GetQuest(CurrentQuestCode);
+}
+
+const FP4StageDetails* UP4QuestManager::GetCurrentStage() const
+{
+	const FP4QuestInfo* Quest = GetCurrentQuest();
+
+	if (Quest == nullptr)
+	{
+		return nullptr;
+	}
+
+	if (Quest->Stages.IsValidIndex(CurrentStageIndex) == false)
+	{
+		return nullptr;
+	}
+
+	return &Quest->Stages[CurrentStageIndex];
 }

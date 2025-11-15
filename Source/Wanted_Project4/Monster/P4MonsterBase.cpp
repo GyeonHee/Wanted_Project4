@@ -6,7 +6,7 @@
 #include "AbilitySystemBlueprintLibrary.h"
 #include "AbilitySystemComponent.h"
 #include "AI/P4MonsterAIController.h"
-#include "Attribute/P4PlayerAttributeSet.h"
+//#include "Attribute/P4PlayerAttributeSet.h"
 #include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "Physics/P4Collision.h"
@@ -14,7 +14,7 @@
 #include "Stat/P4MonsterStatComponent.h"
 //#include "GameplayTagContainer.h"	HandleGameplayCue()
 //#include "GameplayEffectTypes.h"	HandleGameplayCue()
-#include "P4GameInstance.h"
+#include "Game/P4GameInstance.h"
 
 class UP4PlayerAttributeSet;
 // Sets default values
@@ -36,14 +36,27 @@ AP4MonsterBase::AP4MonsterBase()
 		MonsterStatData = DataTableRef.Object;
 	}
 
+	static ConstructorHelpers::FObjectFinder<UBlackboardData> BBAssetRef(
+		TEXT("/Game/Monster/AI/BB_Monster.BB_Monster")
+	);
+	if (BBAssetRef.Succeeded())
+	{
+		BBAsset = BBAssetRef.Object;
+	}
+
+	static ConstructorHelpers::FObjectFinder<UBehaviorTree> BTAssetRef(
+		TEXT("/Game/Monster/AI/BT_Monster.BT_Monster")
+	);
+	if (BTAssetRef.Succeeded())
+	{
+		BTAsset = BTAssetRef.Object;
+	}
+	
 	// AI 설정===========================================
 	AIControllerClass = AP4MonsterAIController::StaticClass();
 
 	// 맵에 배치 또는 생성 시 MonsterAIController 에 빙의되도록
 	AutoPossessAI = EAutoPossessAI::PlacedInWorldOrSpawned;
-
-	// @Todo: 테스트용 임시
-	//MonsterID = FName("Jagras");
 }
 
 void AP4MonsterBase::BeginPlay()
@@ -104,12 +117,12 @@ void AP4MonsterBase::AttackHitCheck()
 //	}
 //}
 
-void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
+void AP4MonsterBase::ApplyDamage(const float DamageAmount)
 {
 	if (ASC)
 	{
-		// Hit 몽타주 실행
-		HitActionBegin();
+		// Damaged 몽타주 실행
+		DamagedActionBegin();
 
 		// 체력 감소 적용 부분
 		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
@@ -145,22 +158,28 @@ void AP4MonsterBase::MonsterApplyDamage(const float DamageAmount)
 	}
 }
 
-void AP4MonsterBase::MonsterGiveDamage(AActor* TargetActor, const float DamageAmount)
+void AP4MonsterBase::GiveDamage(AActor* TargetActor, const float DamageAmount)
 {
-	UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
-	if (!TargetASC)
+	// todo: Player만 데미지 전달하는걸로 바꾸기
+	if (IP4DamageableInterface* Character = Cast<IP4DamageableInterface>(TargetActor))
 	{
-		return;
+		Character->ApplyDamage(DamageAmount); // 공격자 정보도 전달
 	}
 
-	UP4PlayerAttributeSet* TargetAttribute = const_cast<UP4PlayerAttributeSet*>(TargetASC->GetSet<UP4PlayerAttributeSet>());
-	if (!TargetAttribute)
-	{
-		return;
-	}
-	
-	// todo: 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
-	TargetAttribute->SetHealth(TargetAttribute->GetHealth() - DamageAmount);
+	//UAbilitySystemComponent* TargetASC = UAbilitySystemBlueprintLibrary::GetAbilitySystemComponent(TargetActor);
+	//if (!TargetASC)
+	//{
+	//	return;
+	//}
+
+	//UP4PlayerAttributeSet* TargetAttribute = const_cast<UP4PlayerAttributeSet*>(TargetASC->GetSet<UP4PlayerAttributeSet>());
+	//if (!TargetAttribute)
+	//{
+	//	return;
+	//}
+	//
+	//// 일단 Player 의 Attribute에 직접 접근하여 감소 시킴
+	//TargetAttribute->SetHealth(TargetAttribute->GetHealth() - DamageAmount);
 }
 
 void AP4MonsterBase::AttackByAI()
@@ -213,7 +232,7 @@ void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupt
 	IsAttacking = false;
 	
 	// 피격 모션이 진행중이 아니라면
-	if (IsHitting == false)
+	if (IsDamaged == false)
 	{
 	    // 무브먼트 모드 복구
 	    GetCharacterMovement()->SetMovementMode(MOVE_Walking);
@@ -223,38 +242,38 @@ void AP4MonsterBase::AttackActionEnd(UAnimMontage* TargetMontage, bool Interrupt
 	NotifyActionEnd();
 }
 
-void AP4MonsterBase::HitActionBegin()
+void AP4MonsterBase::DamagedActionBegin()
 {
-	// Hit 몽타주 실행
+	// Damaged 몽타주 실행
 	UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance();
 	if (AnimInstance)
 	{
-		IsHitting = true;
+		IsDamaged = true;
 				
-		// @Todo: 임시 Hit 모션 시작 로그
-		UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Hit Action Begin"));
+		// @Todo: 임시 Damaged 모션 시작 로그
+		UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Damaged Action Begin"));
 		
-		// Hit 모션동안 이동 막기
+		// Damaged 모션동안 이동 막기
 		GetCharacterMovement()->SetMovementMode(MOVE_None);
 
-		// Hit 몽타주 재생
-		AnimInstance->Montage_Play(HitMontage, 1.f);
+		// Damaged 몽타주 재생
+		AnimInstance->Montage_Play(DamagedMontage, 1.f);
 
 		FOnMontageEnded OnMontageEnded;
 		OnMontageEnded.BindUObject(
-			this, &AP4MonsterBase::HitActionEnd
+			this, &AP4MonsterBase::DamagedActionEnd
 		);
 
-		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, HitMontage);
+		AnimInstance->Montage_SetEndDelegate(OnMontageEnded, DamagedMontage);
 	}
 }
 
-void AP4MonsterBase::HitActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
+void AP4MonsterBase::DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted)
 {	
-	// @Todo: 임시 Hit 모션 끝 로그
-	UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Hit Action End"));
+	// @Todo: 임시 Damaged 모션 끝 로그
+	UE_LOG(LogTemp, Log, TEXT("[Monster] Monster Damaged Action End"));
 
-	IsHitting = false;
+	IsDamaged = false;
 	
 	GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 }
@@ -294,17 +313,6 @@ void AP4MonsterBase::SetDead()
 		DeadEventDelayTime,
 		false
 	);
-
-
-	//-작성: 한승헌
-	//-일시: 2025.11.13
-	//-내용: 퀘스트 시스템을 제작하여 테스트용으로 작성합니다.
-	auto* GI = GetWorld()->GetGameInstance<UP4GameInstance>();
-
-	if ((GI != nullptr) && (GI->QuestManager != nullptr))
-	{
-		GI->QuestManager->UpdateObjective(TEXT("Jagras_Kill"));
-	}
 }
 
 void AP4MonsterBase::SetupAttackDelegate()

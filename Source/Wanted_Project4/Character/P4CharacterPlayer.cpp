@@ -70,7 +70,6 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 	MapViewrCapture->CaptureSource = ESceneCaptureSource::SCS_FinalColorHDR;
 
 	//작성: 한승헌 -일시 : 2025.11.11
-
 	static ConstructorHelpers::FObjectFinder<UTextureRenderTarget2D> MiniMapRef(TEXT("/Game/UI/MiniMap/MiniMapRenderTarget.MiniMapRenderTarget"));
 
 	if (MiniMapRef.Succeeded() == true)
@@ -90,6 +89,12 @@ AP4CharacterPlayer::AP4CharacterPlayer()
 		//CompassSprite->GetSourceTexture() = CompassTextureRef.Object;
 	}
 	//여기까지가 미니맵 코드입니다. - 작성: 한승헌.
+
+
+	//작성-한승헌
+	//일시- 2025.11.14
+	//현재 인터렉스하고 있는 액터 포인터 초기화.
+	CurrentInteractActor = nullptr;
 }
 
 void AP4CharacterPlayer::GASInputPressed(int32 InputId)
@@ -168,6 +173,34 @@ void AP4CharacterPlayer::HandleLook(const FInputActionValue& Value)
 	// 마우스 좌우 드래그 입력을 컨트롤러의 Y축 회전(피치, Pitch)에 적용.
 	AddControllerPitchInput(LookValue.Y);
 }
+
+void AP4CharacterPlayer::HandleSuicide(const FInputActionValue& Value)
+{
+	if (!ASC) return;
+
+	FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+	// todo: 밑의 코드는 자기 자신만 사용하는거라 필요없다??
+	//Context.AddSourceObject(this);
+
+	// Suicide GE Load
+	FSoftClassPath GEPath(TEXT("/Game/Character/GE/BPGE_PlayerSuicide.BPGE_PlayerSuicide_C"));
+	TSoftClassPtr<UGameplayEffect> SuicideEffect(GEPath);
+
+	if (SuicideEffect.IsPending())
+	{
+		SuicideEffect.LoadSynchronous();
+	}
+
+	if (TSubclassOf<UGameplayEffect> GEClass = SuicideEffect.Get())
+	{
+		FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(GEClass, 1.f, Context);
+		if (SpecHandle.IsValid())
+		{
+			ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+}
+
 
 //void AP4CharacterPlayer::SetupHUDWidget(UP4HUDWidget* InHudWidtet)
 //{

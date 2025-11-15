@@ -18,6 +18,11 @@
 /**
  * 
  */
+
+DECLARE_MULTICAST_DELEGATE(FOnQuestStarted);
+DECLARE_MULTICAST_DELEGATE(FOnQuestUpdated);
+DECLARE_MULTICAST_DELEGATE(FOnQuestCleared);
+
 UCLASS()
 class WANTED_PROJECT4_API UP4QuestManager : public UObject
 {
@@ -35,6 +40,9 @@ public:
 
 	UFUNCTION(BlueprintPure, Category = Quest)
 	int32 GetObjectiveProgress(const FString& ObjectiveID) const; //현재 Object(퀘스트목표) 진행도 조회.
+
+	const FP4QuestInfo* GetCurrentQuest() const;
+	const FP4StageDetails* GetCurrentStage() const;
 
 	//Getter 섹션.
 public:
@@ -70,7 +78,10 @@ public:
 
 	TMap<FString, int32> ObjectiveProgress; //ObjectiveId를 키로 사용해서 현재 카운트에 접근.
 
-
+	//델리게이트
+	FOnQuestStarted OnQuestStarted;
+	FOnQuestUpdated OnQuestUpdated;
+	FOnQuestCleared OnQuestCleared;
 
 
 protected:

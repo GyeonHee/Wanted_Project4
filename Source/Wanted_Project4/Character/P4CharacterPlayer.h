@@ -29,6 +29,13 @@ public:
 	// 입력 처리 함수
 	void HandleMove(const FInputActionValue& Value);
 	void HandleLook(const FInputActionValue& Value);
+	void HandleSuicide(const FInputActionValue& Value);
+
+
+	//작성- 한승헌 
+	//일시- 2025.11.14 
+	// 캐릭터가 인터렉트하고있는 액터.
+	TObjectPtr<AActor> CurrentInteractActor;
 
 	// -작성자: 노현기 -일시: 2025.11.14
 	FORCEINLINE class UAnimMontage* GetDrawKatanaMontage() const { return DrawKatanaMontage; }

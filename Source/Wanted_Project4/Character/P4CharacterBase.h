@@ -6,12 +6,15 @@
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
 //#include "Interface/AnimationAttackInterface.h"
+#include "Interface/P4DamageableInterface.h"
 #include "Interface/P4CharacterWidgetInterface.h"
 #include "P4CharacterBase.generated.h"
 
 UCLASS()
 class WANTED_PROJECT4_API AP4CharacterBase : 
-	public ACharacter, public IAbilitySystemInterface,
+	public ACharacter,
+	public IAbilitySystemInterface,
+	public IP4DamageableInterface,
 	public IP4CharacterWidgetInterface
 {
 	GENERATED_BODY()
@@ -24,7 +27,7 @@ public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 
 	// AttributeSet 접근용
-	class UAttributeSet* GetAttributeSet() const { return AttributeSet; }
+	class UP4PlayerAttributeSet* GetAttributeSet() const { return AttributeSet; }
 
 	// -작성: 노현기 -일시: 2025.11.10
 	// 인벤토리 컴포넌트 접근용
@@ -37,13 +40,28 @@ public:
 	// todo: 플레이어에 직접 둘지 아니면 플레이어가 오버라이드해야할지 모르겠음.
 	//void SetupGASInputComponent();
 
+
+public:
+	// 공격 받았을 경우 처리 함수
+	UFUNCTION(BlueprintCallable, Category = Monster)
+	virtual void ApplyDamage(const float DamageAmount) override;
+
+	// 공격할 시 데미지 주는 처리 함수
+	UFUNCTION(BlueprintCallable, Category = Monster)
+	virtual void GiveDamage(AActor* TargetActor, const float DamageAmount) override;
+
+
 public:
 	FORCEINLINE virtual class UAnimMontage* GetDefaultAttackMontage() const { return DefaultAttackMontage; }
 	//FORCEINLINE virtual class UAnimMontage* GetJumpMontage() const { return JumpMontage; }
 	//FORCEINLINE class UABComboActionData* GetComboActionData() const { return ComboActionData; }
 	FORCEINLINE class UAnimMontage* GetDeadMontage() const { return DeadMontage; }
 	
-
+protected:
+	// Damaged 몽타주 실행 및 종료 시 호출될 함수
+	void DamagedActionBegin();
+	void DamagedActionEnd(UAnimMontage* TargetMontage, bool Interrupted);
+	// 공격, 피격 애니메이션 진행 여부를 확인하기 위한 변수
 
 protected:
 	virtual void PostInitializeComponents() override;
@@ -66,7 +84,7 @@ protected:
 
 	// AttributeSet
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "GAS")
-	TObjectPtr<class UAttributeSet> AttributeSet;
+	TObjectPtr<class UP4PlayerAttributeSet> AttributeSet;
 
 	// -작성: 노현기 -일시: 2025.11.10
 	// 인벤토리 컴포넌트 (컨트롤러에서 접근)
@@ -92,6 +110,9 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAnimMontage> DeadMontage;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Stat, Meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAnimMontage> DamagedMontage;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Equipment, Meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class USkeletalMeshComponent> Weapon;
