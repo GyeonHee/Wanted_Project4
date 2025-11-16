@@ -2,3 +2,28 @@
 *.umap filter=lfs diff=lfs merge=lfs -text
 
 Content/Blueprint/BP_P4CharacterPlayer.uasset -filter -diff -merge -text
+
+Content/Blueprint/BP_NPC_DollCat.uasset -filter -diff -merge -text
+Content/Blueprint/BP_P4GameInstacnce.uasset -filter -diff -merge -text
+Content/Blueprint/BP_P4GameMode.uasset -filter -diff -merge -text
+Content/Blueprint/BP_P4PlayerController.uasset -filter -diff -merge -text
+
+Content/Character/GA/BPGA_Attack.uasset -filter -diff -merge -text
+Content/Character/GA/BPGA_AttackHitCheck.uasset -filter -diff -merge -text
+Content/Character/GA/BPGA_Death.uasset -filter -diff -merge -text
+Content/Character/GA/BPGA_Interaction.uasset -filter -diff -merge -text
+Content/Character/GA/BPGA_Jump.uasset -filter -diff -merge -text
+
+Content/Character/GE/BPGE_PlayerDamaged.uasset -filter -diff -merge -text
+Content/Character/GE/BPGE_PlayerHealedHealth.uasset -filter -diff -merge -text
+Content/Character/GE/BPGE_PlayerIncreaseMaxHealth.uasset -filter -diff -merge -text
+Content/Character/GE/BPGE_PlayerSuicide.uasset -filter -diff -merge -text
+
+Content/Character/Input/IMC_Default.uasset -filter -diff -merge -text
+
+Content/Character/Animation/ABP_P4Character.uasset -filter -diff -merge -text
+Content/Monster/Animation/ABP_Jagras.uasset -filter -diff -merge -text
+Content/Monster/Animation/ABP_Namielle.uasset -filter -diff -merge -text
+Content/NPC/DollCat/Animations/ABP_NPCTest.uasset -filter -diff -merge -text
+
+Content/Quest/QuestData.uasset -filter -diff -merge -text
