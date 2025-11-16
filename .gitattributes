@@ -1,3 +1,4 @@
 *.uasset filter=lfs diff=lfs merge=lfs -text
 *.umap filter=lfs diff=lfs merge=lfs -text
-Blueprint/BP_P4CharacterPlayer.uasset -filter -diff -merge -text
+
+Content/Blueprint/BP_P4CharacterPlayer.uasset -filter -diff -merge -text
